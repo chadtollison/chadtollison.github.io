@@ -1,0 +1,5 @@
+Updated portfolio for chadtollison.github.io
+
+Replace index.html in chadtollison/chadtollison.github.io on the main branch with the included index.html. The included styles.css and script.js match the existing files and are provided for local preview. GitHub Pages will publish after the repository update.
+
+Changes: anonymized 2026 reliability, security, and data-reporting case studies; updated Babel Street experience and security keywords; 23 bugs reported through October 2, 2026 instead of the older unreconciled issue count.

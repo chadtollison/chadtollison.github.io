@@ -56,8 +56,36 @@
           <p>Customer organizations supported by enterprise identity integrations</p>
         </article>
         <article class="reactive" data-glow>
-          <strong data-counter data-value="35" data-suffix="+">35+</strong>
-          <p>Production issues surfaced in six months before customer impact</p>
+          <strong data-counter data-value="23" data-suffix="">23</strong>
+          <p>Bugs identified and reported in 2026 YTD through October 2</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="engineering-2026" data-reveal>
+      <div class="title"><h2>2026 production engineering</h2></div>
+      <p class="intro">Selected work through October 2, 2026 across application reliability, security remediation, and usage analytics.</p>
+      <div class="grid">
+        <article class="card reactive" data-glow data-tilt>
+          <small>RELIABILITY CASE STUDY</small><h3>Handling API timeouts</h3>
+          <p><strong>Problem:</strong> Heavy search filters triggered downstream REST timeouts.</p>
+          <p><strong>Change:</strong> Updated RestSharp handling to permit retries on timeout for the affected requests.</p>
+          <p><strong>Result:</strong> Added a retry path for transient timeout failures in complex searches.</p>
+          <div class="tags"><span>C#/.NET</span><span>REST APIs</span><span>Production Support</span></div>
+        </article>
+        <article class="card reactive" data-glow data-tilt>
+          <small>SECURITY CASE STUDY</small><h3>Remediating application findings</h3>
+          <p><strong>Problem:</strong> Static analysis and dependency scanning surfaced security weaknesses across multiple services.</p>
+          <p><strong>Change:</strong> Addressed CodeQL findings, regex denial-of-service risks, insecure random generation, URL validation, dependency CVEs, and TLS certificate handling.</p>
+          <p><strong>Result:</strong> Corrected flagged security weaknesses in application code and dependencies.</p>
+          <div class="tags"><span>CodeQL</span><span>SSRF</span><span>ReDoS</span><span>TLS</span></div>
+        </article>
+        <article class="card feature reactive" data-glow data-tilt>
+          <small>DATA ENGINEERING CASE STUDY</small><h3>Making product usage observable</h3>
+          <p><strong>Problem:</strong> Usage reporting and operations needed recurring API metrics and consistent login/session records.</p>
+          <p><strong>Change:</strong> Built a daily multi-job runner that collects per-endpoint API metrics into SQL and CloudWatch, added session start/end tracking, and delivered usage and monthly login reports.</p>
+          <p><strong>Result:</strong> Automated recurring metric collection and provided reporting datasets for product usage and operational monitoring.</p>
+          <div class="tags"><span>ETL</span><span>SQL Server</span><span>CloudWatch</span><span>Usage Reporting</span></div>
         </article>
       </div>
     </section>
@@ -92,7 +120,7 @@
         <article class="card reactive" data-glow data-tilt>
           <small>CASE STUDY · 04</small>
           <h3>Cloud Observability & SLA Monitoring</h3>
-          <p>Built proactive AWS monitoring with custom CloudWatch metrics, run-status tracking, dashboards, and automated alarms. 15+ alarms surfaced 35+ production issues within six months before customer impact.</p>
+          <p>Built proactive AWS monitoring with custom CloudWatch metrics, run-status tracking, dashboards, and automated alarms. 15+ alarms support operational monitoring alongside Sentry and Splunk. Reported 23 bugs in 2026 YTD through October 2, including search, export, and frontend failures.</p>
           <div class="tags"><span>CloudWatch</span><span>Sentry</span><span>Splunk</span><span>AWS</span></div>
         </article>
 
@@ -132,8 +160,9 @@
           <div class="impact-grid">
             <div><strong>Data Platforms & Analytics</strong><p>Architected a 440+ GB reporting platform and automated C#/.NET and Python pipelines across SQL Server and operational data sources. Work across PostgreSQL, MySQL, ArangoDB, and Elasticsearch volumes exceeding 5 TB. Delivered 30+ SSRS reports and 7 Power BI dashboards.</p></div>
             <div><strong>C#/.NET & Platform Engineering</strong><p>Built and owned C#/.NET microservices and APIs for organizations, users, groups, permissions, quotas, password workflows, and bulk operations using dependency injection, NUnit unit testing, Dapper, and SQL Server.</p></div>
+            <div><strong>Application Security</strong><p>Remediated CodeQL findings and dependency CVEs across .NET, Node.js/TypeScript, and Python. Work included SSRF validation, ReDoS, URL sanitization, insecure randomness, and TLS handling.</p></div>
             <div><strong>Identity & Security</strong><p>Implemented and supported SAML, JWT, SCIM, SSO, and Microsoft Entra ID integrations across 300+ customer organizations, including provisioning, authentication, permissions, and certificate-based workflows.</p></div>
-            <div><strong>AWS, Reliability & Delivery</strong><p>Engineered .NET/Python workloads on ECS/Fargate and EC2 with S3, ECR, EventBridge, IAM, CloudFormation, API Gateway, Docker, and GitHub Actions. Built 15+ CloudWatch alarms that surfaced 35+ production issues within six months.</p></div>
+            <div><strong>AWS, Reliability & Delivery</strong><p>Engineered .NET/Python workloads on ECS/Fargate and EC2 with S3, ECR, EventBridge, IAM, CloudFormation, API Gateway, Docker, and GitHub Actions. Built 15+ CloudWatch alarms, investigated issues using Sentry and CloudWatch, and resolved API timeouts, HTTP 500s, search hangs, export failures, and frontend crashes.</p></div>
             <div><strong>AI & Automation</strong><p>Developed Python/FastAPI and Vertex AI workflows for reporting summaries, anomaly detection, engineering investigation, bug triage, proposed fixes, and deployment-environment drift monitoring.</p></div>
             <div><strong>Technical Leadership</strong><p>Lead developer escalation and production triage work, collaborate across engineering, product, and customer-facing teams, and mentored four software-engineering interns, two of whom joined as full-time engineers.</p></div>
           </div>
@@ -173,7 +202,7 @@
         <article class="reactive" data-glow><h3>Software Engineering</h3><p>C# · .NET 8 / 6 · ASP.NET · Microservices · REST APIs · Dependency Injection · NUnit · Dapper · Python · FastAPI · Node.js · React</p></article>
         <article class="reactive" data-glow><h3>Data Engineering</h3><p>SQL Server · PostgreSQL · MySQL · Elasticsearch · ArangoDB · Oracle · DB2 · Apache Spark · Apache Airflow · SSIS · DataStage · ETL/ELT</p></article>
         <article class="reactive" data-glow><h3>Cloud & DevOps</h3><p>AWS ECS · Fargate · EC2 · S3 · ECR · CloudWatch · API Gateway · EventBridge · IAM · CloudFormation · Docker · GitHub Actions</p></article>
-        <article class="reactive" data-glow><h3>Identity & Security</h3><p>SAML · JWT · SCIM · Entra ID · SSO · RBAC · Certificate Authentication · PII/PHI Protection</p></article>
+        <article class="reactive" data-glow><h3>Identity & Security</h3><p>SAML · JWT · SCIM · Entra ID · SSO · RBAC · Certificate Authentication · CodeQL · CVE Remediation · SSRF · ReDoS · TLS · PII/PHI Protection</p></article>
         <article class="reactive" data-glow><h3>Analytics</h3><p>Power BI · Embedded Power BI · SSRS · QuickSight · Pendo · Matomo · Salesforce integrations · Statistical profiling</p></article>
         <article class="reactive" data-glow><h3>AI</h3><p>Vertex AI · LLM applications · AI agents · FastAPI · anomaly detection · automated analysis · AI-assisted root-cause investigation</p></article>
       </div>
@@ -202,3 +231,4 @@
   <script src="script.js"></script>
 </body>
 </html>
+
