@@ -1,122 +1,204 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Michael Chad Tollison | Senior Software Engineer</title>
-<meta name="description" content="Senior Software Engineer with 10+ years building backend services and APIs in C#/.NET and Python on AWS. Identity, usage tracking, and data platforms.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#f6f7f9;--ink:#14181f;--mute:#566170;--rule:#d9dee5;--acc:#1f4fd8;--chip:#e8ecf3}
-@media(prefers-color-scheme:dark){:root{--bg:#10141a;--ink:#e8ebf0;--mute:#9aa5b4;--rule:#262d38;--acc:#7da2ff;--chip:#1a212b}}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.6 "Public Sans",system-ui,sans-serif}
-a{color:var(--acc);text-underline-offset:3px}
-a:focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:2px}
-.wrap{max-width:1040px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:300px 1fr;gap:72px}
-aside{position:sticky;top:0;align-self:start;padding:72px 0}
-h1{font:600 2.4rem/1.1 "Newsreader",Georgia,serif;margin:0 0 12px}
-.role{font-weight:600;margin:0 0 4px}
-.stack,.meta{color:var(--mute);margin:0 0 20px;font-size:.95rem}
-aside ul{list-style:none;padding:0;margin:0;font-size:.95rem}
-aside li{margin-bottom:6px}
-main{padding:72px 0 96px;max-width:660px}
-h2{font:600 1.5rem/1.2 "Newsreader",Georgia,serif;margin:56px 0 18px;padding-top:20px;border-top:1px solid var(--rule)}
-h2:first-child{margin-top:0;border:0;padding:0}
-h3{font-size:1.05rem;margin:0 0 6px}
-p{margin:0 0 14px}
-.case{margin-bottom:30px}
-.case p{margin-bottom:8px}
-.tags{color:var(--mute);font-size:.88rem}
-.role-line{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 4px}
-.role-line span{color:var(--mute);font-size:.92rem}
-.small{font-size:.95rem;color:var(--mute)}
-dl{margin:0;display:grid;grid-template-columns:150px 1fr;gap:8px 16px;font-size:.95rem}
-dt{font-weight:600}dd{margin:0;color:var(--mute)}
-@media(max-width:820px){.wrap{display:block}aside{position:static;padding:40px 0 0}main{padding-top:32px}dl{grid-template-columns:1fr}dt{margin-top:8px}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Michael Chad Tollison — Senior Software, Data & Platform Engineer specializing in C#/.NET, AWS, data platforms, microservices and AI-powered automation.">
+  <meta name="theme-color" content="#090d12">
+  <title>Michael Chad Tollison | Senior Software, Data & Platform Engineer</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="wrap">
-<aside>
-  <h1>Michael Chad Tollison</h1>
-  <p class="role">Senior Software Engineer</p>
-  <p class="stack">C#/.NET, Python, AWS, Microservices</p>
-  <p class="meta">Mathiston, MS. Open to remote.</p>
-  <ul>
-    <li><a href="mailto:mchadtollison@gmail.com">mchadtollison@gmail.com</a></li>
-    <li><a href="https://www.linkedin.com/in/michael-chad-tollison">LinkedIn</a></li>
-    <li><a href="https://github.com/chadtollison">GitHub</a></li>
-    <li><a href="Michael_Chad_Tollison_Resume.docx">Download resume</a></li>
-  </ul>
-</aside>
-<main>
-  <h2>About</h2>
-  <p>I'm a senior software engineer with 10+ years building and owning backend services and APIs in C#/.NET and Python on AWS. I own production microservices for identity, usage tracking, and reporting used by 300+ customer organizations, and I'm technical lead for a distributed team of nine engineers.</p>
-  <p>My background is in data engineering (healthcare claims, then multi-terabyte state education and workforce data), which is why my services tend to be good at moving, protecting, and reporting on data.</p>
+  <div id="scroll-progress" aria-hidden="true"></div>
+  <div class="cursor-glow" aria-hidden="true"></div>
 
-  <h2>Selected work</h2>
-  <p class="small">Proprietary code, customer information, and internal schemas are excluded. These are sanitized summaries.</p>
+  <header>
+    <a class="logo name-logo" href="#top" aria-label="Back to top">Michael Chad Tollison<span>.</span></a>
+    <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <nav aria-label="Primary navigation">
+      <a href="#impact">Impact</a>
+      <a href="#projects">Projects</a>
+      <a href="#experience">Experience</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
 
-  <div class="case">
-    <h3>Enterprise identity and user platform</h3>
-    <p>C#/.NET microservices for organizations, users, groups, permissions, quotas, and password workflows, plus an SSO framework (SAML 2.0, JWT, certificate validation, identity mapping) used by 300+ customer organizations. User provisioning and deprovisioning are automated through Microsoft Entra ID and SCIM, which reduced manual support work.</p>
-    <p class="tags">C#/.NET, SAML, JWT, SCIM, Entra ID, Dapper, SQL Server, NUnit</p>
-  </div>
+  <main id="top">
+    <section class="hero" data-reveal>
+      <p class="kicker">SENIOR SOFTWARE · DATA · PLATFORM ENGINEER</p>
+      <h1>I build reliable software,<br><em>data platforms & cloud systems.</em></h1>
+      <p class="lead">10+ years designing, building, and owning enterprise C#/.NET microservices, APIs, data platforms, identity systems, AWS workloads, observability, and AI-powered automation.</p>
+      <div class="buttons">
+        <a class="primary magnetic" href="#projects">Explore my work <span>↓</span></a>
+        <a class="secondary magnetic" href="https://github.com/chadtollison" target="_blank" rel="noreferrer">GitHub ↗</a>
+      </div>
+      <div class="tags hero-tags" aria-label="Core technologies">
+        <span>C# / .NET</span><span>Microservices</span><span>SQL Server</span><span>PostgreSQL</span><span>AWS</span><span>Python</span><span>Spark</span><span>Airflow</span><span>AI</span>
+      </div>
+    </section>
 
-  <div class="case">
-    <h3>API usage tracking for billing</h3>
-    <p>A containerized .NET 8 service behind AWS API Gateway that captures per-customer API consumption. It feeds billing, contract-limit monitoring, and account reporting.</p>
-    <p class="tags">.NET 8, Docker, AWS API Gateway</p>
-  </div>
+    <section id="impact" data-reveal>
+      <div class="title"><b>01</b><h2>Engineering impact</h2></div>
+      <div class="metrics">
+        <article class="reactive" data-glow>
+          <strong data-counter data-value="440" data-suffix="+ GB">440+ GB</strong>
+          <p>Centralized enterprise reporting platform</p>
+        </article>
+        <article class="reactive" data-glow>
+          <strong data-counter data-value="5" data-suffix="+ TB">5+ TB</strong>
+          <p>Elasticsearch data environment worked across in production</p>
+        </article>
+        <article class="reactive" data-glow>
+          <strong data-counter data-value="300" data-suffix="+">300+</strong>
+          <p>Customer organizations supported by enterprise identity integrations</p>
+        </article>
+        <article class="reactive" data-glow>
+          <strong data-counter data-value="35" data-suffix="+">35+</strong>
+          <p>Production issues surfaced in six months before customer impact</p>
+        </article>
+      </div>
+    </section>
 
-  <div class="case">
-    <h3>Centralized reporting data platform</h3>
-    <p>A 440+ GB reporting database that consolidates product and API usage from SQL Server, PostgreSQL, MySQL, ArangoDB, and Elasticsearch sources (5+ TB across those systems). It serves 30+ SSRS reports, 7 Power BI dashboards, and QuickSight, fed by C# and Python ETL on ECS/Fargate and EventBridge.</p>
-    <p class="tags">SQL Server, C#, Python, SSIS, Power BI, SSRS, AWS</p>
-  </div>
+    <section id="projects" data-reveal>
+      <div class="title"><b>02</b><h2>Featured engineering</h2></div>
+      <p class="intro">Selected work presented as sanitized case studies. Proprietary code, customer information, internal schemas, and confidential implementation details are intentionally excluded.</p>
+      <div class="grid">
+        <article class="card feature reactive" data-glow data-tilt>
+          <small>PUBLIC PROJECT · 01</small>
+          <h3>LocalLift</h3>
+          <p>A revenue engine designed to help local service businesses discover opportunities, strengthen their online presence, and turn demand into customers.</p>
+          <div class="tags"><span>AI</span><span>Automation</span><span>Python</span><span>Business Intelligence</span></div>
+          <a class="projectlink" href="https://github.com/chadtollison/LocalLift" target="_blank" rel="noreferrer">View repository <span>↗</span></a>
+        </article>
 
-  <div class="case">
-    <h3>Observability and production reliability</h3>
-    <p>15+ CloudWatch alarms and run-status tracking alongside Sentry and Splunk, plus a daily job runner that collects per-endpoint API metrics. I lead production triage for issues such as API timeouts, HTTP 500s, search hangs, and export failures. Deployment-drift reporting built on GitHub Actions flags stale or missed releases across dev, test, and prod.</p>
-    <p class="tags">CloudWatch, Sentry, Splunk, GitHub Actions</p>
-  </div>
+        <article class="card reactive" data-glow data-tilt>
+          <small>CASE STUDY · 02</small>
+          <h3>Enterprise Data Platform</h3>
+          <p>Architected a centralized 440+ GB reporting platform and end-to-end pipelines across SQL Server, PostgreSQL, MySQL, Elasticsearch, product analytics, and internal APIs.</p>
+          <div class="flow">Multi-source data → C# + Python ETL → SQL Server → BI & Analytics</div>
+          <div class="tags"><span>C#</span><span>Python</span><span>SQL Server</span><span>PostgreSQL</span><span>AWS</span></div>
+        </article>
 
-  <div class="case">
-    <h3>AI-assisted engineering workflows</h3>
-    <p>Python/FastAPI and Vertex AI agents that summarize reports, detect anomalies, and investigate bugs using source code, application logs, and ticket history.</p>
-    <p class="tags">Python, FastAPI, Vertex AI, LLMs</p>
-  </div>
+        <article class="card reactive" data-glow data-tilt>
+          <small>CASE STUDY · 03</small>
+          <h3>Customer Health Intelligence</h3>
+          <p>Designed a pipeline that analyzes six months of product usage, calculates growth and decline trends, and combines product signals with Salesforce data to surface retention risk and upsell opportunities.</p>
+          <div class="tags"><span>Data Pipelines</span><span>Salesforce</span><span>Analytics</span></div>
+        </article>
 
-  <div class="case">
-    <h3>LocalLift (public project)</h3>
-    <p>A revenue engine that helps local service businesses discover opportunities, strengthen their online presence, and turn demand into customers. <a href="https://github.com/chadtollison/LocalLift">View the repository</a>.</p>
-    <p class="tags">Python, automation, business intelligence</p>
-  </div>
+        <article class="card reactive" data-glow data-tilt>
+          <small>CASE STUDY · 04</small>
+          <h3>Cloud Observability & SLA Monitoring</h3>
+          <p>Built proactive AWS monitoring with custom CloudWatch metrics, run-status tracking, dashboards, and automated alarms. 15+ alarms surfaced 35+ production issues within six months before customer impact.</p>
+          <div class="tags"><span>CloudWatch</span><span>Sentry</span><span>Splunk</span><span>AWS</span></div>
+        </article>
 
-  <h2>Experience</h2>
-  <div class="role-line"><h3>Babel Street, Senior Software Engineer</h3><span>April 2020 to present</span></div>
-  <p class="small">Promoted from Software Engineer II to III to Senior. Technical lead for nine engineers (three in-house, six offshore): standups, prioritization, PR review, and one-on-ones. Mentored four interns; two were hired full-time. Also remediated CodeQL findings and dependency CVEs across .NET, Node.js/TypeScript, and Python.</p>
-  <div class="role-line"><h3>nSPARC, Mississippi State University, Data Analyst</h3><span>July 2018 to April 2020</span></div>
-  <p class="small">ETL and database work on 2+ TB of education, workforce, and government data, including de-identification of PII.</p>
-  <div class="role-line"><h3>Blue Cross Blue Shield of Mississippi, Data / Information Analyst</h3><span>June 2016 to June 2018</span></div>
-  <p class="small">Production DataStage ETL across Oracle, DB2, XML, and SQL Server in a HIPAA-regulated environment.</p>
+        <article class="card reactive" data-glow data-tilt>
+          <small>CASE STUDY · 05</small>
+          <h3>Enterprise Identity & User Platform</h3>
+          <p>Built and owned C#/.NET microservices for organizations, users, groups, permissions, quotas, authentication, and bulk provisioning, with dependency injection, NUnit testing, and SAML/JWT/SCIM/Entra ID integrations across 300+ organizations.</p>
+          <div class="tags"><span>C#/.NET</span><span>Microservices</span><span>NUnit</span><span>SAML</span><span>SCIM</span></div>
+        </article>
 
-  <h2>Skills</h2>
-  <dl>
-    <dt>Software</dt><dd>C#, .NET 8, ASP.NET, Python, FastAPI, REST APIs, Microservices, Dependency Injection, NUnit, Node.js/TypeScript, React</dd>
-    <dt>Data</dt><dd>SQL Server, PostgreSQL, MySQL, Elasticsearch, Oracle, Dapper, SSIS, ETL, Spark and Airflow exposure</dd>
-    <dt>Cloud and DevOps</dt><dd>AWS (ECS/Fargate, S3, ECR, CloudWatch, API Gateway, EventBridge, CloudFormation), Docker, GitHub Actions, CI/CD</dd>
-    <dt>Identity and security</dt><dd>SAML, JWT, SCIM, Entra ID, SSO, RBAC, CodeQL, CVE remediation, PII/PHI protection</dd>
-    <dt>Analytics and AI</dt><dd>Power BI, SSRS, QuickSight, Vertex AI, LLM applications, AI agents</dd>
-  </dl>
+        <article class="card reactive" data-glow data-tilt>
+          <small>CASE STUDY · 06</small>
+          <h3>AWS ETL & Infrastructure as Code</h3>
+          <p>Engineered idempotent Python/.NET workloads on ECS and infrastructure-as-code for scheduling, logging, IAM, and delivery. Data-engineering experience includes Apache Spark and Airflow.</p>
+          <div class="flow">EventBridge → ECS → .NET / Python → SQL Server / S3</div>
+          <div class="tags"><span>ECS</span><span>Fargate</span><span>CloudFormation</span><span>Spark</span><span>Airflow</span></div>
+        </article>
 
-  <h2>Education</h2>
-  <p class="small">B.S., Business Information Systems, Mississippi State University (2016). Associate of Arts and Science, East Mississippi Community College (2013). SAFe for Teams Certified.</p>
-</main>
-</div>
+        <article class="card reactive" data-glow data-tilt>
+          <small>CASE STUDY · 07</small>
+          <h3>AI Engineering & Automation</h3>
+          <p>Developed AI-assisted reporting and engineering workflows using Python, FastAPI, Vertex AI, and LLMs to summarize data, identify anomalies, assist troubleshooting, and accelerate investigation.</p>
+          <div class="tags"><span>Vertex AI</span><span>LLMs</span><span>FastAPI</span><span>Python</span></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="experience" data-reveal>
+      <div class="title"><b>03</b><h2>Experience</h2></div>
+      <div class="experience-list">
+        <article class="experience-card reactive" data-glow>
+          <div class="experience-heading">
+            <div><p class="role-path">Software Engineer II → Software Engineer III → Senior Software Engineer</p><h3>Babel Street</h3></div>
+            <span>April 2020 — Present</span>
+          </div>
+          <p class="experience-summary">Senior engineer owning production software, APIs, enterprise data platforms, identity systems, cloud workloads, observability, delivery pipelines, and AI-assisted engineering workflows.</p>
+          <div class="impact-grid">
+            <div><strong>Data Platforms & Analytics</strong><p>Architected a 440+ GB reporting platform and automated C#/.NET and Python pipelines across SQL Server and operational data sources. Work across PostgreSQL, MySQL, ArangoDB, and Elasticsearch volumes exceeding 5 TB. Delivered 30+ SSRS reports and 7 Power BI dashboards.</p></div>
+            <div><strong>C#/.NET & Platform Engineering</strong><p>Built and owned C#/.NET microservices and APIs for organizations, users, groups, permissions, quotas, password workflows, and bulk operations using dependency injection, NUnit unit testing, Dapper, and SQL Server.</p></div>
+            <div><strong>Identity & Security</strong><p>Implemented and supported SAML, JWT, SCIM, SSO, and Microsoft Entra ID integrations across 300+ customer organizations, including provisioning, authentication, permissions, and certificate-based workflows.</p></div>
+            <div><strong>AWS, Reliability & Delivery</strong><p>Engineered .NET/Python workloads on ECS/Fargate and EC2 with S3, ECR, EventBridge, IAM, CloudFormation, API Gateway, Docker, and GitHub Actions. Built 15+ CloudWatch alarms that surfaced 35+ production issues within six months.</p></div>
+            <div><strong>AI & Automation</strong><p>Developed Python/FastAPI and Vertex AI workflows for reporting summaries, anomaly detection, engineering investigation, bug triage, proposed fixes, and deployment-environment drift monitoring.</p></div>
+            <div><strong>Technical Leadership</strong><p>Lead developer escalation and production triage work, collaborate across engineering, product, and customer-facing teams, and mentored four software-engineering interns, two of whom joined as full-time engineers.</p></div>
+          </div>
+        </article>
+
+        <article class="experience-card reactive" data-glow>
+          <div class="experience-heading">
+            <div><p class="role-path">Data Analyst</p><h3>nSPARC · Mississippi State University</h3></div>
+            <span>July 2018 — April 2020</span>
+          </div>
+          <p class="experience-summary">Engineered longitudinal data and analytics systems supporting education, workforce, and government research programs.</p>
+          <div class="impact-grid">
+            <div><strong>Large-Scale ETL</strong><p>Built and operated ETL workflows for 2+ TB of education, workforce, unemployment, government-program, and student-record data using SQL Server, SSIS, Python, C#, and stored procedures.</p></div>
+            <div><strong>Data Engineering</strong><p>Normalized source data, designed repeatable transformations and loads, validated data quality, and prepared integrated datasets for downstream analysis and reporting.</p></div>
+            <div><strong>Privacy & Government Data</strong><p>De-identified personally identifiable information and worked with longitudinal datasets supplied by Mississippi education, community college/university, workforce, and other state partners.</p></div>
+          </div>
+        </article>
+
+        <article class="experience-card reactive" data-glow>
+          <div class="experience-heading">
+            <div><p class="role-path">Data / Information Analyst</p><h3>Blue Cross &amp; Blue Shield of Mississippi</h3></div>
+            <span>June 2016 — June 2018</span>
+          </div>
+          <p class="experience-summary">Developed and supported enterprise healthcare data integrations and production ETL workflows in a regulated environment.</p>
+          <div class="impact-grid">
+            <div><strong>Enterprise ETL</strong><p>Built and maintained DataStage workflows integrating claims, member, provider, eligibility, billing, and other operational healthcare data.</p></div>
+            <div><strong>Database Engineering</strong><p>Worked across Oracle, DB2, SQL Server, XML, SQL, data models, and stored procedures to transform and deliver reliable enterprise datasets.</p></div>
+            <div><strong>Production Support</strong><p>Investigated data issues, supported scheduled production processing, and worked with sensitive healthcare information in a HIPAA-regulated environment.</p></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="skills" data-reveal>
+      <div class="title"><b>04</b><h2>Technical toolkit</h2></div>
+      <div class="skills">
+        <article class="reactive" data-glow><h3>Software Engineering</h3><p>C# · .NET 8 / 6 · ASP.NET · Microservices · REST APIs · Dependency Injection · NUnit · Dapper · Python · FastAPI · Node.js · React</p></article>
+        <article class="reactive" data-glow><h3>Data Engineering</h3><p>SQL Server · PostgreSQL · MySQL · Elasticsearch · ArangoDB · Oracle · DB2 · Apache Spark · Apache Airflow · SSIS · DataStage · ETL/ELT</p></article>
+        <article class="reactive" data-glow><h3>Cloud & DevOps</h3><p>AWS ECS · Fargate · EC2 · S3 · ECR · CloudWatch · API Gateway · EventBridge · IAM · CloudFormation · Docker · GitHub Actions</p></article>
+        <article class="reactive" data-glow><h3>Identity & Security</h3><p>SAML · JWT · SCIM · Entra ID · SSO · RBAC · Certificate Authentication · PII/PHI Protection</p></article>
+        <article class="reactive" data-glow><h3>Analytics</h3><p>Power BI · Embedded Power BI · SSRS · QuickSight · Pendo · Matomo · Salesforce integrations · Statistical profiling</p></article>
+        <article class="reactive" data-glow><h3>AI</h3><p>Vertex AI · LLM applications · AI agents · FastAPI · anomaly detection · automated analysis · AI-assisted root-cause investigation</p></article>
+      </div>
+    </section>
+
+    <section class="education" data-reveal>
+      <div class="title"><b>05</b><h2>Education</h2></div>
+      <div class="edu reactive" data-glow>
+        <div><strong>Bachelor of Science</strong><h3>Business Information Systems</h3></div>
+        <p>Mississippi State University<br><span>May 2016</span></p>
+      </div>
+    </section>
+
+    <section id="contact" class="contact reactive" data-glow data-reveal>
+      <p class="kicker">LET'S BUILD SOMETHING THAT MATTERS</p>
+      <h2>Interested in working together?</h2>
+      <p>I'm interested in senior software, backend, data platform, cloud, and AI-enabled engineering opportunities where I can own meaningful systems from architecture through production.</p>
+      <div class="buttons">
+        <a class="primary magnetic" href="mailto:mchadtollison@gmail.com">Email me <span>↗</span></a>
+        <a class="secondary magnetic" href="https://github.com/chadtollison" target="_blank" rel="noreferrer">GitHub ↗</a>
+      </div>
+    </section>
+  </main>
+
+  <footer><span>Michael Chad Tollison</span><span>Senior Software, Data & Platform Engineer</span><span id="year"></span></footer>
+  <script src="script.js"></script>
 </body>
 </html>
