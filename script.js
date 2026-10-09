@@ -113,6 +113,86 @@ if (finePointer && !reduceMotion) {
   });
 }
 
+// ---- Charts: data-driven geometry, then reveal on scroll ----
+// Month math so the donut and timeline stay correct as time passes.
+const monthPos = (value, isEnd) => {
+  if (value === 'now') {
+    const d = new Date();
+    const daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+    return d.getFullYear() * 12 + d.getMonth() + (d.getDate() - 1) / daysInMonth;
+  }
+  const [y, m] = value.split('-').map(Number);
+  return y * 12 + (m - 1) + (isEnd ? 1 : 0);
+};
+
+// 50 dots for the privacy-automation card
+document.querySelectorAll('[data-dots]').forEach((box) => {
+  const n = Number(box.dataset.dots) || 0;
+  for (let i = 0; i < n; i += 1) {
+    const dot = document.createElement('i');
+    dot.style.setProperty('--i', i);
+    box.appendChild(dot);
+  }
+});
+
+// Donut: share of career by organization
+const segs = [...document.querySelectorAll('.seg[data-start]')];
+if (segs.length) {
+  const spans = segs.map((seg) => monthPos(seg.dataset.end, true) - monthPos(seg.dataset.start, false));
+  const total = spans.reduce((a, b) => a + b, 0);
+  const gap = 1.2;
+  let used = 0;
+  segs.forEach((seg, i) => {
+    const pct = (spans[i] / total) * 100;
+    const len = Math.max(pct - gap, 0.1);
+    seg.style.setProperty('--len', len.toFixed(2));
+    seg.style.setProperty('--rest', (100 - len).toFixed(2));
+    seg.style.strokeDashoffset = (-used).toFixed(2);
+    seg.style.setProperty('--d', `${i * 0.18}s`);
+    used += pct;
+    const label = document.querySelector(`[data-dur="${seg.dataset.key}"]`);
+    if (label) {
+      const years = spans[i] / 12;
+      const nearest = Math.round(years);
+      label.textContent = `${Math.abs(years - nearest) < 0.1 ? nearest : years.toFixed(1)} yrs`;
+    }
+  });
+  const totalEl = document.querySelector('[data-years-total]');
+  if (totalEl) {
+    const wholeYears = Math.floor(total / 12);
+    totalEl.dataset.value = String(wholeYears);
+    totalEl.textContent = String(wholeYears);
+  }
+}
+
+// Timeline: position each bar from its dates
+document.querySelectorAll('.gantt').forEach((gantt) => {
+  const axisStart = monthPos(gantt.dataset.axisStart, false);
+  const span = monthPos(gantt.dataset.axisEnd, false) - axisStart;
+  gantt.querySelectorAll('.gantt-bar').forEach((bar, i) => {
+    const start = monthPos(bar.dataset.start, false);
+    const end = monthPos(bar.dataset.end, true);
+    bar.style.setProperty('--l', `${(((start - axisStart) / span) * 100).toFixed(2)}%`);
+    bar.style.setProperty('--w', `${(((end - start) / span) * 100).toFixed(2)}%`);
+    bar.style.setProperty('--d', `${0.1 + i * 0.22}s`);
+  });
+});
+
+// Play each chart once when it scrolls into view
+const chartItems = document.querySelectorAll('[data-chart]');
+if (reduceMotion || !('IntersectionObserver' in window)) {
+  chartItems.forEach((item) => item.classList.add('in'));
+} else {
+  const chartObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('in');
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.2, rootMargin: '0px 0px -6% 0px' });
+  chartItems.forEach((item) => chartObserver.observe(item));
+}
+
 // Animate impact numbers once
 const counters = document.querySelectorAll('[data-counter]');
 function animateCounter(element) {
