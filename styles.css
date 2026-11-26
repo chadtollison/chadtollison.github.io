@@ -193,3 +193,6 @@ footer{display:flex;justify-content:space-between;border-top:1px solid var(--lin
 .hero .tags{margin-top:30px}
 @media(max-width:900px){.hero-grid{gap:28px}.hero-side{display:flex;justify-content:flex-start;order:-1;padding-left:10px}.portrait{width:130px;height:130px}.hero .redact-teaser{grid-template-columns:1fr;gap:10px}}
 @media(max-width:560px){.hero-side{display:block;order:-1}.hero .redact-teaser{margin-top:28px}}
+/* certification badge */
+.edu.cert{align-items:center;gap:18px}.edu.cert picture{flex:none}.edu.cert img{display:block;width:72px;height:auto}.edu.cert>div{flex:1}
+@media(max-width:900px){.edu.cert{flex-direction:row;flex-wrap:wrap;align-items:center}.edu.cert p{flex-basis:100%;margin:0 0 0 90px}}
