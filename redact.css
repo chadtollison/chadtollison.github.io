@@ -79,6 +79,24 @@ footer a{color:var(--accent)}
 .mini:not(:empty){padding:10px 14px;border-top:1px solid var(--line)}
 .mini b{color:var(--accent);font-weight:700}
 .conf.rule{justify-content:flex-end;color:var(--c);font-weight:700;letter-spacing:.04em}
+.use{margin-top:56px}
+.use h2{margin-bottom:6px}
+.use-lead,.use-more{color:var(--muted);max-width:760px}
+.use a{color:var(--accent)}.use a:hover{text-decoration:underline}
+.use-steps{list-style:none;counter-reset:step;padding:0;margin:22px 0 0;display:grid;gap:16px}
+.use-steps>li{counter-increment:step;border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:18px 20px;min-width:0}
+.use-steps h3{margin:0 0 6px;font-size:1.05rem}
+.use-steps h3:before{content:"0" counter(step) "  ";color:var(--accent);font-size:.75rem;letter-spacing:.12em;font-weight:800}
+.use-steps p{margin:0 0 10px;color:var(--muted);font-size:.92rem}
+.use-steps p.out{margin-top:12px}
+.use code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.85em}
+.use p code{background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--text)}
+.code{position:relative;background:var(--panel2);border:1px solid var(--line);border-radius:10px}
+.code pre{margin:0;padding:14px 16px;overflow-x:auto;font-size:.84rem;line-height:1.6;color:var(--text)}
+.copy-code + pre{padding-top:40px}
+.copy-code{position:absolute;top:8px;right:8px;border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:6px;padding:3px 9px;font-size:.72rem;cursor:pointer}
+.copy-code:hover{color:var(--text);border-color:#3d5264}
+.use-more{margin-top:18px;font-size:.92rem}
 @media(max-width:900px){.panes{grid-template-columns:1fr}.steps{grid-template-columns:1fr}textarea,.output{min-height:200px}}
 @media(max-width:560px){
   main>section{padding-left:16px;padding-right:16px}

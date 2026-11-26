@@ -292,6 +292,13 @@ $('try').addEventListener('click', async () => {
 });
 input.addEventListener('focus', () => { typing++; });
 
+// Copy buttons on the "Use it in your own code" snippets.
+document.querySelectorAll('.copy-code').forEach((b) => b.addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(b.nextElementSibling.innerText); b.textContent = 'Copied!'; }
+  catch { b.textContent = 'Copy failed'; }
+  setTimeout(() => { b.textContent = 'Copy'; }, 1500);
+}));
+
 input.value = SAMPLES[0];
 render();
 
