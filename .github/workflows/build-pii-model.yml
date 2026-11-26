@@ -1,0 +1,114 @@
+# Converts the Hugging Face model ChadTollison/pii-distilbert-v2 into a small
+# ONNX file that runs right in the visitor's browser (transformers.js), and
+# saves it under models/ so GitHub Pages can serve it for free.
+# Run it again from the Actions tab ("Run workflow") whenever the model on
+# Hugging Face changes; it commits the new files to the branch it runs on.
+name: Build in-browser PII model
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install converter
+        run: |
+          pip install --extra-index-url https://download.pytorch.org/whl/cpu \
+            "torch==2.4.1" "transformers==4.46.3" "optimum[onnxruntime]==1.23.3" "onnx==1.17.0" "onnxruntime==1.20.1" "ml_dtypes" "accelerate"
+
+      - name: Export and quantize
+        run: |
+          set -e
+          OUT=models/pii-distilbert-v2
+          rm -rf build "$OUT"
+          optimum-cli export onnx --model ChadTollison/pii-distilbert-v2 --task token-classification build/
+          mkdir -p "$OUT/onnx"
+          python - <<'PY'
+          # Try a few int8 settings and keep the one whose labels best match the full model.
+          import json, numpy as np, onnxruntime as ort
+          from onnxruntime.quantization import quantize_dynamic, QuantType
+          from transformers import AutoTokenizer
+          tok = AutoTokenizer.from_pretrained("build")
+          texts = [
+              "Hi, I'm Sarah Johnson. Email me at sarah.j@example.com or call 555-123-4567.",
+              "My SSN is 123-45-6789 and my card is 4111 1111 1111 1111.",
+              "Ship it to 42 Maple Street, Springfield, IL 62704 for Dr. Raj Patel.",
+              "Contact Maria Garcia at (212) 555-0187 or maria.garcia@company.org.",
+              "Server 192.168.1.24 logged a failed login for user jdoe from 10.0.0.7.",
+              "Please charge 5500 0000 0000 0004 and send the receipt to tom.lee@mail.com.",
+              "Applicant: Kevin O'Brien, SSN 078-05-1120, phone +1 646 555 0110.",
+              "Thanks for your order, Aisha! We will text 917-555-0133 when it ships.",
+              "The meeting with Jennifer and Mark is moved to Tuesday at 3pm.",
+              "Refund issued to Visa ending 4242 for customer Wei Zhang (wei.zhang@outlook.com).",
+          ]
+          full = ort.InferenceSession("build/model.onnx")
+          names = [i.name for i in full.get_inputs()]
+          encs = [{k: v for k, v in tok(t, return_tensors="np").items() if k in names} for t in texts]
+          ref = [full.run(None, e)[0][0].argmax(-1) for e in encs]
+          variants = {
+              "quint8": dict(weight_type=QuantType.QUInt8),
+              "qint8_per_channel": dict(weight_type=QuantType.QInt8, per_channel=True),
+              "quint8_per_channel": dict(weight_type=QuantType.QUInt8, per_channel=True),
+          }
+          best = None
+          for name, kw in variants.items():
+              out = f"build/{name}.onnx"
+              quantize_dynamic("build/model.onnx", out, **kw)
+              sess = ort.InferenceSession(out)
+              agree = sum(int((sess.run(None, e)[0][0].argmax(-1) == r).sum()) for e, r in zip(encs, ref))
+              total = sum(len(r) for r in ref)
+              print(f"{name}: {agree}/{total} token labels match the full model")
+              if best is None or agree > best[1]:
+                  best = (name, agree)
+          print("Using", best[0])
+          import shutil
+          shutil.copy(f"build/{best[0]}.onnx", "models/pii-distilbert-v2/onnx/model_quantized.onnx")
+          PY
+          cp build/config.json build/tokenizer.json build/tokenizer_config.json "$OUT/"
+          cp build/special_tokens_map.json "$OUT/" 2>/dev/null || true
+          ls -la build "$OUT" "$OUT/onnx"
+
+      - name: Compare full vs small model
+        run: |
+          python - <<'PY'
+          import json, numpy as np, onnxruntime as ort
+          from transformers import AutoTokenizer
+          cfg = json.load(open("build/config.json"))
+          print("id2label:", json.dumps(cfg.get("id2label")))
+          tok = AutoTokenizer.from_pretrained("build")
+          texts = [
+              "Hi, I'm Sarah Johnson. Email me at sarah.j@example.com or call 555-123-4567.",
+              "My SSN is 123-45-6789 and my card is 4111 1111 1111 1111.",
+              "Ship it to 42 Maple Street, Springfield, IL 62704 for Dr. Raj Patel.",
+          ]
+          full = ort.InferenceSession("build/model.onnx")
+          small = ort.InferenceSession("models/pii-distilbert-v2/onnx/model_quantized.onnx")
+          for t in texts:
+              enc = tok(t, return_tensors="np")
+              feeds = {k: v for k, v in enc.items() if k in [i.name for i in full.get_inputs()]}
+              a = full.run(None, feeds)[0][0].argmax(-1)
+              b = small.run(None, feeds)[0][0].argmax(-1)
+              toks = tok.convert_ids_to_tokens(enc["input_ids"][0])
+              print("\nTEXT:", t)
+              print("agree: %d/%d" % ((a == b).sum(), len(a)))
+              for tag, pred in (("full ", a), ("small", b)):
+                  print(tag, " ".join(f"{w}/{cfg['id2label'][str(x)]}" for w, x in zip(toks, pred) if cfg['id2label'][str(x)] != 'O'))
+          PY
+
+      - name: Save model to this branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
+          git add models/pii-distilbert-v2
+          git commit -m "Add in-browser copy of the PII model" || echo "No changes"
+          git push
