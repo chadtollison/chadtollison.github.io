@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#090d12">
   <title>Redact Me | Live PII Detector Demo</title>
   <link rel="stylesheet" href="styles.css?v=2026-11-26b">
-  <link rel="stylesheet" href="redact.css?v=2026-11-26c">
+  <link rel="stylesheet" href="redact.css?v=2026-11-26d">
 </head>
 <body>
   <header>
@@ -83,6 +83,50 @@
         <article><small>02</small><h3>Classify</h3><p>A DistilBERT model I fine-tuned labels every piece and gives a confidence score, running on your device with ONNX Runtime.</p></article>
         <article><small>03</small><h3>Validate</h3><p>Card numbers must pass a Luhn checksum and SSNs a format check, the same rule-based safety net used in the full service.</p></article>
       </div>
+      <div class="use">
+        <h2>Use it in your own code</h2>
+        <p class="use-lead">The model is free on Hugging Face. Three steps get it running in Python.</p>
+        <ol class="use-steps">
+          <li>
+            <h3>Install Python and two libraries</h3>
+            <p>You need <a href="https://www.python.org/downloads/" target="_blank" rel="noreferrer">Python 3.9 or newer</a>. Then run this in a terminal:</p>
+            <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>pip install transformers torch</code></pre></div>
+          </li>
+          <li>
+            <h3>Find personal data</h3>
+            <p>Save this as <code>find_pii.py</code> and run <code>python find_pii.py</code>. The first run downloads the model (about 260 MB) from Hugging Face. After that it works offline.</p>
+            <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>from transformers import pipeline
+
+pii = pipeline(
+    "token-classification",
+    model="ChadTollison/pii-distilbert-v2",
+    aggregation_strategy="max",  # join word pieces into whole words
+)
+
+text = "Hi, I'm Sarah Johnson. Email sarah.j@example.com or call 415-555-0198."
+for item in pii(text):
+    print(item["entity_group"], text[item["start"]:item["end"]], round(item["score"], 2))</code></pre></div>
+            <p class="out">It prints the type, the text and a confidence score for each item, something like this:</p>
+            <div class="code"><pre><code>PERSON Sarah Johnson 1.0
+EMAIL sarah.j@example.com 1.0
+PHONE 415-555-0198 0.99</code></pre></div>
+          </li>
+          <li>
+            <h3>Redact it</h3>
+            <p>Add this to swap each item for a label, like this page does:</p>
+            <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>def redact(text, min_score=0.5):
+    for item in sorted(pii(text), key=lambda i: i["start"], reverse=True):
+        if item["score"] &gt;= min_score:
+            text = text[:item["start"]] + f"[{item['entity_group']}]" + text[item["end"]:]
+    return text
+
+print(redact(text))
+# Hi, I'm [PERSON]. Email [EMAIL] or call [PHONE].</code></pre></div>
+          </li>
+        </ol>
+        <p class="use-more">It finds <strong>PERSON, EMAIL, PHONE, SSN, CREDIT_CARD</strong> and <strong>IP_ADDRESS</strong>. For the full service with the Luhn and format checks and a ready-to-run API in Docker, see the <a href="https://github.com/chadtollison/PII-Detector" target="_blank" rel="noreferrer">PII-Detector repository</a>.</p>
+      </div>
+
       <div class="buttons">
         <a class="primary" href="https://github.com/chadtollison/PII-Detector" target="_blank" rel="noreferrer">View the code ↗</a>
         <a class="secondary" href="https://huggingface.co/ChadTollison/pii-distilbert-v2" target="_blank" rel="noreferrer">Model on Hugging Face ↗</a>
@@ -92,7 +136,7 @@
   </main>
 
   <footer><span>Michael Chad Tollison</span><span>Software & Data Engineer</span><span><a href="./">Portfolio</a></span></footer>
-  <script type="module" src="redact.js?v=2026-11-26c"></script>
+  <script type="module" src="redact.js?v=2026-11-26d"></script>
   <script data-goatcounter="https://chadtollison.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
