@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Live demo: paste any text and watch Michael Chad Tollison's fine-tuned DistilBERT model find and redact personal data, right in your browser.">
+  <meta name="theme-color" content="#090d12">
+  <title>Redact Me | Live PII Detector Demo</title>
+  <link rel="stylesheet" href="styles.css?v=2026-11-26b">
+  <link rel="stylesheet" href="redact.css?v=2026-11-26">
+</head>
+<body>
+  <header>
+    <a class="logo name-logo" href="./" aria-label="Back to portfolio">Michael Chad Tollison<span>.</span></a>
+    <a class="back" href="./#projects">← Back to portfolio</a>
+  </header>
+
+  <main>
+    <section class="demo-hero">
+      <p class="kicker">LIVE DEMO · PII DETECTOR</p>
+      <h1>Redact me<em>.</em></h1>
+      <p class="lead">Type or paste anything below. My fine-tuned DistilBERT model finds names, emails, phone numbers, Social Security numbers, card numbers and IP addresses as you type. It runs entirely in your browser, so nothing you enter ever leaves this page.</p>
+    </section>
+
+    <section class="demo">
+      <div id="status" class="status" role="status" aria-live="polite">
+        <span class="dot"></span>
+        <span id="status-text">Loading the model (about 65 MB, only the first time)…</span>
+        <span class="bar"><span id="status-bar"></span></span>
+      </div>
+
+      <div class="panes">
+        <div class="pane">
+          <div class="pane-head">
+            <label for="input">Your text</label>
+            <div class="samples" aria-label="Example texts">
+              <button type="button" data-sample="0">Support ticket</button>
+              <button type="button" data-sample="1">Order email</button>
+              <button type="button" data-sample="2">HR note</button>
+            </div>
+          </div>
+          <textarea id="input" spellcheck="false" maxlength="5000"></textarea>
+          <div class="pane-foot"><span id="count">0 / 5000</span><button type="button" id="clear" class="link-btn">Clear</button></div>
+        </div>
+
+        <div class="pane">
+          <div class="pane-head">
+            <span class="pane-label">What the model sees</span>
+            <div class="toggle" role="group" aria-label="View">
+              <button type="button" id="view-highlight" aria-pressed="true">Highlight</button>
+              <button type="button" id="view-redact" aria-pressed="false">Redact</button>
+            </div>
+          </div>
+          <div id="output" class="output" aria-live="polite"></div>
+          <div class="pane-foot">
+            <span id="timing">&nbsp;</span>
+            <button type="button" id="copy" class="link-btn">Copy redacted text</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <label for="threshold">Confidence needed to redact: <strong id="threshold-value">50%</strong></label>
+        <input id="threshold" type="range" min="0.3" max="0.95" step="0.05" value="0.5">
+      </div>
+
+      <div class="findings">
+        <h2>Found <span id="found-count">0</span> <span id="found-word">items</span></h2>
+        <div id="legend" class="legend"></div>
+        <ul id="entities" class="entities"></ul>
+      </div>
+    </section>
+
+    <section class="how">
+      <h2>How it works</h2>
+      <div class="steps">
+        <article><small>01</small><h3>Tokenize</h3><p>Your text is split into the same word pieces the model was trained on.</p></article>
+        <article><small>02</small><h3>Classify</h3><p>A DistilBERT model I fine-tuned labels every piece and gives a confidence score, running on your device with ONNX Runtime.</p></article>
+        <article><small>03</small><h3>Validate</h3><p>Card numbers must pass a Luhn checksum and SSNs a format check, the same rule-based safety net used in the full service.</p></article>
+      </div>
+      <div class="buttons">
+        <a class="primary" href="https://github.com/chadtollison/PII-Detector" target="_blank" rel="noreferrer">View the code ↗</a>
+        <a class="secondary" href="https://huggingface.co/ChadTollison/pii-distilbert-v2" target="_blank" rel="noreferrer">Model on Hugging Face ↗</a>
+      </div>
+      <p class="note">This is a demo of a research model, so it can miss things or flag things by mistake. Please don't rely on it for real compliance work.</p>
+    </section>
+  </main>
+
+  <footer><span>Michael Chad Tollison</span><span>Software & Data Engineer</span><span><a href="./">Portfolio</a></span></footer>
+  <script type="module" src="redact.js?v=2026-11-26"></script>
+  <script data-goatcounter="https://chadtollison.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>

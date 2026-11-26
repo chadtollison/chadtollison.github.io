@@ -6,7 +6,7 @@
   <meta name="description" content="Michael Chad Tollison — Software & Data Engineer with 10 years building backend services, identity systems, and data platforms in C#/.NET and Python on AWS.">
   <meta name="theme-color" content="#090d12">
   <title>Michael Chad Tollison | Software & Data Engineer</title>
-  <link rel="stylesheet" href="styles.css?v=2026-11-26">
+  <link rel="stylesheet" href="styles.css?v=2026-11-26b">
 </head>
 <body>
   <div id="scroll-progress" aria-hidden="true"></div>
@@ -34,6 +34,7 @@
       <p class="lead">Software and data engineer with 10 years across backend services, identity, and data platforms. Owns production C#/.NET microservices for identity, privacy requests, and API usage tracking, supported by a decade of ETL, SQL Server, and reporting work in education, government, and healthcare.</p>
       <div class="buttons">
         <a class="primary magnetic" href="#projects">Explore my work <span>↓</span></a>
+        <a class="secondary magnetic" href="redact.html">Try my live PII demo <span>→</span></a>
         <a class="secondary magnetic" href="https://github.com/chadtollison" target="_blank" rel="noreferrer">GitHub ↗</a>
       </div>
       <div class="tags hero-tags" aria-label="Core technologies">
@@ -149,6 +150,7 @@
           <p>A service that finds and redacts personal data in free text. A fine-tuned DistilBERT model proposes candidates, and checksum and format validators confirm them, reaching 0.98 precision and recall on held-out data. Diagnosed shortcut learning in the first model through token-level error analysis and fixed it with leakage-checked training data, raising F1 from 0.55 to 0.97.</p>
           <div class="flow">Text → DistilBERT → Luhn &amp; format validators → Redacted output</div>
           <div class="tags"><span>Python</span><span>PyTorch</span><span>Hugging Face</span><span>FastAPI</span><span>Docker</span></div>
+          <a class="projectlink live" href="redact.html">Try the live demo <span>→</span></a>
           <a class="projectlink" href="https://github.com/chadtollison/PII-Detector" target="_blank" rel="noreferrer">View repository <span>↗</span></a>
           <a class="projectlink" href="https://huggingface.co/ChadTollison/pii-distilbert-v2" target="_blank" rel="noreferrer">View model <span>↗</span></a>
         </article>
