@@ -40,7 +40,9 @@ if (reduceMotion || !('IntersectionObserver' in window)) {
       entry.target.classList.add('visible');
       observer.unobserve(entry.target);
     });
-  }, { threshold: 0.12, rootMargin: '0px 0px -7% 0px' });
+  // threshold 0: tall sections (e.g. Projects on phones) can never show 12% of
+  // themselves at once, which left them invisible.
+  }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
   revealItems.forEach((item) => revealObserver.observe(item));
 }
 
