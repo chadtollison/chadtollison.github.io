@@ -73,6 +73,7 @@ function validate(span) {
     if (!m || m[1] === '000' || m[1] === '666' || m[1][0] === '9' || m[2] === '00' || m[3] === '0000') return { ok: false, msg: '✗ Not a valid SSN format' };
     return { ok: true, msg: '✓ Valid SSN format' };
   }
+  if (isPhone(span.type) && digits.length < 7) return { ok: false, msg: '✗ Too few digits for a phone number' };
   if (/EMAIL/i.test(span.type) && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(span.text)) return { ok: false, msg: '✗ Not an email address' };
   if (/IP/i.test(span.type)) {
     const parts = span.text.split('.');
@@ -164,6 +165,17 @@ function mergeSpans(text, labeled) {
       else if (digits.length >= 10 && digits.length <= 11 && phoneType) s.type = phoneType;
     }
   }
+  // Safety net: a US phone number the model missed (e.g. "6626341142") is still
+  // caught when it has a valid area code and exchange (both start with 2-9).
+  const phoneType = Object.keys(id2labelTypes).find(isPhone);
+  if (phoneType) {
+    for (const [a, b] of shapes.find(([t]) => t.test(phoneType))[1]) {
+      const d = text.slice(a, b).replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '');
+      if (d.length !== 10 || !/^[2-9]\d\d[2-9]/.test(d) || /^[2-9]11/.test(d)) continue;
+      if (spans.some((s) => s.start < b && s.end > a)) continue;
+      spans.push({ type: phoneType, start: a, end: b, scores: [1], rule: true });
+    }
+  }
   // Drop entities swallowed by a grown one, then build the results.
   const kept = [];
   for (const s of spans.sort((a, b) => a.start - b.start)) {
@@ -172,8 +184,8 @@ function mergeSpans(text, labeled) {
     else kept.push(s);
   }
   return kept.map((s) => {
-    const span = { type: s.type, start: s.start, end: s.end, text: text.slice(s.start, s.end), score: s.scores.reduce((a, b) => a + b, 0) / s.scores.length };
-    span.check = validate(span);
+    const span = { type: s.type, start: s.start, end: s.end, text: text.slice(s.start, s.end), score: s.scores.reduce((a, b) => a + b, 0) / s.scores.length, rule: !!s.rule };
+    span.check = s.rule ? { ok: true, msg: '✓ Caught by the phone format rule (valid US area code)' } : validate(span);
     return span;
   });
 }
@@ -189,7 +201,7 @@ function render() {
     let html = '', pos = 0;
     for (const s of lastSpans) {
       const info = typeInfo(s.type), live = redactable(s);
-      const tip = `${info.name} · ${Math.round(s.score * 100)}% confident${s.check ? ' · ' + s.check.msg.replace(/^[✓✗] /, '') : ''}${live ? '' : ' · not redacted'}`;
+      const tip = `${info.name} · ${s.rule ? 'format rule' : Math.round(s.score * 100) + '% confident'}${s.check ? ' · ' + s.check.msg.replace(/^[✓✗] /, '') : ''}${live ? '' : ' · not redacted'}`;
       html += esc(text.slice(pos, s.start));
       html += `<mark class="pii${live ? '' : ' low'}" style="--c:${info.color}" title="${esc(tip)}">${esc(s.text)}<span class="lbl">${esc(info.name.toUpperCase())}${live ? '' : ' ?'}</span></mark>`;
       pos = s.end;
@@ -200,6 +212,11 @@ function render() {
   output.classList.toggle('redacted', view === 'redact');
 
   const live = lastSpans.filter(redactable);
+  const byType = {};
+  for (const s of live) { const n = typeInfo(s.type).name; byType[n] = (byType[n] || 0) + 1; }
+  $('mini').innerHTML = live.length
+    ? 'Found: ' + Object.entries(byType).map(([n, c]) => `<b>${c} ${esc(n.toLowerCase())}${c > 1 ? 's' : ''}</b>`).join(', ')
+    : (model && input.value.trim() ? 'Nothing personal found yet' : '');
   $('found-count').textContent = live.length;
   $('found-word').textContent = live.length === 1 ? 'item' : 'items';
   const types = [...new Set(lastSpans.map((s) => s.type))];
@@ -207,7 +224,8 @@ function render() {
   $('entities').innerHTML = lastSpans.length ? lastSpans.map((s) => {
     const i = typeInfo(s.type), pct = Math.round(s.score * 100);
     const check = s.check ? `<span class="check ${s.check.ok ? 'ok' : 'bad'}">${esc(s.check.msg)}</span>` : '';
-    return `<li class="${redactable(s) ? '' : 'low'}" style="--c:${i.color}"><span class="type">${esc(i.name.toUpperCase())}</span><span class="val">${esc(s.text)}${check}</span><span class="conf"><i><b style="width:${pct}%"></b></i>${pct}%</span></li>`;
+    const conf = s.rule ? '<span class="conf rule">Rule</span>' : `<span class="conf"><i><b style="width:${pct}%"></b></i>${pct}%</span>`;
+    return `<li class="${redactable(s) ? '' : 'low'}" style="--c:${i.color}"><span class="type">${esc(i.name.toUpperCase())}</span><span class="val">${esc(s.text)}${check}</span>${conf}</li>`;
   }).join('') : `<li class="none">${model ? 'No personal data found yet. Try one of the examples.' : 'Waiting for the model to load…'}</li>`;
 }
 
@@ -219,9 +237,17 @@ function redactedText() {
 
 let timer;
 function schedule(delay = 250) { clearTimeout(timer); timer = setTimeout(run, delay); }
+let busy = false, again = false;
 async function run() {
   const count = $('count'); count.textContent = `${input.value.length} / 5000`;
   if (!model) { render(); return; }
+  // One model call at a time; if text changed meanwhile, run once more after.
+  if (busy) { again = true; return; }
+  busy = true;
+  try { await analyze(); } finally { busy = false; }
+  if (again) { again = false; run(); }
+}
+async function analyze() {
   const id = ++runId, text = input.value, t0 = performance.now();
   try {
     const spans = text.trim() ? await classify(text) : [];
@@ -246,6 +272,25 @@ $('copy').addEventListener('click', async () => {
   catch { btn.textContent = 'Copy failed'; }
   setTimeout(() => { btn.textContent = 'Copy redacted text'; }, 1600);
 });
+
+// "Try me": type an example in so people can watch it get caught live.
+let typing = 0;
+$('try').addEventListener('click', async () => {
+  const me = ++typing, text = SAMPLES[Math.floor(Math.random() * SAMPLES.length)];
+  document.querySelector('.panes').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setView('highlight');
+  input.value = ''; schedule(0);
+  const slow = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  for (let i = 0; i < text.length; i++) {
+    if (me !== typing) return;
+    input.value = text.slice(0, i + 1); $('count').textContent = `${input.value.length} / 5000`;
+    if (/[\s.,]/.test(text[i])) run();
+    if (slow) await new Promise((r) => setTimeout(r, 28));
+  }
+  await run();
+  if (me === typing && slow) setTimeout(() => { if (me === typing) setView('redact'); }, 1400);
+});
+input.addEventListener('focus', () => { typing++; });
 
 input.value = SAMPLES[0];
 render();

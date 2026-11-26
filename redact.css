@@ -72,6 +72,13 @@ mark.pii.low{background:transparent;border-bottom-style:dashed;opacity:.75}
 .note{color:var(--muted);font-size:.8rem;margin-top:24px}
 footer a{color:var(--accent)}
 
+.try-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:6px;color:var(--muted);font-size:.9rem}
+.try-btn{background:var(--accent);border:1px solid var(--accent);color:#07110e;font-weight:800;font-size:1rem;border-radius:10px;padding:12px 22px;cursor:pointer;box-shadow:0 8px 28px rgba(92,219,182,.18);transition:transform .2s ease,box-shadow .2s ease}
+.try-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(92,219,182,.28)}
+.mini{min-height:0;padding:0 14px;font-size:.82rem;color:var(--muted)}
+.mini:not(:empty){padding:10px 14px;border-top:1px solid var(--line)}
+.mini b{color:var(--accent);font-weight:700}
+.conf.rule{justify-content:flex-end;color:var(--c);font-weight:700;letter-spacing:.04em}
 @media(max-width:900px){.panes{grid-template-columns:1fr}.steps{grid-template-columns:1fr}textarea,.output{min-height:200px}}
 @media(max-width:560px){
   main>section{padding-left:16px;padding-right:16px}

@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#090d12">
   <title>Redact Me | Live PII Detector Demo</title>
   <link rel="stylesheet" href="styles.css?v=2026-11-26b">
-  <link rel="stylesheet" href="redact.css?v=2026-11-26">
+  <link rel="stylesheet" href="redact.css?v=2026-11-26c">
 </head>
 <body>
   <header>
@@ -20,12 +20,16 @@
       <p class="kicker">LIVE DEMO · PII DETECTOR</p>
       <h1>Redact me<em>.</em></h1>
       <p class="lead">Type or paste anything below. My fine-tuned DistilBERT model finds names, emails, phone numbers, Social Security numbers, card numbers and IP addresses as you type. It runs entirely in your browser, so nothing you enter ever leaves this page.</p>
+      <div class="try-row">
+        <button type="button" id="try" class="try-btn">▶ Try me</button>
+        <span>Watch it catch personal data in a sample message, or type your own below.</span>
+      </div>
     </section>
 
     <section class="demo">
       <div id="status" class="status" role="status" aria-live="polite">
         <span class="dot"></span>
-        <span id="status-text">Loading the model (about 65 MB, only the first time)…</span>
+        <span id="status-text">Loading the model (about 63 MB, only the first time)…</span>
         <span class="bar"><span id="status-bar"></span></span>
       </div>
 
@@ -40,6 +44,7 @@
             </div>
           </div>
           <textarea id="input" spellcheck="false" maxlength="5000"></textarea>
+          <div id="mini" class="mini" aria-live="polite"></div>
           <div class="pane-foot"><span id="count">0 / 5000</span><button type="button" id="clear" class="link-btn">Clear</button></div>
         </div>
 
@@ -87,7 +92,7 @@
   </main>
 
   <footer><span>Michael Chad Tollison</span><span>Software & Data Engineer</span><span><a href="./">Portfolio</a></span></footer>
-  <script type="module" src="redact.js?v=2026-11-26"></script>
+  <script type="module" src="redact.js?v=2026-11-26c"></script>
   <script data-goatcounter="https://chadtollison.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
