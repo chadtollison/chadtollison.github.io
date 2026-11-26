@@ -46,6 +46,19 @@ if (reduceMotion || !('IntersectionObserver' in window)) {
   revealItems.forEach((item) => revealObserver.observe(item));
 }
 
+// Safety net: never leave a section hidden once the reader has scrolled to it,
+// even if the observer misfires (some mobile browsers, very tall sections).
+function revealInView() {
+  revealItems.forEach((item) => {
+    if (item.classList.contains('visible')) return;
+    const rect = item.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) item.classList.add('visible');
+  });
+}
+['scroll', 'resize', 'hashchange', 'load'].forEach((type) =>
+  window.addEventListener(type, revealInView, { passive: true }));
+revealInView();
+
 // Active navigation state
 const navLinks = [...document.querySelectorAll('nav a[href^="#"]')];
 const sections = navLinks
