@@ -6,7 +6,7 @@
   <meta name="description" content="Michael Chad Tollison — Software & Data Engineer with 10 years building backend services, identity systems, and data platforms in C#/.NET and Python on AWS.">
   <meta name="theme-color" content="#090d12">
   <title>Michael Chad Tollison | Software & Data Engineer</title>
-  <link rel="stylesheet" href="styles.css?v=2026-11-26b">
+  <link rel="stylesheet" href="styles.css?v=2026-11-26d">
 </head>
 <body>
   <div id="scroll-progress" aria-hidden="true"></div>
@@ -29,13 +29,30 @@
 
   <main id="top">
     <section class="hero" data-reveal>
-      <p class="kicker">SOFTWARE & DATA ENGINEER · C#/.NET · PYTHON · AWS</p>
-      <h1>I build reliable software,<br><em>data platforms & cloud systems.</em></h1>
-      <p class="lead">Software and data engineer with 10 years across backend services, identity, and data platforms. Owns production C#/.NET microservices for identity, privacy requests, and API usage tracking, supported by a decade of ETL, SQL Server, and reporting work in education, government, and healthcare.</p>
-      <div class="buttons">
-        <a class="primary magnetic" href="#projects">Explore my work <span>↓</span></a>
-        <a class="secondary magnetic" href="redact.html">Try my live PII demo <span>→</span></a>
-        <a class="secondary magnetic" href="https://github.com/chadtollison" target="_blank" rel="noreferrer">GitHub ↗</a>
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="kicker">SOFTWARE & DATA ENGINEER · C#/.NET · PYTHON · AWS</p>
+          <h1>I build software that keeps <em>private data private.</em></h1>
+          <p class="lead">I'm Chad, a software and data engineer with 10 years in C#/.NET, Python and AWS. I run identity and privacy services in production, and I trained my own AI model that spots personal data. Go ahead and try it.</p>
+          <div class="buttons">
+            <a class="primary magnetic" href="redact.html">Try my live PII demo <span>→</span></a>
+            <a class="secondary magnetic" href="#projects">Explore my work <span>↓</span></a>
+            <a class="secondary magnetic" href="https://github.com/chadtollison" target="_blank" rel="noreferrer">GitHub ↗</a>
+          </div>
+        </div>
+        <div class="hero-side">
+          <figure class="portrait">
+            <picture>
+              <source srcset="images/chad-tollison.webp" type="image/webp">
+              <img src="images/chad-tollison.jpg" width="180" height="180" alt="Portrait of Michael Chad Tollison">
+            </picture>
+          </figure>
+          <a class="redact-teaser reactive" href="redact.html" aria-label="Open the live PII redaction demo">
+            <small><i class="live-dot" aria-hidden="true"></i>LIVE DEMO · RUNS IN YOUR BROWSER</small>
+            <p aria-hidden="true">Hi, I'm <span class="t-pii" data-tag="NAME">Jane Doe</span>. Email me at <span class="t-pii" data-tag="EMAIL">jane@mail.com</span> or call <span class="t-pii" data-tag="PHONE">555-0142</span>.</p>
+            <b>Paste your own text <span>→</span></b>
+          </a>
+        </div>
       </div>
       <div class="tags hero-tags" aria-label="Core technologies">
         <span>C# / .NET</span><span>Microservices</span><span>SQL Server</span><span>PostgreSQL</span><span>AWS</span><span>Python</span><span>ETL</span><span>AI</span>
