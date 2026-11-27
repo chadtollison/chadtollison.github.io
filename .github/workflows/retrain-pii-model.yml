@@ -69,16 +69,19 @@ jobs:
           set -e
           OUT=models/pii-distilbert-v2
           optimum-cli export onnx --model build/new_model --task token-classification build/onnx/
-          python - <<'PY'
-          from onnxruntime.quantization import quantize_dynamic, QuantType
-          quantize_dynamic("build/onnx/model.onnx", "models/pii-distilbert-v2/onnx/model_quantized.onnx",
-                           weight_type=QuantType.QInt8, per_channel=True)
-          PY
+          # Tries several 8-bit methods and keeps the one closest to the full model.
+          python training/quantize.py build/onnx "$OUT/onnx/model_quantized.onnx" | tee -a build/new_model/report.md
           cp build/onnx/config.json build/onnx/tokenizer.json build/onnx/tokenizer_config.json "$OUT/"
           cp build/onnx/special_tokens_map.json "$OUT/" 2>/dev/null || true
           git config user.name "github-actions[bot]"
           git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
-          git add "$OUT"
+          # Score the new model on the public ai4privacy dataset too.
+          pip install -q "datasets==3.1.0"
+          python training/benchmark_ai4privacy.py \
+            --model build/new_model --name "Retrained model (full size)" \
+            --model "$OUT" --name "In-browser model (this site)"
+          cat benchmarks/ai4privacy.md >> "$GITHUB_STEP_SUMMARY"
+          git add "$OUT" benchmarks
           git commit -m "Update in-browser PII model with the retrained version" || echo "No changes"
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
