@@ -16,7 +16,7 @@ on:
         default: false
   # Adding lines to training/examples.txt on main retrains automatically.
   push:
-    branches: [main, claude/project-thread-rci1w3]
+    branches: [main, "claude/**"]
     paths: ["training/examples.txt", "training/retrain_pii.py", "training/area_codes.txt", ".github/workflows/retrain-pii-model.yml"]
 
 concurrency:

@@ -252,6 +252,26 @@ Charge card {CREDIT_CARD} for {PRICE}.
 Card number {CREDIT_CARD} exp {DATE}
 {PERSON} paid with {CREDIT_CARD}.
 Refund {PRICE} to card {CREDIT_CARD} for order {ORDER}.
+My card is {CREDIT_CARD}.
+Visa {CREDIT_CARD}, expires {DATE}, billing zip {ZIP}.
+Please update my payment method to {CREDIT_CARD}.
+{CREDIT_CARD}
+The customer read their card number over the phone: {CREDIT_CARD}.
+cc: {CREDIT_CARD} exp {DATE}
+Mastercard ending in {CREDIT_CARD} was declined for order {ORDER}.
+Use the company card {CREDIT_CARD} for the {PRICE} invoice.
+{PERSON} | {CREDIT_CARD} | {DATE}
+I was charged twice on {CREDIT_CARD} for order {ORDER}, total {PRICE}.
+Amex {CREDIT_CARD} on file for {PERSON}.
+Card: {CREDIT_CARD}  Tracking: {TRACK}
+Her social is {SSN}.
+{PERSON}, SSN {SSN}, lives at {ADDRESS}.
+ssn {SSN}
+Please verify the last four of {SSN} before we talk about invoice {INVOICE}.
+Employee {PERSON} ({SSN}) started on {DATE}.
+Tax ID / SSN: {SSN}
+{SSN}
+The W-2 for {PERSON} lists social security number {SSN}.
 Login from {IP_ADDRESS} by {PERSON} on {DATE}.
 Server {IP_ADDRESS} logged a failed login from {IP_ADDRESS}.
 Blocked IP {IP_ADDRESS} after {QTY} attempts.
@@ -303,6 +323,10 @@ IBAN: {IBAN}, titular {PERSON}.
 Devuelva {PRICE} a la cuenta {IBAN}.
 Pagó con la tarjeta {CREDIT_CARD}.
 Número de tarjeta {CREDIT_CARD}, caduca el {DATE}.
+Mi tarjeta es {CREDIT_CARD}.
+Cobrar {PRICE} a la tarjeta {CREDIT_CARD} del pedido {ORDER}.
+Tarjeta de crédito: {CREDIT_CARD}
+{PERSON} pagó con la Visa {CREDIT_CARD} el {DATE}.
 Acceso desde la IP {IP_ADDRESS} el {DATE}.
 Bloqueamos la IP {IP_ADDRESS} tras {QTY} intentos.
 La clave de API es {API_KEY}, no la compartas.
