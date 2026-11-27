@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "chad-pii"
+version = "0.1.0"
+description = "Find and redact personal data (names, emails, phones, SSNs, cards, IPs, passports, driver's licenses, API keys, IBANs) with a fine-tuned DistilBERT model plus checksum rules."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Michael Chad Tollison" }]
+keywords = ["pii", "redaction", "privacy", "ner", "distilbert", "gdpr", "data-masking"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Topic :: Security",
+  "Topic :: Text Processing :: Linguistic",
+  "Intended Audience :: Developers",
+]
+dependencies = ["transformers>=4.40", "torch>=2.6"]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[project.scripts]
+chad-pii = "chad_pii.cli:main"
+
+[project.urls]
+Homepage = "https://chadtollison.github.io/redact.html"
+Model = "https://huggingface.co/ChadTollison/pii-distilbert-v2"
+Source = "https://github.com/chadtollison/chadtollison.github.io/tree/main/chad-pii"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/chad_pii"]
