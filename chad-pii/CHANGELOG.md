@@ -8,6 +8,7 @@
 - `chad-pii serve`: a local HTTP API (FastAPI) with `/redact`, `/find` and `/restore`. Install with `chad-pii[server]`.
 - The command line redacts `.csv`, `.json`, `.jsonl` and text files.
 - `tokenize()` can reuse an existing key.
+- A failed check (Luhn, SSN format ...) no longer drops an item the model is 95%+ sure of: hiding beats leaking.
 - Fake values for address, ID number, date of birth, username and password.
 
 ## 0.1.0

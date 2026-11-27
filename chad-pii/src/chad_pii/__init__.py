@@ -27,6 +27,7 @@ __version__ = "0.2.0"
 
 MODEL_ID = "ChadTollison/pii-distilbert-v2"
 MODES = ("label", "mask", "fake", "token")
+SURE = 0.95     # model confidence that overrides a failed format/checksum check
 
 _pipeline = None
 _pipeline_id = None
@@ -203,7 +204,8 @@ def find(text: str, min_score: float = 0.5, model: str = MODEL_ID) -> List[Entit
 
     Items the rules found or confirmed are always returned. Others need a model
     confidence of at least `min_score`, and must pass their type's check
-    (Luhn for cards, checksum for IBANs, format for SSNs...).
+    (Luhn for cards, checksum for IBANs, format for SSNs...) unless the model
+    is at least 95% sure.
     """
     if not text.strip():
         return []
@@ -213,7 +215,9 @@ def find(text: str, min_score: float = 0.5, model: str = MODEL_ID) -> List[Entit
 def _finish(text: str, ents: List[Entity], min_score: float) -> List[Entity]:
     _grow(ents, text)
     ents = _rules(ents, text)
-    return [e for e in ents if e.rule or (e.score >= min_score and _valid(e))]
+    # A failed check (Luhn, SSN format ...) drops an item unless the model is
+    # very sure: for a redactor, hiding a mistyped card number beats leaking it.
+    return [e for e in ents if e.rule or (e.score >= min_score and (e.score >= SURE or _valid(e)))]
 
 
 def find_many(texts: List[str], min_score: float = 0.5, model: str = MODEL_ID, batch_size: int = 16) -> List[List[Entity]]:
