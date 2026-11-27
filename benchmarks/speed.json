@@ -3,23 +3,23 @@
     {
       "name": "Microsoft Presidio + spaCy lg",
       "mb": 815,
-      "install_s": 22,
-      "first_s": 1.43,
-      "warm_s": 1.47
+      "install_s": 26,
+      "first_s": 1.46,
+      "warm_s": 1.49
     },
     {
       "name": "scrubpii with PyTorch (0.3 setup)",
       "mb": 1558,
-      "install_s": 41,
-      "first_s": 8.55,
-      "warm_s": 3.18
+      "install_s": 39,
+      "first_s": 8.03,
+      "warm_s": 3.39
     },
     {
       "name": "scrubpii 0.4 (ONNX, default)",
       "mb": 288,
-      "install_s": 7,
-      "first_s": 1.65,
-      "warm_s": 0.59
+      "install_s": 8,
+      "first_s": 2.31,
+      "warm_s": 0.6
     }
   ],
   "accuracy": {
@@ -30,7 +30,7 @@
         "fully_hidden": 0.989,
         "was_personal": 0.994,
         "f1": 0.992,
-        "ms_per_text": 7.7,
+        "ms_per_text": 11.8,
         "by_type": {
           "ADDRESS": {
             "items": 319,
@@ -85,7 +85,7 @@
         "fully_hidden": 0.99,
         "was_personal": 0.995,
         "f1": 0.993,
-        "ms_per_text": 26.2,
+        "ms_per_text": 37.1,
         "by_type": {
           "ADDRESS": {
             "items": 319,
@@ -140,7 +140,7 @@
         "fully_hidden": 0.668,
         "was_personal": 0.905,
         "f1": 0.814,
-        "ms_per_text": 10.7,
+        "ms_per_text": 9.1,
         "by_type": {
           "ADDRESS": {
             "items": 319,
@@ -195,9 +195,9 @@
         "items": 790,
         "caught": 0.989,
         "fully_hidden": 0.984,
-        "was_personal": 0.994,
-        "f1": 0.991,
-        "ms_per_text": 10.7,
+        "was_personal": 0.995,
+        "f1": 0.992,
+        "ms_per_text": 17.3,
         "by_type": {
           "ADDRESS": {
             "items": 169,
@@ -252,7 +252,7 @@
         "fully_hidden": 0.984,
         "was_personal": 0.993,
         "f1": 0.991,
-        "ms_per_text": 32.0,
+        "ms_per_text": 46.9,
         "by_type": {
           "ADDRESS": {
             "items": 169,
@@ -307,7 +307,7 @@
         "fully_hidden": 0.515,
         "was_personal": 0.653,
         "f1": 0.629,
-        "ms_per_text": 10.3,
+        "ms_per_text": 8.9,
         "by_type": {
           "ADDRESS": {
             "items": 169,
@@ -361,15 +361,15 @@
       "scrubpii 0.4 (ONNX 8-bit)": {
         "items": 2933,
         "caught": 0.996,
-        "fully_hidden": 0.992,
+        "fully_hidden": 0.993,
         "was_personal": 0.988,
         "f1": 0.992,
-        "ms_per_text": 16.6,
+        "ms_per_text": 30.3,
         "by_type": {
           "ADDRESS": {
             "items": 312,
             "caught": 0.994,
-            "fully_hidden": 0.987
+            "fully_hidden": 0.99
           },
           "API_KEY": {
             "items": 7,
@@ -432,9 +432,9 @@
         "items": 2933,
         "caught": 0.996,
         "fully_hidden": 0.994,
-        "was_personal": 0.988,
+        "was_personal": 0.987,
         "f1": 0.992,
-        "ms_per_text": 46.4,
+        "ms_per_text": 72.3,
         "by_type": {
           "ADDRESS": {
             "items": 312,
@@ -504,7 +504,7 @@
         "fully_hidden": 0.75,
         "was_personal": 0.832,
         "f1": 0.852,
-        "ms_per_text": 18.1,
+        "ms_per_text": 17.1,
         "by_type": {
           "ADDRESS": {
             "items": 312,
@@ -572,11 +572,11 @@
     "Gretel finance (English, never trained on)": {
       "scrubpii 0.4 (ONNX 8-bit)": {
         "items": 3136,
-        "caught": 0.726,
-        "fully_hidden": 0.653,
-        "was_personal": 0.86,
-        "f1": 0.787,
-        "ms_per_text": 146.9,
+        "caught": 0.743,
+        "fully_hidden": 0.67,
+        "was_personal": 0.857,
+        "f1": 0.796,
+        "ms_per_text": 195.3,
         "by_type": {
           "ADDRESS": {
             "items": 801,
@@ -601,7 +601,7 @@
           "DRIVER_LICENSE": {
             "items": 30,
             "caught": 0.767,
-            "fully_hidden": 0.633
+            "fully_hidden": 0.6
           },
           "EMAIL": {
             "items": 292,
@@ -610,8 +610,8 @@
           },
           "IBAN": {
             "items": 57,
-            "caught": 0.596,
-            "fully_hidden": 0.561
+            "caught": 0.614,
+            "fully_hidden": 0.579
           },
           "IP_ADDRESS": {
             "items": 73,
@@ -630,13 +630,13 @@
           },
           "PERSON": {
             "items": 1503,
-            "caught": 0.629,
+            "caught": 0.627,
             "fully_hidden": 0.55
           },
           "PHONE": {
             "items": 183,
-            "caught": 0.689,
-            "fully_hidden": 0.678
+            "caught": 0.978,
+            "fully_hidden": 0.967
           },
           "SSN": {
             "items": 32,
@@ -652,11 +652,11 @@
       },
       "scrubpii (PyTorch)": {
         "items": 3136,
-        "caught": 0.743,
-        "fully_hidden": 0.678,
-        "was_personal": 0.843,
-        "f1": 0.79,
-        "ms_per_text": 255.6,
+        "caught": 0.759,
+        "fully_hidden": 0.694,
+        "was_personal": 0.842,
+        "f1": 0.798,
+        "ms_per_text": 415.4,
         "by_type": {
           "ADDRESS": {
             "items": 801,
@@ -715,8 +715,8 @@
           },
           "PHONE": {
             "items": 183,
-            "caught": 0.705,
-            "fully_hidden": 0.694
+            "caught": 0.978,
+            "fully_hidden": 0.967
           },
           "SSN": {
             "items": 32,
@@ -736,7 +736,7 @@
         "fully_hidden": 0.564,
         "was_personal": 0.384,
         "f1": 0.521,
-        "ms_per_text": 74.7,
+        "ms_per_text": 75.4,
         "by_type": {
           "ADDRESS": {
             "items": 801,

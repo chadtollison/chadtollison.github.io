@@ -8,9 +8,9 @@ Run on 2026-11-27 on a GitHub Actions runner (CPU only). Up to 1000 texts per da
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| scrubpii 0.4 (ONNX 8-bit) | 99% | 99% | 99% | 0.992 | 8 |
-| scrubpii (PyTorch) | 99% | 99% | 100% | **0.993** | 26 |
-| Microsoft Presidio | 74% | 67% | 90% | 0.814 | 11 |
+| scrubpii 0.4 (ONNX 8-bit) | 99% | 99% | 99% | 0.992 | 12 |
+| scrubpii (PyTorch) | 99% | 99% | 100% | **0.993** | 37 |
+| Microsoft Presidio | 74% | 67% | 90% | 0.814 | 9 |
 
 Caught, by type:
 
@@ -30,9 +30,9 @@ Caught, by type:
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| scrubpii 0.4 (ONNX 8-bit) | 99% | 98% | 99% | **0.991** | 11 |
-| scrubpii (PyTorch) | 99% | 98% | 99% | **0.991** | 32 |
-| Microsoft Presidio | 61% | 52% | 65% | 0.629 | 10 |
+| scrubpii 0.4 (ONNX 8-bit) | 99% | 98% | 100% | **0.992** | 17 |
+| scrubpii (PyTorch) | 99% | 98% | 99% | 0.991 | 47 |
+| Microsoft Presidio | 61% | 52% | 65% | 0.629 | 9 |
 
 Caught, by type:
 
@@ -52,9 +52,9 @@ Caught, by type:
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| scrubpii 0.4 (ONNX 8-bit) | 100% | 99% | 99% | **0.992** | 17 |
-| scrubpii (PyTorch) | 100% | 99% | 99% | **0.992** | 46 |
-| Microsoft Presidio | 87% | 75% | 83% | 0.852 | 18 |
+| scrubpii 0.4 (ONNX 8-bit) | 100% | 99% | 99% | **0.992** | 30 |
+| scrubpii (PyTorch) | 100% | 99% | 99% | **0.992** | 72 |
+| Microsoft Presidio | 87% | 75% | 83% | 0.852 | 17 |
 
 Caught, by type:
 
@@ -77,8 +77,8 @@ Caught, by type:
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| scrubpii 0.4 (ONNX 8-bit) | 73% | 65% | 86% | 0.787 | 147 |
-| scrubpii (PyTorch) | 74% | 68% | 84% | **0.790** | 256 |
+| scrubpii 0.4 (ONNX 8-bit) | 74% | 67% | 86% | 0.796 | 195 |
+| scrubpii (PyTorch) | 76% | 69% | 84% | **0.798** | 415 |
 | Microsoft Presidio | 81% | 56% | 38% | 0.521 | 75 |
 
 Caught, by type:
@@ -91,15 +91,15 @@ Caught, by type:
 | DATE_OF_BIRTH | 52 | 90% | 92% | 94% |
 | DRIVER_LICENSE | 30 | 77% | 77% | 93% |
 | EMAIL | 292 | 98% | 98% | 99% |
-| IBAN | 57 | 60% | 60% | 54% |
+| IBAN | 57 | 61% | 60% | 54% |
 | IP_ADDRESS | 73 | 73% | 73% | 99% |
 | PASSPORT | 24 | 79% | 92% | 100% |
 | PASSWORD | 33 | 67% | 70% | 39% |
 | PERSON | 1503 | 63% | 65% | 79% |
-| PHONE | 183 | 69% | 70% | 92% |
+| PHONE | 183 | 98% | 98% | 92% |
 | SSN | 32 | 88% | 84% | 75% |
 | USERNAME | 11 | 82% | 91% | 36% |
 
 Presidio runs with its defaults (spaCy en_core_web_lg, all recognizers, English). On Spanish text every system uses its English setup except scrubpii, which trains on Spanish too.
 
-Data: ai4privacy open-pii-masking-500k (CC BY 4.0), Gretel gretel-pii-masking-en-v1 and synthetic_pii_finance_multilingual (Apache 2.0).
+Data: ai4privacy open-pii-masking-500k (CC BY 4.0), Gretel gretel-pii-masking-en-v1 and synthetic_pii_finance_multilingual (Apache 2.0), NVIDIA Nemotron-PII (CC BY 4.0).
