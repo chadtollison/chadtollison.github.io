@@ -564,3 +564,25 @@ render();
     statusText.textContent = "Sorry, the model couldn't load in this browser. Try a recent Chrome, Edge, Firefox or Safari.";
   }
 })();
+
+// ---- Benchmark on a public dataset (filled in by the benchmark workflow) ----
+(async () => {
+  try {
+    const res = await fetch('benchmarks/ai4privacy.json', { cache: 'no-cache' });
+    if (!res.ok) return;
+    const data = await res.json();
+    const name = Object.keys(data.models).find((n) => /in-browser/i.test(n)) || Object.keys(data.models)[0];
+    const r = data.models[name];
+    if (!r) return;
+    const pct = (x) => `${Math.round(x * 100)}%`;
+    const names = { PERSON: 'Names', EMAIL: 'Emails', PHONE: 'Phone numbers', SSN: 'Social Security numbers', CREDIT_CARD: 'Card numbers', IP_ADDRESS: 'IP addresses', ALL: 'All of them' };
+    $('bench-rows').innerHTML = Object.keys(names).filter((t) => r[t]).map((t) => {
+      const x = r[t];
+      if (!x.items) return `<tr><td>${names[t]}</td><td>0</td><td class="na" colspan="3">not in the sample</td></tr>`;
+      return `<tr><td>${names[t]}</td><td>${x.items.toLocaleString()}</td><td>${pct(x.overlap_recall)}</td><td>${pct(x.overlap_precision)}</td><td>${x.overlap_f1.toFixed(2)}</td></tr>`;
+    }).join('');
+    const ds = data.meta.dataset;
+    $('bench-lead').innerHTML = `Tested on ${data.meta.rows.toLocaleString()} English texts from <a href="https://huggingface.co/datasets/${esc(ds)}" target="_blank" rel="noreferrer">${esc(ds)}</a>, a public dataset written by another team that this model never trained on. These are the scores for the model running on this page.`;
+    $('bench').hidden = false;
+  } catch (e) { /* no results yet */ }
+})();

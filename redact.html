@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#090d12">
   <title>Redact Me | Live PII Detector Demo</title>
   <link rel="stylesheet" href="styles.css?v=2026-11-26b">
-  <link rel="stylesheet" href="redact.css?v=2026-11-27c">
+  <link rel="stylesheet" href="redact.css?v=2026-11-27d">
 </head>
 <body>
   <header>
@@ -108,6 +108,13 @@
         <article><small>02</small><h3>Classify</h3><p>A DistilBERT model I fine-tuned labels every piece and gives a confidence score, running on your device with ONNX Runtime.</p></article>
         <article><small>03</small><h3>Validate</h3><p>Card numbers must pass a Luhn checksum and SSNs a format check, the same rule-based safety net used in the full service.</p></article>
       </div>
+      <div id="bench" class="bench" hidden>
+        <h2>How well it works</h2>
+        <p class="use-lead" id="bench-lead"></p>
+        <div class="bench-wrap"><table class="bench-table"><thead><tr><th>Type</th><th>Items</th><th>Found</th><th>Right</th><th>F1</th></tr></thead><tbody id="bench-rows"></tbody></table></div>
+        <p class="bench-note"><strong>Found</strong> is the share of real items it caught. <strong>Right</strong> is the share of its finds that were real. Its finds count when they cover the item, since that is what hides it. <a href="benchmarks/ai4privacy.md" target="_blank" rel="noreferrer">Full results</a></p>
+      </div>
+
       <div class="use">
         <h2>Use it in your own code</h2>
         <p class="use-lead">The model is free on Hugging Face. Three steps get it running in Python.</p>
@@ -161,7 +168,7 @@ print(redact(text))
   </main>
 
   <footer><span>Michael Chad Tollison</span><span>Software & Data Engineer</span><span><a href="./">Portfolio</a></span></footer>
-  <script type="module" src="redact.js?v=2026-11-27d"></script>
+  <script type="module" src="redact.js?v=2026-11-27e"></script>
   <script data-goatcounter="https://chadtollison.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
