@@ -2,6 +2,7 @@
 # publishes it to PyPI. Publishing uses PyPI "trusted publishing", so there is
 # no token to store: PyPI trusts this workflow once you add it as a publisher.
 # Publish: Actions tab -> "scrubpii package" -> Run workflow -> tick "publish".
+# (The file keeps the name piiguard-package.yml because PyPI trusts this file name.)
 name: scrubpii package
 
 on:
@@ -13,7 +14,7 @@ on:
         default: false
   push:
     branches: [main, "claude/**"]
-    paths: ["scrubpii/**", ".github/workflows/scrubpii-package.yml"]
+    paths: ["scrubpii/**", ".github/workflows/piiguard-package.yml"]
 
 jobs:
   test:
