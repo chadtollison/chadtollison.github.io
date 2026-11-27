@@ -1,4 +1,4 @@
-# chad-pii vs Microsoft Presidio vs spaCy
+# piiguard vs Microsoft Presidio vs spaCy
 
 Run on 2026-11-27 on a GitHub Actions runner (CPU only). Up to 1000 texts per dataset.
 
@@ -8,7 +8,7 @@ Run on 2026-11-27 on a GitHub Actions runner (CPU only). Up to 1000 texts per da
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| chad-pii-v3 | 99% | 99% | 100% | 0.993 | 26 |
+| piiguard-v3 | 99% | 99% | 100% | 0.993 | 26 |
 | v4-long-documents | 100% | 99% | 100% | **0.996** | 25 |
 | v4-large-DeBERTa | 74% | 52% | 100% | 0.846 | 63 |
 | Microsoft Presidio | 74% | 67% | 90% | 0.814 | 6 |
@@ -16,7 +16,7 @@ Run on 2026-11-27 on a GitHub Actions runner (CPU only). Up to 1000 texts per da
 
 Caught, by type:
 
-| Type | Items | chad-pii-v3 | v4-long-documents | v4-large-DeBERTa | Microsoft Presidio | spaCy (en_core_web_lg) |
+| Type | Items | piiguard-v3 | v4-long-documents | v4-large-DeBERTa | Microsoft Presidio | spaCy (en_core_web_lg) |
 |---|---:|---:|---:|---:|---:|---:|
 | ADDRESS | 319 | 99% | 99% | 88% | 66% | 61% |
 | CREDIT_CARD | 13 | 100% | 100% | 85% | 62% | 0% |
@@ -32,7 +32,7 @@ Caught, by type:
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| chad-pii-v3 | 99% | 98% | 99% | 0.991 | 33 |
+| piiguard-v3 | 99% | 98% | 99% | 0.991 | 33 |
 | v4-long-documents | 99% | 99% | 100% | **0.996** | 33 |
 | v4-large-DeBERTa | 73% | 53% | 100% | 0.843 | 67 |
 | Microsoft Presidio | 61% | 52% | 65% | 0.629 | 5 |
@@ -40,7 +40,7 @@ Caught, by type:
 
 Caught, by type:
 
-| Type | Items | chad-pii-v3 | v4-long-documents | v4-large-DeBERTa | Microsoft Presidio | spaCy (en_core_web_lg) |
+| Type | Items | piiguard-v3 | v4-long-documents | v4-large-DeBERTa | Microsoft Presidio | spaCy (en_core_web_lg) |
 |---|---:|---:|---:|---:|---:|---:|
 | ADDRESS | 169 | 98% | 99% | 81% | 36% | 32% |
 | CREDIT_CARD | 14 | 100% | 100% | 64% | 64% | 14% |
@@ -56,7 +56,7 @@ Caught, by type:
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| chad-pii-v3 | 100% | 99% | 99% | 0.992 | 51 |
+| piiguard-v3 | 100% | 99% | 99% | 0.992 | 51 |
 | v4-long-documents | 100% | 100% | 99% | **0.993** | 52 |
 | v4-large-DeBERTa | 65% | 45% | 100% | 0.787 | 88 |
 | Microsoft Presidio | 87% | 75% | 83% | 0.852 | 11 |
@@ -64,7 +64,7 @@ Caught, by type:
 
 Caught, by type:
 
-| Type | Items | chad-pii-v3 | v4-long-documents | v4-large-DeBERTa | Microsoft Presidio | spaCy (en_core_web_lg) |
+| Type | Items | piiguard-v3 | v4-long-documents | v4-large-DeBERTa | Microsoft Presidio | spaCy (en_core_web_lg) |
 |---|---:|---:|---:|---:|---:|---:|
 | ADDRESS | 312 | 100% | 100% | 95% | 81% | 75% |
 | API_KEY | 7 | 100% | 100% | 86% | 29% | 14% |
@@ -83,7 +83,7 @@ Caught, by type:
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| chad-pii-v3 | 70% | 63% | 84% | **0.761** | 291 |
+| piiguard-v3 | 70% | 63% | 84% | **0.761** | 291 |
 | v4-long-documents | 70% | 65% | 81% | 0.755 | 300 |
 | v4-large-DeBERTa | 48% | 14% | 88% | 0.619 | 433 |
 | Microsoft Presidio | 81% | 56% | 38% | 0.521 | 53 |
@@ -91,7 +91,7 @@ Caught, by type:
 
 Caught, by type:
 
-| Type | Items | chad-pii-v3 | v4-long-documents | v4-large-DeBERTa | Microsoft Presidio | spaCy (en_core_web_lg) |
+| Type | Items | piiguard-v3 | v4-long-documents | v4-large-DeBERTa | Microsoft Presidio | spaCy (en_core_web_lg) |
 |---|---:|---:|---:|---:|---:|---:|
 | ADDRESS | 801 | 82% | 82% | 76% | 78% | 73% |
 | API_KEY | 19 | 84% | 90% | 37% | 16% | 0% |
@@ -108,6 +108,6 @@ Caught, by type:
 | SSN | 32 | 84% | 88% | 84% | 75% | 0% |
 | USERNAME | 11 | 82% | 91% | 9% | 36% | 9% |
 
-Presidio runs with its defaults (spaCy en_core_web_lg, all recognizers, English). On Spanish text every system uses its English setup except chad-pii, which trains on Spanish too.
+Presidio runs with its defaults (spaCy en_core_web_lg, all recognizers, English). On Spanish text every system uses its English setup except piiguard, which trains on Spanish too.
 
 Data: ai4privacy open-pii-masking-500k (CC BY 4.0), Gretel gretel-pii-masking-en-v1 and synthetic_pii_finance_multilingual (Apache 2.0).

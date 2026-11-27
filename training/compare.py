@@ -1,4 +1,4 @@
-"""Head-to-head: chad-pii vs Microsoft Presidio vs spaCy on public PII datasets.
+"""Head-to-head: piiguard vs Microsoft Presidio vs spaCy on public PII datasets.
 
 The question for a redactor is "would this text be safe to share after
 redaction?", so the main scores ignore what *name* each system gives an item:
@@ -13,11 +13,11 @@ redaction?", so the main scores ignore what *name* each system gives an item:
 Per-type "Caught" is reported too. Datasets:
   * ai4privacy open-pii-masking-500k, validation split, English and Spanish
   * gretel-pii-masking-en-v1, test split
-  * gretel synthetic_pii_finance_multilingual, English test split: chad-pii
+  * gretel synthetic_pii_finance_multilingual, English test split: piiguard
     never trains on this one, so it is the fairest outside test.
-chad-pii v3 trains on the *train* splits of the first two (never on these rows).
+piiguard v3 trains on the *train* splits of the first two (never on these rows).
 
-  python training/compare.py --system chad-pii:build/v3 --system chad-pii:ChadTollison/pii-distilbert-v2 \
+  python training/compare.py --system piiguard:build/v3 --system piiguard:ChadTollison/pii-distilbert-v2 \
       --system presidio --system spacy --rows 1000
 """
 import argparse
@@ -39,13 +39,13 @@ SPACY_MAP = {"PERSON": "PERSON", "GPE": "ADDRESS", "LOC": "ADDRESS", "FAC": "ADD
 
 def make_system(spec):
     """Return (display name, fn(text) -> [(start, end, type)])."""
-    if spec.startswith("chad-pii"):
-        import chad_pii
-        model = spec.split(":", 1)[1] if ":" in spec else chad_pii.MODEL_ID
+    if spec.startswith("piiguard"):
+        import piiguard
+        model = spec.split(":", 1)[1] if ":" in spec else piiguard.MODEL_ID
         model, _, named = model.partition("=")
-        label = named if named else "chad-pii v3" if "v3" in model else "chad-pii v2 (current)" if "pii-distilbert-v2" in model else f"chad-pii ({model})"
-        chad_pii.find("warm up", model=model)
-        return label, lambda t: [(e.start, e.end, e.type) for e in chad_pii.find(t, model=model)]
+        label = named if named else "piiguard v3" if "v3" in model else "piiguard v2 (current)" if "pii-distilbert-v2" in model else f"piiguard ({model})"
+        piiguard.find("warm up", model=model)
+        return label, lambda t: [(e.start, e.end, e.type) for e in piiguard.find(t, model=model)]
     if spec == "presidio":
         from presidio_analyzer import AnalyzerEngine
         eng = AnalyzerEngine()
@@ -104,7 +104,7 @@ DATASETS = {
 def report(results, stem, meta):
     OUT.mkdir(exist_ok=True)
     (OUT / f"{stem}.json").write_text(json.dumps({"meta": meta, "results": results}, indent=2) + "\n")
-    L = ["# chad-pii vs Microsoft Presidio vs spaCy", "",
+    L = ["# piiguard vs Microsoft Presidio vs spaCy", "",
          f"Run on {meta['date']} on a GitHub Actions runner (CPU only). Up to {meta['rows']} texts per dataset.", "",
          "**Caught**: share of marked personal-data items that any find touches. "
          "**Fully hidden**: share with 90%+ of characters covered. "
@@ -124,7 +124,7 @@ def report(results, stem, meta):
                                                          for r in systems.values()) + " |")
         L.append("")
     L += ["Presidio runs with its defaults (spaCy en_core_web_lg, all recognizers, English). "
-          "On Spanish text every system uses its English setup except chad-pii, which trains on Spanish too.", "",
+          "On Spanish text every system uses its English setup except piiguard, which trains on Spanish too.", "",
           "Data: ai4privacy open-pii-masking-500k (CC BY 4.0), Gretel gretel-pii-masking-en-v1 and "
           "synthetic_pii_finance_multilingual (Apache 2.0)."]
     (OUT / f"{stem}.md").write_text("\n".join(L) + "\n")

@@ -1,6 +1,6 @@
 """Find and redact personal data in text.
 
-    >>> from chad_pii import redact
+    >>> from piiguard import redact
     >>> redact("Hi, I'm Sarah Johnson. Call 662-634-1142.")
     "Hi, I'm [PERSON]. Call [PHONE]."
 
@@ -25,7 +25,7 @@ from typing import Dict, List, Optional, Tuple
 
 __all__ = ["Entity", "find", "find_many", "redact", "redact_many", "tokenize", "restore", "fake_for", "MODEL_ID",
            "redact_json", "redact_csv", "redact_dataframe", "Guard"]
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 MODEL_ID = "ChadTollison/pii-distilbert-v3"
 MODES = ("label", "mask", "fake", "token")
@@ -33,7 +33,7 @@ SURE = 0.95     # model confidence that overrides a failed format/checksum check
 # Long text is read in windows of this many tokens. The model learned on short
 # texts, and on long documents it finds much more when it reads them in short
 # pieces (finance set: 0.65 F1 with 512-token windows, 0.76 with 128).
-WINDOW = int(os.environ.get("CHAD_PII_WINDOW", "128"))
+WINDOW = int(os.environ.get("PIIGUARD_WINDOW") or os.environ.get("CHAD_PII_WINDOW") or "128")
 
 _pipeline = None
 _pipeline_id = None

@@ -1,6 +1,6 @@
 """Keep personal data out of prompts you send to an LLM (or any outside service).
 
-    from chad_pii import Guard
+    from piiguard import Guard
     guard = Guard()
     safe = guard.scrub("Email Sarah Johnson at sarah.j@example.com about her refund")
     # "Email <PERSON_1> at <EMAIL_1> about her refund"   -> send this to the model

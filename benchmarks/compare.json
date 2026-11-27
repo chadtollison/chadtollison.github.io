@@ -3,15 +3,15 @@
     "date": "2026-11-27",
     "rows": 1000,
     "systems": [
-      "chad-pii v3",
-      "chad-pii v2 (current)",
+      "piiguard v3",
+      "piiguard v2 (current)",
       "Microsoft Presidio",
       "spaCy (en_core_web_lg)"
     ]
   },
   "results": {
     "ai4privacy (English)": {
-      "chad-pii v3": {
+      "piiguard v3": {
         "items": 1637,
         "caught": 0.992,
         "fully_hidden": 0.99,
@@ -66,7 +66,7 @@
           }
         }
       },
-      "chad-pii v2 (current)": {
+      "piiguard v2 (current)": {
         "items": 1637,
         "caught": 0.808,
         "fully_hidden": 0.732,
@@ -233,7 +233,7 @@
       }
     },
     "ai4privacy (Spanish)": {
-      "chad-pii v3": {
+      "piiguard v3": {
         "items": 790,
         "caught": 0.989,
         "fully_hidden": 0.984,
@@ -288,7 +288,7 @@
           }
         }
       },
-      "chad-pii v2 (current)": {
+      "piiguard v2 (current)": {
         "items": 790,
         "caught": 0.741,
         "fully_hidden": 0.644,
@@ -455,7 +455,7 @@
       }
     },
     "Gretel PII (English)": {
-      "chad-pii v3": {
+      "piiguard v3": {
         "items": 2933,
         "caught": 0.996,
         "fully_hidden": 0.994,
@@ -525,7 +525,7 @@
           }
         }
       },
-      "chad-pii v2 (current)": {
+      "piiguard v2 (current)": {
         "items": 2933,
         "caught": 0.69,
         "fully_hidden": 0.579,
@@ -737,7 +737,7 @@
       }
     },
     "Gretel finance (English, never trained on)": {
-      "chad-pii v3": {
+      "piiguard v3": {
         "items": 3136,
         "caught": 0.743,
         "fully_hidden": 0.677,
@@ -817,7 +817,7 @@
           }
         }
       },
-      "chad-pii v2 (current)": {
+      "piiguard v2 (current)": {
         "items": 3136,
         "caught": 0.855,
         "fully_hidden": 0.598,

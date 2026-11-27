@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="piiguard: find and redact personal data in Python with one line. Fine-tuned transformer plus checksum rules, runs fully offline, benchmarked against Microsoft Presidio.">
+  <meta name="theme-color" content="#090d12">
+  <title>piiguard | Redact personal data in Python</title>
+  <link rel="stylesheet" href="../styles.css?v=2026-11-26b">
+  <link rel="stylesheet" href="../redact.css?v=2026-11-27d">
+  <style>
+    .docs{max-width:900px}
+    .docs h2{font-size:clamp(1.6rem,3.4vw,2.2rem);letter-spacing:-.04em;margin:64px 0 8px;scroll-margin-top:90px}
+    .docs h3{margin:26px 0 8px;font-size:1.05rem}
+    .docs p,.docs li{color:var(--muted)}
+    .docs p code,.docs li code,.docs td code{background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--text);font-size:.85em}
+    .docs a{color:var(--accent)}.docs a:hover{text-decoration:underline}
+    .docs .code{margin:12px 0}
+    .toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+    .toc a{border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:.82rem;color:var(--muted)}
+    .toc a:hover{color:var(--text);border-color:#3d5264;text-decoration:none}
+    .pill-row{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0;padding:0;list-style:none}
+    .pill-row li{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 10px;font-size:.85rem;color:var(--text)}
+    .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}
+    .facts div{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:16px}
+    .facts strong{display:block;color:var(--text);margin-bottom:4px}
+    .facts span{color:var(--muted);font-size:.9rem}
+    .cmp h3{margin-top:30px}
+    .cmp .bench-wrap{max-width:none}
+    .cmp td.win{color:var(--accent);font-weight:700}
+    table.plain{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:12px}
+    table.plain th,table.plain td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+    table.plain th{color:var(--muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em}
+    .wrap-x{overflow-x:auto}
+    @media (max-width:700px){.facts{grid-template-columns:1fr}.docs h2{margin-top:48px}}
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo name-logo" href="../" aria-label="Back to portfolio">Michael Chad Tollison<span>.</span></a>
+    <a class="back" href="../redact.html">Live demo →</a>
+  </header>
+
+  <main>
+    <section class="demo-hero docs">
+      <p class="kicker">PYTHON PACKAGE · MIT · RUNS OFFLINE</p>
+      <h1>piiguard<em>.</em></h1>
+      <p class="lead">Find and redact personal data with one line of Python. A fine-tuned transformer finds names, emails, phones, IDs, cards, addresses, keys and more, in English and Spanish, and checksum rules double-check it. Everything runs on your machine.</p>
+      <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>pip install piiguard</code></pre></div>
+      <div class="code"><pre><code>&gt;&gt;&gt; from piiguard import redact
+&gt;&gt;&gt; redact("Hi, I'm Sarah Johnson. Email sarah.j@example.com or call 6626341142.")
+"Hi, I'm [PERSON]. Email [EMAIL] or call [PHONE]."</code></pre></div>
+      <div class="buttons">
+        <a class="primary" href="https://pypi.org/project/piiguard/" target="_blank" rel="noreferrer">PyPI ↗</a>
+        <a class="secondary" href="../redact.html">Try it in the browser</a>
+        <a class="secondary" href="https://github.com/chadtollison/chadtollison.github.io/tree/main/piiguard" target="_blank" rel="noreferrer">Source ↗</a>
+      </div>
+      <nav class="toc" aria-label="On this page">
+        <a href="#why">Why</a><a href="#benchmark">Benchmark</a><a href="#modes">Redaction modes</a><a href="#data">JSON, CSV, pandas</a>
+        <a href="#llm">LLM prompts</a><a href="#api">HTTP API</a><a href="#cli">Command line</a><a href="#types">What it finds</a><a href="#privacy">Privacy</a>
+      </nav>
+    </section>
+
+    <section class="docs">
+      <h2 id="why">Why piiguard</h2>
+      <div class="facts">
+        <div><strong>One line</strong><span><code>redact(text)</code>. No engines, recognizers or NLP models to configure.</span></div>
+        <div><strong>Model plus rules</strong><span>A transformer for context, and Luhn, IBAN and SSN checks for certainty.</span></div>
+        <div><strong>Nothing leaves</strong><span>Runs locally after one download. Safe for data you can't send to an API.</span></div>
+      </div>
+
+      <h2 id="benchmark">Benchmark against Microsoft Presidio</h2>
+      <p id="cmp-lead">The head-to-head results will appear here after the next benchmark run.</p>
+      <div id="cmp" class="cmp"></div>
+
+      <h2 id="modes">Redaction modes</h2>
+      <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>from piiguard import redact, tokenize, restore
+
+text = "Call Sarah Johnson at 662-634-1142."
+redact(text)                 # Call [PERSON] at [PHONE].
+redact(text, mode="mask")    # Call █████████████ at ████████████.
+redact(text, mode="fake")    # Call Avery Brooks at (202) 555-0117.
+
+safe, key = tokenize(text)   # Call &lt;PERSON_1&gt; at &lt;PHONE_1&gt;.
+restore(safe, key) == text   # True</code></pre></div>
+      <p>Fake values are harmless on purpose. Phones use the 555-01xx range reserved for fiction, cards are public test numbers, IPs come from the documentation range, and SSNs start with 9, which is never issued. Use <code>find(text)</code> to get each item's type, position, confidence, and the rule that confirmed it.</p>
+
+      <h2 id="data">JSON, CSV and pandas</h2>
+      <p>These collect every string and run the model in batches, so they're much faster than a loop.</p>
+      <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>from piiguard import redact_many, redact_json, redact_csv, redact_dataframe
+
+redact_many(["Call Sarah at 6626341142", "Email raj@example.com"])
+redact_json({"user": {"name": "Sarah Johnson", "email": "sarah.j@example.com", "age": 41}})
+# {"user": {"name": "[PERSON]", "email": "[EMAIL]", "age": 41}}
+redact_csv(open("customers.csv").read(), columns=["name", "email", "notes"], mode="token")
+safe_df = redact_dataframe(df, mode="fake")     # pip install "piiguard[pandas]"</code></pre></div>
+
+      <h2 id="llm">Keep personal data out of LLM prompts</h2>
+      <p>Scrub prompts before they reach a hosted model, then put the real values back into its reply. One key covers the whole conversation, so the same person stays <code>&lt;PERSON_1&gt;</code> in every turn.</p>
+      <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>from piiguard import Guard
+
+guard = Guard()
+safe = guard.scrub("Write to Sarah Johnson (sarah.j@example.com) about her refund")
+# "Write to &lt;PERSON_1&gt; (&lt;EMAIL_1&gt;) about her refund"   &lt;- all the LLM sees
+reply = call_your_llm(safe)
+guard.restore(reply)                       # real names back in
+
+ask = guard.wrap(call_your_llm)            # or wrap the call once
+scrub, unscrub = guard.langchain()         # LangChain: scrub | prompt | llm | parser | unscrub</code></pre></div>
+
+      <h2 id="api">HTTP API</h2>
+      <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>pip install "piiguard[server]"
+piiguard serve --port 8000
+
+curl -X POST localhost:8000/redact -H 'content-type: application/json' \
+     -d '{"text": "Call Sarah at 6626341142", "mode": "token"}'</code></pre></div>
+      <p>The endpoints are <code>POST /redact</code>, <code>POST /find</code>, <code>POST /restore</code> and <code>GET /health</code>, with interactive docs at <code>/docs</code>.</p>
+
+      <h2 id="cli">Command line</h2>
+      <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>piiguard "Call Sarah at 662-634-1142"
+cat notes.txt | piiguard --mode mask &gt; notes-safe.txt
+piiguard --file customers.csv --columns name,email -o customers-safe.csv   # .csv .json .jsonl .txt
+piiguard --find "My SSN is 123-45-6789"</code></pre></div>
+
+      <h2 id="types">What it finds</h2>
+      <div class="wrap-x"><table class="plain">
+        <thead><tr><th>Type</th><th>Examples</th><th>Extra check</th></tr></thead>
+        <tbody>
+          <tr><td><code>PERSON</code></td><td>Sarah Johnson, José Álvarez García</td><td></td></tr>
+          <tr><td><code>EMAIL</code></td><td>sarah.j@example.com</td><td>format</td></tr>
+          <tr><td><code>PHONE</code></td><td>6626341142, (662) 634-1142, +34 612 345 678</td><td>real US/Canada area codes</td></tr>
+          <tr><td><code>SSN</code></td><td>123-45-6789</td><td>SSA format</td></tr>
+          <tr><td><code>CREDIT_CARD</code></td><td>4111 1111 1111 1111</td><td>Luhn checksum</td></tr>
+          <tr><td><code>IBAN</code></td><td>GB82 WEST 1234 5698 7654 32</td><td>IBAN checksum</td></tr>
+          <tr><td><code>IP_ADDRESS</code></td><td>192.168.1.24</td><td>valid octets</td></tr>
+          <tr><td><code>API_KEY</code></td><td>AKIA…, ghp_…, sk_live_…</td><td>known key formats</td></tr>
+          <tr><td><code>PASSPORT</code>, <code>DRIVER_LICENSE</code>, <code>ID_NUMBER</code></td><td>PAA123456, D1234567, 12345678Z</td><td></td></tr>
+          <tr><td><code>ADDRESS</code>, <code>DATE_OF_BIRTH</code>, <code>USERNAME</code>, <code>PASSWORD</code></td><td>42 Maple Street, Leeds</td><td></td></tr>
+        </tbody>
+      </table></div>
+      <p>The last two rows arrive with the v3 model, trained on public PII data.</p>
+
+      <h2 id="privacy">Privacy</h2>
+      <p>piiguard downloads its model once from Hugging Face and caches it. After that, nothing you redact goes anywhere. Set <code>HF_HUB_OFFLINE=1</code> to make sure no network call is even attempted. The browser demo runs the same model on your device with ONNX Runtime.</p>
+      <p>Training data credits: <a href="https://huggingface.co/datasets/ai4privacy/open-pii-masking-500k-ai4privacy" target="_blank" rel="noreferrer">ai4privacy open-pii-masking-500k</a> (CC BY 4.0) and <a href="https://huggingface.co/datasets/gretelai/gretel-pii-masking-en-v1" target="_blank" rel="noreferrer">Gretel PII masking</a> (Apache 2.0), plus generated data.</p>
+      <p class="note">This is a research model, so it can miss things or flag things by mistake. Please don't rely on it alone for compliance work.</p>
+    </section>
+  </main>
+
+  <footer><span>Michael Chad Tollison</span><span>piiguard · MIT</span><span><a href="../">Portfolio</a></span></footer>
+  <script>
+    document.querySelectorAll('.copy-code').forEach((b) => b.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(b.nextElementSibling.innerText); b.textContent = 'Copied'; setTimeout(() => (b.textContent = 'Copy'), 1400); } catch (e) {}
+    }));
+    (async () => {
+      try {
+        const res = await fetch('../benchmarks/compare.json', { cache: 'no-cache' });
+        if (!res.ok) return;
+        const { meta, results } = await res.json();
+        const pct = (x) => `${Math.round(x * 100)}%`;
+        const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        let html = '';
+        for (const [ds, systems] of Object.entries(results)) {
+          const rows = Object.entries(systems);
+          const best = (k, lowWins) => (lowWins ? Math.min : Math.max)(...rows.map(([, r]) => r[k]));
+          const cell = (r, k, f, low) => `<td class="${r[k] === best(k, low) ? 'win' : ''}">${f(r[k])}</td>`;
+          html += `<h3>${esc(ds)}</h3><div class="bench-wrap"><table class="bench-table"><thead><tr><th>System</th><th>Caught</th><th>Fully hidden</th><th>Was personal</th><th>F1</th><th>ms/text</th></tr></thead><tbody>`
+            + rows.map(([n, r]) => `<tr><td>${esc(n)}</td>${cell(r, 'caught', pct)}${cell(r, 'fully_hidden', pct)}${cell(r, 'was_personal', pct)}${cell(r, 'f1', (x) => x.toFixed(2))}${cell(r, 'ms_per_text', (x) => Math.round(x), true)}</tr>`).join('')
+            + '</tbody></table></div>';
+        }
+        document.getElementById('cmp').innerHTML = html;
+        document.getElementById('cmp-lead').innerHTML = `Same texts, same CPU, run on ${esc(meta.date)}. <strong>Caught</strong> is the share of personal-data items each system touched. <strong>Fully hidden</strong> means 90% or more of the item was covered, since half a card number still leaks. <strong>Was personal</strong> is the share of finds that really were personal data. Presidio runs with its defaults. <a href="../benchmarks/compare.md">Full results by type</a>`;
+      } catch (e) { /* no results yet */ }
+    })();
+  </script>
+  <script data-goatcounter="https://chadtollison.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>

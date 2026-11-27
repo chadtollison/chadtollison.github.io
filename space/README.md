@@ -1,5 +1,5 @@
 ---
-title: chad-pii
+title: piiguard
 emoji: 🕶️
 colorFrom: green
 colorTo: blue
@@ -10,5 +10,5 @@ license: mit
 short_description: Find and redact personal data with one line of Python
 ---
 
-Demo of [chad-pii](https://pypi.org/project/chad-pii/): `pip install chad-pii`, then `redact(text)`.
-Docs: https://chadtollison.github.io/chad-pii/
+Demo of [piiguard](https://pypi.org/project/piiguard/): `pip install piiguard`, then `redact(text)`.
+Docs: https://chadtollison.github.io/piiguard/

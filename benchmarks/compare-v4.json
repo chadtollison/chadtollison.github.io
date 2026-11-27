@@ -3,7 +3,7 @@
     "date": "2026-11-27",
     "rows": 1000,
     "systems": [
-      "chad-pii-v3",
+      "piiguard-v3",
       "v4-long-documents",
       "v4-large-DeBERTa",
       "Microsoft Presidio",
@@ -12,7 +12,7 @@
   },
   "results": {
     "ai4privacy (English)": {
-      "chad-pii-v3": {
+      "piiguard-v3": {
         "items": 1637,
         "caught": 0.991,
         "fully_hidden": 0.989,
@@ -289,7 +289,7 @@
       }
     },
     "ai4privacy (Spanish)": {
-      "chad-pii-v3": {
+      "piiguard-v3": {
         "items": 790,
         "caught": 0.989,
         "fully_hidden": 0.984,
@@ -566,7 +566,7 @@
       }
     },
     "Gretel PII (English)": {
-      "chad-pii-v3": {
+      "piiguard-v3": {
         "items": 2933,
         "caught": 0.996,
         "fully_hidden": 0.994,
@@ -918,7 +918,7 @@
       }
     },
     "Gretel finance (English, never trained on)": {
-      "chad-pii-v3": {
+      "piiguard-v3": {
         "items": 3136,
         "caught": 0.699,
         "fully_hidden": 0.633,
