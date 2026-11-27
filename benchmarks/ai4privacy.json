@@ -106,40 +106,12 @@
         "overlap_recall": 0.508,
         "overlap_f1": 0.567
       },
-      "PASSPORT": {
-        "items": 0,
-        "exact_f1": 0.0,
-        "overlap_precision": 0.0,
-        "overlap_recall": 0.0,
-        "overlap_f1": 0.0
-      },
-      "DRIVER_LICENSE": {
-        "items": 0,
-        "exact_f1": 0.0,
-        "overlap_precision": 0.0,
-        "overlap_recall": 0.0,
-        "overlap_f1": 0.0
-      },
-      "API_KEY": {
-        "items": 0,
-        "exact_f1": 0.0,
-        "overlap_precision": 0.0,
-        "overlap_recall": 0.0,
-        "overlap_f1": 0.0
-      },
-      "IBAN": {
-        "items": 94,
-        "exact_f1": 0.0,
-        "overlap_precision": 0.0,
-        "overlap_recall": 0.0,
-        "overlap_f1": 0.0
-      },
       "ALL": {
-        "items": 1698,
-        "exact_f1": 0.302,
+        "items": 1604,
+        "exact_f1": 0.307,
         "overlap_precision": 0.323,
-        "overlap_recall": 0.706,
-        "overlap_f1": 0.443
+        "overlap_recall": 0.748,
+        "overlap_f1": 0.451
       }
     },
     "In-browser model (this site)": {
@@ -185,40 +157,12 @@
         "overlap_recall": 0.502,
         "overlap_f1": 0.503
       },
-      "PASSPORT": {
-        "items": 0,
-        "exact_f1": 0.0,
-        "overlap_precision": 0.0,
-        "overlap_recall": 0.0,
-        "overlap_f1": 0.0
-      },
-      "DRIVER_LICENSE": {
-        "items": 0,
-        "exact_f1": 0.0,
-        "overlap_precision": 0.0,
-        "overlap_recall": 0.0,
-        "overlap_f1": 0.0
-      },
-      "API_KEY": {
-        "items": 0,
-        "exact_f1": 0.0,
-        "overlap_precision": 0.0,
-        "overlap_recall": 0.0,
-        "overlap_f1": 0.0
-      },
-      "IBAN": {
-        "items": 94,
-        "exact_f1": 0.0,
-        "overlap_precision": 0.0,
-        "overlap_recall": 0.0,
-        "overlap_f1": 0.0
-      },
       "ALL": {
-        "items": 1698,
-        "exact_f1": 0.153,
+        "items": 1604,
+        "exact_f1": 0.155,
         "overlap_precision": 0.169,
-        "overlap_recall": 0.755,
-        "overlap_f1": 0.276
+        "overlap_recall": 0.799,
+        "overlap_f1": 0.279
       }
     }
   }
