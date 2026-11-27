@@ -34,3 +34,6 @@ Source = "https://github.com/chadtollison/chadtollison.github.io/tree/main/chad-
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/chad_pii"]
+
+[tool.hatch.build.targets.sdist]
+exclude = ["index.html"]
