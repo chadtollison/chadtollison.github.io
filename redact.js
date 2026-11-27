@@ -227,6 +227,8 @@ function mergeSpans(text, labeled) {
   const cardOk = (v) => luhn(v.replace(/\D/g, ''));
   for (const [type, re, ok, why] of [['IBAN', IBAN_RE, ibanOk, 'passes the IBAN checksum'], ['API_KEY', API_KEY_RE, () => true, 'matches a known API key format'],
     ['CREDIT_CARD', CARD_RE, cardOk, 'passes the Luhn checksum'], ['SSN', SSN_RE, ssnOk, 'valid SSN format'],
+    ['EMAIL', /[\p{L}\p{N}._%+-]+@[\p{L}\p{N}.-]+\.[\p{L}]{2,}/gu, () => true, 'email address format'],
+    ['IP_ADDRESS', /\b(?:\d{1,3}\.){3}\d{1,3}\b/g, (v) => v.split('.').every((p) => +p <= 255), 'valid IP address'],
     ['DATE_OF_BIRTH', DOB_RE, () => true, "a date right after 'born' or 'DOB'"]]) {
     for (const m of text.matchAll(re)) {
       const v = re === DOB_RE ? m[1] : m[0];
@@ -235,8 +237,8 @@ function mergeSpans(text, labeled) {
       const hits = spans.filter((s) => s.start < b && s.end > a);
       if (!hits.length) { spans.push({ type, start: a, end: b, scores: [1], rule: 'found', why }); continue; }
       for (const s of hits) {
-        // A card or SSN rule only relabels a find whose own label fails its check.
-        if ((type === 'CREDIT_CARD' || type === 'SSN') && s.type !== type && validate({ type: s.type, text: text.slice(s.start, s.end) })?.ok !== false) continue;
+        // A card, SSN, email or IP rule only relabels a find whose own label fails its check.
+        if (['CREDIT_CARD', 'SSN', 'EMAIL', 'IP_ADDRESS'].includes(type) && s.type !== type && validate({ type: s.type, text: text.slice(s.start, s.end) })?.ok !== false) continue;
         s.type = type; s.rule = 'confirmed'; s.why = why; s.scores = [1]; s.start = Math.min(s.start, a); s.end = Math.max(s.end, b); }
     }
   }
