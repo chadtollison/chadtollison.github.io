@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#090d12">
   <title>Redact Me | Live PII Detector Demo</title>
   <link rel="stylesheet" href="styles.css?v=2026-11-26b">
-  <link rel="stylesheet" href="redact.css?v=2026-11-27b">
+  <link rel="stylesheet" href="redact.css?v=2026-11-27c">
 </head>
 <body>
   <header>
@@ -41,6 +41,8 @@
               <button type="button" data-sample="0">Support ticket</button>
               <button type="button" data-sample="1">Order email</button>
               <button type="button" data-sample="2">HR note</button>
+              <label class="upload" for="file-input">Upload PDF or CSV</label>
+              <input id="file-input" type="file" accept=".pdf,.csv,.txt,.md,text/plain,text/csv,application/pdf" hidden>
             </div>
           </div>
           <textarea id="input" spellcheck="false" maxlength="5000"></textarea>
@@ -76,6 +78,15 @@
             <button type="button" id="copy" class="link-btn">Copy redacted text</button>
           </div>
         </div>
+      </div>
+
+      <div id="file-panel" class="file-panel" hidden>
+        <div class="file-head">
+          <strong id="file-name"></strong>
+          <button type="button" id="file-download" class="try-btn small" hidden>Download redacted file</button>
+        </div>
+        <p id="file-status" class="file-status" role="status" aria-live="polite"></p>
+        <div id="file-preview"></div>
       </div>
 
       <div class="controls">
@@ -150,7 +161,7 @@ print(redact(text))
   </main>
 
   <footer><span>Michael Chad Tollison</span><span>Software & Data Engineer</span><span><a href="./">Portfolio</a></span></footer>
-  <script type="module" src="redact.js?v=2026-11-27b"></script>
+  <script type="module" src="redact.js?v=2026-11-27d"></script>
   <script data-goatcounter="https://chadtollison.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>

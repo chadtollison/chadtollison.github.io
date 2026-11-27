@@ -113,6 +113,23 @@ mark.pii.swap{color:var(--c);background:color-mix(in srgb,var(--c) 14%,transpare
 .token-key textarea{min-height:0;flex:none;width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:8px;font:inherit;font-size:.85rem;resize:vertical}
 .restore-out{margin-top:6px;color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere}
 .restore-out:not(:empty):before{content:"Restored: ";color:var(--accent);font-weight:700}
+.samples .upload{border:1px dashed var(--accent);color:var(--accent);border-radius:30px;padding:4px 11px;font-size:.75rem;cursor:pointer;font-weight:700}
+.samples .upload:hover{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.panes.dropping .pane{border-color:var(--accent);box-shadow:0 0 0 2px rgba(92,219,182,.25)}
+.file-panel{margin-top:18px;border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:14px 16px;min-width:0}
+.file-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.file-head strong{overflow-wrap:anywhere}
+.try-btn.small{font-size:.85rem;padding:8px 14px}
+.file-status{color:var(--muted);font-size:.88rem;margin:8px 0}
+.file-note{color:var(--muted);font-size:.8rem;margin:8px 0 0}
+.csv-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+.csv{border-collapse:collapse;font-size:.8rem;min-width:100%}
+.csv th,.csv td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;white-space:nowrap}
+.csv th{color:var(--muted);font-weight:700;background:var(--panel2)}
+.pdf-pages{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px}
+.pdf-page{height:420px;width:auto;border-radius:6px;border:1px solid var(--line);background:#fff;flex:none}
+.txt-preview{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:.82rem;max-height:360px;overflow:auto;margin:0}
+@media(max-width:560px){.pdf-page{height:300px}}
 @media(max-width:900px){.panes{grid-template-columns:1fr}.steps{grid-template-columns:1fr}textarea,.output{min-height:200px}}
 @media(max-width:560px){
   main>section{padding-left:16px;padding-right:16px}
