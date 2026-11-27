@@ -14,6 +14,7 @@ What the generated data teaches:
   * Four new types: PASSPORT, DRIVER_LICENSE, API_KEY and IBAN. The model's
     output layer is grown for them; the old types keep their learned weights.
   * Spanish sentences (Spain and Latin America) for every type.
+  * Your own examples from training/examples.txt (see that file).
 
 Usage:
   python training/retrain_pii.py --out build/new_model
@@ -337,6 +338,27 @@ def make_example(templates):
     return text, spans
 
 
+def load_examples(path=HERE / "examples.txt"):
+    """Lines like "Call [PERSON: Chad] at [PHONE: 6626341141]" -> (text, spans)."""
+    out = []
+    if not path.exists():
+        return out
+    for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        text, spans, pos = "", [], 0
+        for m in re.finditer(r"\[([A-Z_]+):\s*(.+?)\]", line):
+            if m.group(1) not in LABELS:
+                raise SystemExit(f"examples.txt line {n}: unknown type {m.group(1)} (use one of {', '.join(LABELS)})")
+            text += line[pos:m.start()]
+            spans.append((len(text), len(text) + len(m.group(2)), m.group(1)))
+            text += m.group(2)
+            pos = m.end()
+        out.append((text + line[pos:], spans))
+    return out
+
+
 # --------------------------------------------------------------------------
 # Tokenize and label every word piece (B- on the first piece, I- after)
 # --------------------------------------------------------------------------
@@ -447,10 +469,15 @@ def main():
     label2id = {n: i for i, n in enumerate(names)}
 
     train = [make_example(TRAIN_TEMPLATES) for _ in range(args.train_size)]
+    mine = load_examples()
+    train += mine * 10          # your examples count ten times, so they stick
+    R.shuffle(train)
+    print(f"{len(mine)} examples from training/examples.txt")
     test = [make_example(TEST_TEMPLATES) for _ in range(args.test_size)]
 
     print("Scoring the current model ...")
     before = score(old, tok, test)
+    before_mine = score(old, tok, mine) if mine else None
     before_checks = show(old, tok)
 
     model = AutoModelForTokenClassification.from_pretrained(
@@ -478,6 +505,7 @@ def main():
 
     print("Scoring the retrained model ...")
     after = score(model, tok, test)
+    after_mine = score(model, tok, mine) if mine else None
     after_checks = show(model, tok)
 
     model.save_pretrained(args.out)
@@ -489,15 +517,21 @@ def main():
     for lab in LABELS + ["ALL"]:
         b, a = before[lab], after[lab]
         report.append(f"| {lab} | {b['f1']:.3f} | {a['f1']:.3f} | {b['recall']:.3f} | {a['recall']:.3f} |")
+    if mine:
+        report += ["", f"Your {len(mine)} examples from training/examples.txt (the new model trained on these): "
+                   f"F1 {before_mine['ALL']['f1']:.3f} → {after_mine['ALL']['f1']:.3f}"]
     report += ["", "### Spot checks, old model", *before_checks, "", "### Spot checks, retrained model", *after_checks]
     text = "\n".join(report)
     print(text)
     Path(args.out, "report.md").write_text(text)
-    # Better = no type got worse, something improved, and any new type is
-    # actually usable (F1 of at least 0.85 on sentences it never saw).
+    # Better = no type got worse, something improved (a type, or your own
+    # examples), any new type is actually usable (F1 of at least 0.85 on
+    # sentences it never saw), and your examples didn't get worse.
     better = (all(after[l]["f1"] >= before[l]["f1"] - 0.005 for l in LABELS)
-              and any(after[l]["f1"] > before[l]["f1"] + 0.005 for l in LABELS)
-              and all(after[l]["f1"] >= 0.85 for l in LABELS if f"B-{l}" not in old_ids))
+              and (any(after[l]["f1"] > before[l]["f1"] + 0.005 for l in LABELS)
+                   or (mine and after_mine["ALL"]["f1"] > before_mine["ALL"]["f1"] + 0.005))
+              and all(after[l]["f1"] >= 0.85 for l in LABELS if f"B-{l}" not in old_ids)
+              and (not mine or after_mine["ALL"]["f1"] >= before_mine["ALL"]["f1"]))
     Path(args.out, "verdict.json").write_text(json.dumps({"better": better, "before": before, "after": after}, indent=2))
     print("VERDICT:", "better" if better else "NOT better, keep the old model")
 

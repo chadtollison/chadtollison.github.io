@@ -3,7 +3,8 @@
 #   * refreshes the in-browser copy in models/ on the branch it runs on, and
 #   * if "publish" is ticked and the HF_TOKEN secret is set, uploads it to
 #     huggingface.co/ChadTollison/pii-distilbert-v2 (the model card is left alone).
-# Start it from the Actions tab: "Retrain PII model" -> "Run workflow".
+# Start it from the Actions tab: "Retrain PII model" -> "Run workflow", or just
+# add examples to training/examples.txt on main and it runs by itself.
 name: Retrain PII model
 
 on:
@@ -13,9 +14,14 @@ on:
         description: "Upload the new model to Hugging Face if it scores better"
         type: boolean
         default: false
+  # Adding lines to training/examples.txt on main retrains automatically.
   push:
-    branches: [claude/project-thread-rci1w3]
-    paths: ["training/**", ".github/workflows/retrain-pii-model.yml"]
+    branches: [main, claude/project-thread-rci1w3]
+    paths: ["training/examples.txt", "training/retrain_pii.py", "training/area_codes.txt", ".github/workflows/retrain-pii-model.yml"]
+
+concurrency:
+  group: retrain-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
