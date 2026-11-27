@@ -105,6 +105,10 @@ DATASETS = {
     "ai4privacy (Spanish)": lambda n: pii_data.openpii("validation", langs=("es",), n=n // 2, seed=7),
     "Gretel PII (English)": lambda n: pii_data.gretel_en("test", n=n, seed=7),
     "Gretel finance (English, never trained on)": lambda n: pii_data.gretel_finance("test", n=n, seed=7),
+    "Medical records (Nemotron-PII, never trained on)": lambda n: pii_data.nemotron("medical", n=n, seed=7),
+    "Support tickets, emails, transcripts (Nemotron-PII, never trained on)":
+        lambda n: pii_data.nemotron("conversation", n=n, seed=7),
+    "Logs and config files (Nemotron-PII, never trained on)": lambda n: pii_data.nemotron("logs_config", n=n, seed=7),
 }
 
 
@@ -133,7 +137,7 @@ def report(results, stem, meta):
     L += ["Presidio runs with its defaults (spaCy en_core_web_lg, all recognizers, English). "
           "On Spanish text every system uses its English setup except scrubpii, which trains on Spanish too.", "",
           "Data: ai4privacy open-pii-masking-500k (CC BY 4.0), Gretel gretel-pii-masking-en-v1 and "
-          "synthetic_pii_finance_multilingual (Apache 2.0)."]
+          "synthetic_pii_finance_multilingual (Apache 2.0), NVIDIA Nemotron-PII (CC BY 4.0)."]
     (OUT / f"{stem}.md").write_text("\n".join(L) + "\n")
 
 

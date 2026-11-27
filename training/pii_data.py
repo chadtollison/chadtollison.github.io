@@ -10,6 +10,7 @@ Sources (both allow training and redistribution with credit):
   * ai4privacy/open-pii-masking-500k-ai4privacy  (CC BY 4.0)
   * gretelai/gretel-pii-masking-en-v1            (Apache 2.0)
   * gretelai/synthetic_pii_finance_multilingual  (Apache 2.0)  test only, never trained on
+  * nvidia/Nemotron-PII                          (CC BY 4.0)   test only, never trained on
 """
 import ast
 import json
@@ -37,7 +38,7 @@ LABEL_MAP = {
     "taxidentificationnumber": "ID_NUMBER", "nationalidentificationnumber": "ID_NUMBER", "medicalrecordnumber": "ID_NUMBER",
     "healthplanbeneficiarynumber": "ID_NUMBER",
     # money
-    "creditcardnumber": "CREDIT_CARD", "creditcard": "CREDIT_CARD",
+    "creditcardnumber": "CREDIT_CARD", "creditcard": "CREDIT_CARD", "creditdebitcard": "CREDIT_CARD",
     "iban": "IBAN", "bban": "IBAN",
     # tech
     "ipv4": "IP_ADDRESS", "ipv6": "IP_ADDRESS", "ip": "IP_ADDRESS", "ipaddress": "IP_ADDRESS",
@@ -123,6 +124,29 @@ def gretel_finance(split="test", language="English", n=None, seed=0):
         text = r["generated_text"]
         spans = [(int(m["start"]), int(m["end"]), map_label(m["label"])) for m in _parse(r["pii_spans"])]
         out.append((text, merge(spans, text)))
+    return out
+
+
+# Harder kinds of text from nvidia/Nemotron-PII, picked by document type.
+NEMOTRON_KINDS = {
+    "medical": r"medical|patient|health|prescription|discharge|lab report|clinic|hospital|immuniz|vaccin|dental|pharmacy",
+    "conversation": r"ticket|transcript|e-?mail|interview|complaint|inquiry|chat|message|correspondence",
+    "logs_config": r"\blog\b|logs|logging|configuration file|config|script|api|debug|server|dhcp",
+}
+
+
+def nemotron(kind, split="test", n=None, seed=0):
+    from datasets import load_dataset
+    ds = load_dataset("nvidia/Nemotron-PII", split=split)
+    rx = re.compile(NEMOTRON_KINDS[kind], re.I)
+    ds = ds.filter(lambda r: bool(rx.search(r["document_type"])))
+    idx = list(range(len(ds)))
+    random.Random(seed).shuffle(idx)
+    out = []
+    for i in idx[:n] if n else idx:
+        r = ds[i]
+        spans = [(int(m["start"]), int(m["end"]), map_label(m["label"])) for m in _parse(r["spans"])]
+        out.append((r["text"], merge(spans, r["text"])))
     return out
 
 

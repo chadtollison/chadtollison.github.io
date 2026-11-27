@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   push:
     branches: ["claude/**"]
-    paths: ["scrubpii/src/**", "training/cold_start.py", "training/speed_report.py", ".github/workflows/scrubpii-speed.yml"]
+    paths: ["training/cold_start.py", "training/speed_report.py", ".github/workflows/scrubpii-speed.yml"]
 concurrency:
   group: speed-${{ github.ref }}
   cancel-in-progress: true
@@ -62,6 +62,8 @@ jobs:
         run: |
           cd training
           python compare.py --rows 1000 --out compare-backends \
+            --dataset "ai4privacy (English)" --dataset "ai4privacy (Spanish)" --dataset "Gretel PII (English)" \
+            --dataset "Gretel finance (English, never trained on)" \
             --system "scrubpii@onnx:ChadTollison/pii-distilbert-v3=scrubpii 0.4 (ONNX 8-bit)" \
             --system "scrubpii@torch:ChadTollison/pii-distilbert-v3=scrubpii (PyTorch)" --system presidio
       - uses: actions/upload-artifact@v4
