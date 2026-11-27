@@ -139,3 +139,16 @@ mark.pii.swap{color:var(--c);background:color-mix(in srgb,var(--c) 14%,transpare
   .entities li{grid-template-columns:1fr;gap:4px}
 }
 @media(prefers-reduced-motion:reduce){mark.pii{animation:none;transition:none}.status .dot{animation:none}}
+.bench{margin-top:56px}
+.bench h2{margin-bottom:6px}
+.bench a{color:var(--accent)}.bench a:hover{text-decoration:underline}
+.bench-wrap{overflow-x:auto;margin-top:18px;border:1px solid var(--line);border-radius:14px;background:var(--panel);max-width:760px}
+.bench-table{width:100%;border-collapse:collapse;font-size:.92rem}
+.bench-table th,.bench-table td{padding:10px 14px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.bench-table th:first-child,.bench-table td:first-child{text-align:left}
+.bench-table th{color:var(--muted);font-weight:600;font-size:.8rem;letter-spacing:.04em;text-transform:uppercase}
+.bench-table tr:last-child td{border-bottom:0;font-weight:700}
+.bench-table td.na{color:var(--muted)}
+.bench-note{color:var(--muted);font-size:.85rem;max-width:760px;margin-top:12px}
+.bench-table td:first-child{white-space:normal}
+@media (max-width:600px){.bench-table th,.bench-table td{padding:9px 8px;font-size:.85rem}.bench-table th{font-size:.7rem}}

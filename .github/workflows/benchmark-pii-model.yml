@@ -1,0 +1,53 @@
+# Scores the PII model on the public ai4privacy/pii-masking-200k dataset
+# (training/benchmark_ai4privacy.py) and commits the results to benchmarks/
+# on the branch it runs on. The demo page and the model card show them.
+# Start it from the Actions tab: "Benchmark PII model" -> "Run workflow".
+name: Benchmark PII model
+
+on:
+  workflow_dispatch:
+    inputs:
+      rows:
+        description: "How many dataset texts to score"
+        default: "2000"
+  push:
+    branches: ["claude/**"]
+    paths: ["training/benchmark_ai4privacy.py", ".github/workflows/benchmark-pii-model.yml"]
+
+permissions:
+  contents: write
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: |
+          pip install --extra-index-url https://download.pytorch.org/whl/cpu \
+            "torch==2.4.1" "transformers==4.46.3" "datasets==3.1.0" \
+            "optimum[onnxruntime]==1.23.3" "onnxruntime==1.20.1" "huggingface_hub<1"
+
+      - name: Score both models
+        run: |
+          python training/benchmark_ai4privacy.py --rows "${{ inputs.rows || '2000' }}" \
+            --model ChadTollison/pii-distilbert-v2 --name "Published model (Hugging Face)" \
+            --model models/pii-distilbert-v2 --name "In-browser model (this site)"
+          cat benchmarks/ai4privacy.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Commit the results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
+          git add benchmarks
+          git commit -m "Benchmark results on ai4privacy/pii-masking-200k" || { echo "No changes"; exit 0; }
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
