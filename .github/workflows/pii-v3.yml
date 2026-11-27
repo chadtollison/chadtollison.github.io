@@ -1,0 +1,102 @@
+# chad-pii v3: train on public PII data and compare head to head with
+# Microsoft Presidio and spaCy. Everything runs on GitHub's free CPU runners.
+#   baseline: current model vs Presidio vs spaCy (no training needed)
+#   train:    training/train_v3.py, stops itself before the 6 hour job limit
+#   compare:  adds v3 to the table, builds the 8-bit browser copy, commits both
+name: chad-pii v3
+
+on:
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: "Training time budget (minutes)"
+        default: "300"
+  push:
+    branches: ["claude/**"]
+    paths: ["training/train_v3.py", "training/pii_data.py", "training/compare.py", ".github/workflows/pii-v3.yml"]
+
+concurrency:
+  group: pii-v3-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  PIP_DEPS: >-
+    "torch==2.4.1" "transformers==4.46.3" "accelerate==1.1.1" "datasets==3.1.0"
+    "optimum[onnxruntime]==1.23.3" "onnx==1.17.0" "onnxruntime==1.20.1" "ml_dtypes" "huggingface_hub<1"
+
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install
+        run: |
+          pip install --extra-index-url https://download.pytorch.org/whl/cpu ${{ env.PIP_DEPS }} "presidio-analyzer==2.2.355"
+          python -m spacy download en_core_web_lg -q
+          pip install --no-deps ./chad-pii
+      - name: Current chad-pii vs Presidio vs spaCy
+        run: |
+          cd training
+          python compare.py --rows 1000 --system chad-pii:ChadTollison/pii-distilbert-v2 --system presidio --system spacy
+          cat ../benchmarks/compare.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with: { name: baseline, path: benchmarks/compare.* }
+
+  train:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install
+        run: pip install --extra-index-url https://download.pytorch.org/whl/cpu ${{ env.PIP_DEPS }}
+      - name: Train
+        run: python training/train_v3.py --out build/v3 --minutes "${{ inputs.minutes || '300' }}"
+      - uses: actions/upload-artifact@v4
+        with: { name: v3-model, path: build/v3, retention-days: 30 }
+
+  compare:
+    needs: [train]
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install
+        run: |
+          pip install --extra-index-url https://download.pytorch.org/whl/cpu ${{ env.PIP_DEPS }} "presidio-analyzer==2.2.355"
+          python -m spacy download en_core_web_lg -q
+          pip install --no-deps ./chad-pii
+      - uses: actions/download-artifact@v4
+        with: { name: v3-model, path: build/v3 }
+      - name: v3 vs current vs Presidio vs spaCy
+        run: |
+          cd training
+          python compare.py --rows 1000 --system chad-pii:../build/v3 --system chad-pii:ChadTollison/pii-distilbert-v2 \
+            --system presidio --system spacy
+          cat ../benchmarks/compare.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Build the 8-bit browser copy
+        run: |
+          set -e
+          OUT=models/pii-distilbert-v3
+          optimum-cli export onnx --model build/v3 --task token-classification build/onnx/
+          python training/quantize.py build/onnx "$OUT/onnx/model_quantized.onnx"
+          cp build/onnx/config.json build/onnx/tokenizer.json build/onnx/tokenizer_config.json "$OUT/"
+          cp build/onnx/special_tokens_map.json "$OUT/" 2>/dev/null || true
+      - name: Commit results and browser model
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
+          git add benchmarks models/pii-distilbert-v3
+          git commit -m "chad-pii v3: benchmark vs Presidio and spaCy, browser model" || exit 0
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
