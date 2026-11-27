@@ -22,10 +22,11 @@ import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Callable, Dict, Iterable, List, Optional, Tuple
 
 __all__ = ["Entity", "find", "find_many", "redact", "redact_many", "tokenize", "restore", "fake_for", "MODEL_ID",
-           "redact_json", "redact_csv", "redact_dataframe", "Guard"]
+           "redact_json", "redact_csv", "redact_dataframe", "Guard",
+           "add_rule", "add_words", "allow", "clear_rules", "load_rules", "rules", "audit", "audit_markdown"]
 __version__ = "0.4.0"
 
 MODEL_ID = "ChadTollison/pii-distilbert-v3"
@@ -47,10 +48,18 @@ class Entity:
     end: int
     score: float
     rule: Optional[str] = None      # why a rule found or confirmed it, if one did
+    source: str = "model"           # "model", "rule", "model+rule" or "custom"
+    reason: str = ""                # one line on why it was flagged
+
+    @property
+    def confidence(self) -> str:
+        """'high', 'medium' or 'low': an easy-to-read band for score."""
+        return "high" if self.score >= 0.9 else "medium" if self.score >= 0.7 else "low"
 
     def as_dict(self) -> dict:
         return {"type": self.type, "text": self.text, "start": self.start, "end": self.end,
-                "score": round(self.score, 4), "rule": self.rule}
+                "score": round(self.score, 4), "confidence": self.confidence, "source": self.source,
+                "rule": self.rule, "reason": self.reason}
 
 
 # ---------------------------------------------------------------- checks
@@ -119,6 +128,10 @@ def us_phone_ok(s: str) -> bool:
     return len(d) == 10 and d[:3] in AREA_CODES and d[3] in "23456789"
 
 
+CHECK_NAMES = {"CREDIT_CARD": "Luhn checksum", "SSN": "SSN format", "IBAN": "IBAN checksum",
+               "PHONE": "phone length", "EMAIL": "email format", "IP_ADDRESS": "IP address format"}
+
+
 def _valid(e: Entity) -> bool:
     t, s = e.type, e.text
     if t == "CREDIT_CARD":
@@ -135,6 +148,135 @@ def _valid(e: Entity) -> bool:
         parts = s.split(".")
         return len(parts) == 4 and all(p.isdigit() and int(p) <= 255 for p in parts)
     return True
+
+
+# ---------------------------------------------------------------- your own rules
+@dataclass
+class Rule:
+    type: str
+    pattern: "re.Pattern"
+    group: int = 0
+    check: Optional[Callable[[str], bool]] = None
+    context: Tuple[str, ...] = ()
+    window: int = 40
+    why: str = ""
+
+    def as_dict(self) -> dict:
+        return {"type": self.type, "pattern": self.pattern.pattern, "group": self.group,
+                "context": list(self.context), "why": self.why, "check": bool(self.check)}
+
+
+_custom: List[Rule] = []
+_allowed: List["re.Pattern"] = []
+
+
+def _type_name(t: str) -> str:
+    name = re.sub(r"[^A-Z_]+", "_", str(t).upper()).strip("_")
+    if not name:
+        raise ValueError(f"type name {t!r} needs letters, e.g. 'EMPLOYEE_ID'")
+    return name
+
+
+def add_rule(type: str, pattern, *, group: int = 0, check: Optional[Callable[[str], bool]] = None,
+             context: Iterable[str] = (), window: int = 40, why: str = "", ignore_case: bool = False) -> Rule:
+    r"""Teach scrubpii a pattern of your own, no retraining needed.
+
+        >>> add_rule("EMPLOYEE_ID", r"\bEMP-\d{6}\b")
+        >>> redact("Ask EMP-004211 to sign")
+        'Ask [EMPLOYEE_ID] to sign'
+
+    group:   redact only this regex group (e.g. the number after a label).
+    check:   a function that gets the matched text and returns True to keep it.
+    context: words of which at least one must appear within `window`
+             characters before the match (case-insensitive), e.g. ["member", "acct"].
+    Your rules win over the model where they overlap. Rules apply to every
+    find/redact call in this process; clear_rules() removes them.
+    """
+    rx = pattern if isinstance(pattern, re.Pattern) else re.compile(pattern, re.I if ignore_case else 0)
+    if group > rx.groups:
+        raise ValueError(f"pattern has {rx.groups} group(s), so group={group} does not exist")
+    r = Rule(_type_name(type), rx, group, check, tuple(c.lower() for c in context), window,
+             why or f"your rule {_type_name(type)}")
+    _custom.append(r)
+    return r
+
+
+def add_words(type: str, words: Iterable[str], *, ignore_case: bool = True, why: str = "") -> Rule:
+    """Always redact these exact words or phrases (client names, project code names ...)."""
+    words = sorted({w.strip() for w in words if w and w.strip()}, key=len, reverse=True)
+    if not words:
+        raise ValueError("give at least one word")
+    rx = re.compile(r"(?<!\w)(?:" + "|".join(map(re.escape, words)) + r")(?!\w)", re.I if ignore_case else 0)
+    return add_rule(type, rx, why=why or f"on your {_type_name(type)} list")
+
+
+def allow(*values: str, pattern: Optional[str] = None) -> None:
+    r"""Never redact these values (your company's support line, a public office address ...).
+
+    allow("support@acme.com", "1-800-555-0100") or allow(pattern=r"@acme\.com$").
+    An item is kept visible when its whole text matches.
+    """
+    for v in values:
+        _allowed.append(re.compile(re.escape(v.strip()), re.I))
+    if pattern:
+        _allowed.append(re.compile(pattern, re.I))
+
+
+def clear_rules() -> None:
+    """Remove every rule and allowed value added with add_rule/add_words/allow."""
+    _custom.clear()
+    _allowed.clear()
+
+
+def rules() -> List[dict]:
+    """The rules you have added, as dicts."""
+    return [r.as_dict() for r in _custom] + [{"allow": a.pattern} for a in _allowed]
+
+
+def load_rules(path: str) -> int:
+    """Load rules from a JSON file. Returns how many were added.
+
+        {"rules": [{"type": "EMPLOYEE_ID", "pattern": "\\bEMP-\\d{6}\\b"},
+                   {"type": "MEMBER_ID", "pattern": "\\b\\d{8}\\b", "context": ["member"]}],
+         "words": {"CLIENT": ["Globex", "Initech"]},
+         "allow": ["support@acme.com"]}
+    """
+    import json
+    cfg = json.loads(Path(path).read_text(encoding="utf-8"))
+    n = 0
+    for r in cfg.get("rules", []):
+        add_rule(r["type"], r["pattern"], group=int(r.get("group", 0)), context=r.get("context", ()),
+                 window=int(r.get("window", 40)), why=r.get("why", ""), ignore_case=bool(r.get("ignore_case")))
+        n += 1
+    for typ, words in (cfg.get("words") or {}).items():
+        add_words(typ, words)
+        n += 1
+    allowed = cfg.get("allow", [])
+    allow(*[a for a in allowed if isinstance(a, str)])
+    for a in allowed:
+        if isinstance(a, dict) and a.get("pattern"):
+            allow(pattern=a["pattern"])
+    return n + len(allowed)
+
+
+def _custom_entities(text: str) -> List[Entity]:
+    out = []
+    low = text.lower()
+    for r in _custom:
+        for m in r.pattern.finditer(text):
+            s, e = m.span(r.group)
+            if s < 0 or e <= s:
+                continue
+            if r.context and not any(c in low[max(0, s - r.window):s] for c in r.context):
+                continue
+            if r.check and not r.check(m.group(r.group)):
+                continue
+            out.append(Entity(r.type, text[s:e], s, e, 1.0, r.why, "custom", r.why))
+    return out
+
+
+def _is_allowed(e: Entity) -> bool:
+    return any(a.fullmatch(e.text.strip()) for a in _allowed)
 
 
 # ---------------------------------------------------------------- model
@@ -226,13 +368,16 @@ def _rules(ents: List[Entity], text: str) -> List[Entity]:
                 continue
             hits = [e for e in ents if e.start < me and e.end > ms]
             if not hits:
-                ents.append(Entity(typ, m.group(g), ms, me, 1.0, why))
+                ents.append(Entity(typ, m.group(g), ms, me, 1.0, why, "rule"))
             for e in hits:
                 # Phone, card and SSN rules only relabel the model's find when
                 # its own label fails its check (e.g. "card number" that fails Luhn).
                 if typ in ("PHONE", "CREDIT_CARD", "SSN", "EMAIL", "IP_ADDRESS") and e.type != typ and _valid(e):
                     continue
+                if e.source == "custom":
+                    continue
                 e.type, e.rule, e.score = typ, why, 1.0
+                e.source = "model+rule" if e.source == "model" else e.source
                 e.start, e.end = min(e.start, ms), max(e.end, me)
                 e.text = text[e.start:e.end]
     ents.sort(key=lambda e: (e.start, -e.end))
@@ -240,6 +385,8 @@ def _rules(ents: List[Entity], text: str) -> List[Entity]:
     for e in ents:
         if kept and e.start < kept[-1].end:
             k = kept[-1]
+            if e.source == "custom" and k.source != "custom":   # your rule names the item
+                k.type, k.rule, k.source, k.reason, k.score = e.type, e.rule, "custom", e.reason, 1.0
             if e.end > k.end:
                 k.end, k.text = e.end, text[k.start:e.end]
             continue
@@ -260,12 +407,34 @@ def find(text: str, min_score: float = 0.5, model: str = MODEL_ID) -> List[Entit
     return _finish(text, _model_entities(text, model), min_score)
 
 
-def _finish(text: str, ents: List[Entity], min_score: float) -> List[Entity]:
+def _finish(text: str, ents: List[Entity], min_score: float, dropped: Optional[List[Entity]] = None) -> List[Entity]:
     _grow(ents, text)
-    ents = _rules(ents, text)
+    ents = _rules(ents + _custom_entities(text), text)
     # A failed check (Luhn, SSN format ...) drops an item unless the model is
     # very sure: for a redactor, hiding a mistyped card number beats leaking it.
-    return [e for e in ents if e.rule or (e.score >= min_score and (e.score >= SURE or _valid(e)))]
+    kept = []
+    for e in ents:
+        pct = f"{e.score:.0%}"
+        check = CHECK_NAMES.get(e.type)
+        if e.source == "custom":
+            e.reason = e.rule or "your rule"
+        elif e.source == "rule":
+            e.reason = f"rule: {e.rule}"
+        elif e.source == "model+rule":
+            e.reason = f"model found it, rule confirmed: {e.rule}"
+        elif e.score < min_score:
+            e.reason = f"model only {pct} sure, below min_score {min_score:g}"
+        elif not _valid(e) and e.score < SURE:
+            e.reason = f"model {pct} sure but it fails the {check}"
+        elif not _valid(e):
+            e.reason = f"model {pct} sure, kept although it fails the {check} (hiding beats leaking)"
+        else:
+            e.reason = f"model {pct} sure" + (f", passes the {check}" if check else "")
+        keep = e.rule or (e.score >= min_score and (e.score >= SURE or _valid(e)))
+        if keep and _allowed and _is_allowed(e):
+            keep, e.reason = False, "on your allow list"
+        (kept if keep else dropped if dropped is not None else []).append(e)
+    return kept
 
 
 def find_many(texts: List[str], min_score: float = 0.5, model: str = MODEL_ID, batch_size: int = 16) -> List[List[Entity]]:
@@ -387,6 +556,81 @@ def tokenize(text: str, min_score: float = 0.5, model: str = MODEL_ID,
     call to keep tokens consistent across several texts (e.g. a chat).
     """
     return _apply(text, find(text, min_score, model), "token", key)
+
+
+# ---------------------------------------------------------------- audit
+def _preview(v: str) -> str:
+    v = v.strip()
+    if len(v) <= 4:
+        return "*" * len(v)
+    return v[0] + "*" * (len(v) - 2) + v[-1]
+
+
+def audit(text: str, mode: str = "label", min_score: float = 0.5, model: str = MODEL_ID,
+          include_values: bool = False, include_dropped: bool = True) -> dict:
+    """Redact `text` and explain every decision, for review or a compliance log.
+
+    Returns a dict with the redacted text, one entry per item (type, position,
+    score, confidence band, whether the model or a rule found it, and why),
+    counts by type, and the items that were looked at but left visible (low
+    score, failed check, allowed) with the reason.
+
+    The report holds no personal data unless include_values=True: values are
+    shown as previews like "S***********n", and the input is identified by its
+    SHA-256 hash.
+    """
+    import datetime
+    dropped: List[Entity] = []
+    ents = _finish(text, _model_entities(text, model), min_score, dropped) if text.strip() else []
+    redacted = _apply(text, ents, mode)[0]
+
+    def row(e: Entity) -> dict:
+        d = {"type": e.type, "start": e.start, "end": e.end, "score": round(e.score, 4),
+             "confidence": e.confidence, "source": e.source, "reason": e.reason,
+             "preview": _preview(e.text)}
+        if include_values:
+            d["text"] = e.text
+        return d
+
+    counts: Dict[str, int] = {}
+    for e in ents:
+        counts[e.type] = counts.get(e.type, 0) + 1
+    return {
+        "scrubpii": __version__, "model": model, "backend": _backend(),
+        "created": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+        "input_sha256": hashlib.sha256(text.encode()).hexdigest(), "input_chars": len(text),
+        "settings": {"mode": mode, "min_score": min_score, "custom_rules": len(_custom), "allowed": len(_allowed)},
+        "redacted": redacted,
+        "counts": dict(sorted(counts.items())),
+        "items": [row(e) for e in ents],
+        "left_visible": [row(e) for e in dropped] if include_dropped else [],
+    }
+
+
+def audit_markdown(report: dict) -> str:
+    """A readable Markdown version of an audit() report."""
+    lines = [f"# scrubpii audit", "",
+             f"- Created: {report['created']}", f"- scrubpii {report['scrubpii']}, model `{report['model']}` "
+             f"({report['backend']})", f"- Input: {report['input_chars']} characters, SHA-256 `{report['input_sha256'][:16]}...`",
+             f"- Settings: mode `{report['settings']['mode']}`, min_score {report['settings']['min_score']}, "
+             f"{report['settings']['custom_rules']} custom rule(s), {report['settings']['allowed']} allowed value(s)", "",
+             f"## Redacted ({len(report['items'])} items)", ""]
+    if report["counts"]:
+        lines.append(", ".join(f"{t}: {n}" for t, n in report["counts"].items()))
+        lines.append("")
+    for title, items in (("Items", report["items"]), ("Looked at, left visible", report["left_visible"])):
+        if not items:
+            continue
+        if title != "Items":
+            lines += [f"## {title}", ""]
+        lines += ["| # | Type | Where | Value | Score | Found by | Why |", "|---:|---|---|---|---:|---|---|"]
+        for i, it in enumerate(items, 1):
+            val = it.get("text", it["preview"]).replace("|", "\\|")
+            why = it["reason"].replace("|", "\\|")
+            lines.append(f"| {i} | {it['type']} | {it['start']}-{it['end']} | `{val}` | {it['score']:.2f} "
+                         f"({it['confidence']}) | {it['source']} | {why} |")
+        lines.append("")
+    return "\n".join(lines)
 
 
 def restore(text: str, key: Dict[str, str]) -> str:
