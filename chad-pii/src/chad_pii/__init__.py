@@ -4,7 +4,7 @@
     >>> redact("Hi, I'm Sarah Johnson. Call 662-634-1142.")
     "Hi, I'm [PERSON]. Call [PHONE]."
 
-A fine-tuned DistilBERT model (ChadTollison/pii-distilbert-v2) finds the
+A fine-tuned DistilBERT model (ChadTollison/pii-distilbert-v3) finds the
 items, and checksum and format rules double-check them: card numbers must
 pass Luhn, IBANs their bank checksum, SSNs the SSA format. The rules also
 catch 10-digit US phone numbers with a real area code, valid IBANs and
@@ -16,16 +16,24 @@ cached, so later runs work offline.
 from __future__ import annotations
 
 import hashlib
+import ipaddress
+import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-__all__ = ["Entity", "find", "redact", "tokenize", "restore", "MODEL_ID"]
-__version__ = "0.1.0"
+__all__ = ["Entity", "find", "find_many", "redact", "redact_many", "tokenize", "restore", "fake_for", "MODEL_ID",
+           "redact_json", "redact_csv", "redact_dataframe", "Guard"]
+__version__ = "0.2.0"
 
-MODEL_ID = "ChadTollison/pii-distilbert-v2"
+MODEL_ID = "ChadTollison/pii-distilbert-v3"
 MODES = ("label", "mask", "fake", "token")
+SURE = 0.95     # model confidence that overrides a failed format/checksum check
+# Long text is read in windows of this many tokens. The model learned on short
+# texts, and on long documents it finds much more when it reads them in short
+# pieces (finance set: 0.65 F1 with 512-token windows, 0.76 with 128).
+WINDOW = int(os.environ.get("CHAD_PII_WINDOW", "128"))
 
 _pipeline = None
 _pipeline_id = None
@@ -52,6 +60,21 @@ IBAN_RE = re.compile(r"\b[A-Z]{2}\d{2}(?: ?[A-Z0-9]{4}){2,7}(?: ?[A-Z0-9]{1,4})?
 API_KEY_RE = re.compile(
     r"\b(?:(?:sk|pk|rk)_(?:live|test)_[A-Za-z0-9]{16,}|sk-(?:proj-)?[A-Za-z0-9_-]{32,}|AKIA[0-9A-Z]{16}"
     r"|gh[pousr]_[A-Za-z0-9]{30,}|xox[abprs]-[A-Za-z0-9-]{20,}|AIza[0-9A-Za-z_-]{35})")
+CARD_RE = re.compile(r"\b[2-6]\d{3}(?:[ -]?\d){9,15}\b")
+SSN_RE = re.compile(r"\b\d{3}([- ])\d{2}\1\d{4}\b")
+SSN_BARE_RE = re.compile(r"(?i)(?:ssn|social security(?: number| no\.?)?)\W{0,12}(\d{9})\b")
+DOB_RE = re.compile(r"(?i)\b(?:born(?: on)?|d\.?o\.?b\.?|date of birth|birth ?date|birthday|fecha de nacimiento|nacid[oa] el)\W{0,4}(\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}|\d{4}[/.-]\d{1,2}[/.-]\d{1,2}|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.? \d{1,2}(?:st|nd|rd|th)?,? \d{4}|\d{1,2}(?:st|nd|rd|th)? (?:of )?(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?,? \d{4}|\d{1,2} de [a-záéíóú]+ de \d{4})")
+IPV6_RE = re.compile(r"(?<![\w:])(?=[0-9A-Fa-f:]*:[0-9A-Fa-f]*:)[0-9A-Fa-f:]{2,39}(?![\w:])")
+
+
+def ip_ok(s: str) -> bool:
+    try:
+        ipaddress.ip_address(s)
+        return True
+    except ValueError:
+        return False
+
+
 SHAPES = {
     "EMAIL": re.compile(r"[\w.%+-]+@[\w.-]+\.[^\W\d_]{2,}"),
     "PHONE": PHONE_RE,
@@ -84,7 +107,7 @@ def iban_ok(s: str) -> bool:
 
 
 def ssn_ok(s: str) -> bool:
-    m = re.fullmatch(r"(\d{3})-?(\d{2})-?(\d{4})", s.strip())
+    m = re.fullmatch(r"(\d{3})[- ]?(\d{2})[- ]?(\d{4})", s.strip())
     return bool(m) and m[1] not in ("000", "666") and m[1][0] != "9" and m[2] != "00" and m[3] != "0000"
 
 
@@ -119,15 +142,16 @@ def _get_pipeline(model: str):
     if _pipeline is None or _pipeline_id != model:
         from transformers import AutoTokenizer, pipeline
         tok = AutoTokenizer.from_pretrained(model, model_input_names=["input_ids", "attention_mask"])
+        tok.model_max_length = min(tok.model_max_length, WINDOW)
         _pipeline = pipeline("token-classification", model=model, tokenizer=tok,
-                             aggregation_strategy="max", stride=64)
+                             aggregation_strategy="max", stride=WINDOW // 4)
         _pipeline_id = model
     return _pipeline
 
 
-def _model_entities(text: str, model: str) -> List[Entity]:
+def _model_entities(text: str, model: str, items=None) -> List[Entity]:
     out = []
-    for item in _get_pipeline(model)(text):
+    for item in (items if items is not None else _get_pipeline(model)(text)):
         s, e = item["start"], item["end"]
         while s < e and text[s].isspace():
             s += 1
@@ -169,21 +193,30 @@ def _grow(ents: List[Entity], text: str) -> None:
 def _rules(ents: List[Entity], text: str) -> List[Entity]:
     checks = [("PHONE", PHONE_RE, us_phone_ok, "real US/Canada area code"),
               ("IBAN", IBAN_RE, iban_ok, "IBAN checksum"),
-              ("API_KEY", API_KEY_RE, lambda s: True, "known API key format")]
+              ("API_KEY", API_KEY_RE, lambda s: True, "known API key format"),
+              ("CREDIT_CARD", CARD_RE, luhn_ok, "card number with valid Luhn checksum"),
+              ("SSN", SSN_RE, ssn_ok, "valid SSN format"),
+              ("SSN", SSN_BARE_RE, ssn_ok, "9 digits right after 'SSN'"),
+              ("EMAIL", SHAPES["EMAIL"], lambda s: True, "email address format"),
+              ("IP_ADDRESS", SHAPES["IP_ADDRESS"], ip_ok, "valid IP address"),
+              ("IP_ADDRESS", IPV6_RE, ip_ok, "valid IPv6 address"),
+              ("DATE_OF_BIRTH", DOB_RE, lambda s: True, "a date right after 'born' or 'DOB'")]
     for typ, rx, ok, why in checks:
         for m in rx.finditer(text):
-            if not ok(m.group()):
+            g = 1 if rx in (SSN_BARE_RE, DOB_RE) else 0
+            ms, me = m.start(g), m.end(g)
+            if not ok(m.group(g)):
                 continue
-            hits = [e for e in ents if e.start < m.end() and e.end > m.start()]
+            hits = [e for e in ents if e.start < me and e.end > ms]
             if not hits:
-                ents.append(Entity(typ, m.group(), m.start(), m.end(), 1.0, why))
+                ents.append(Entity(typ, m.group(g), ms, me, 1.0, why))
             for e in hits:
-                # A phone rule only overrides the model when the model's own
-                # label fails its check (e.g. "card number" that fails Luhn).
-                if typ == "PHONE" and e.type != "PHONE" and _valid(e):
+                # Phone, card and SSN rules only relabel the model's find when
+                # its own label fails its check (e.g. "card number" that fails Luhn).
+                if typ in ("PHONE", "CREDIT_CARD", "SSN", "EMAIL", "IP_ADDRESS") and e.type != typ and _valid(e):
                     continue
                 e.type, e.rule, e.score = typ, why, 1.0
-                e.start, e.end = min(e.start, m.start()), max(e.end, m.end())
+                e.start, e.end = min(e.start, ms), max(e.end, me)
                 e.text = text[e.start:e.end]
     ents.sort(key=lambda e: (e.start, -e.end))
     kept: List[Entity] = []
@@ -202,20 +235,39 @@ def find(text: str, min_score: float = 0.5, model: str = MODEL_ID) -> List[Entit
 
     Items the rules found or confirmed are always returned. Others need a model
     confidence of at least `min_score`, and must pass their type's check
-    (Luhn for cards, checksum for IBANs, format for SSNs...).
+    (Luhn for cards, checksum for IBANs, format for SSNs...) unless the model
+    is at least 95% sure.
     """
     if not text.strip():
         return []
-    ents = _model_entities(text, model)
+    return _finish(text, _model_entities(text, model), min_score)
+
+
+def _finish(text: str, ents: List[Entity], min_score: float) -> List[Entity]:
     _grow(ents, text)
     ents = _rules(ents, text)
-    return [e for e in ents if e.rule or (e.score >= min_score and _valid(e))]
+    # A failed check (Luhn, SSN format ...) drops an item unless the model is
+    # very sure: for a redactor, hiding a mistyped card number beats leaking it.
+    return [e for e in ents if e.rule or (e.score >= min_score and (e.score >= SURE or _valid(e)))]
+
+
+def find_many(texts: List[str], min_score: float = 0.5, model: str = MODEL_ID, batch_size: int = 16) -> List[List[Entity]]:
+    """find() for many texts at once. Batched, so much faster than a loop."""
+    texts = list(texts)
+    todo = [i for i, t in enumerate(texts) if t and t.strip()]
+    out: List[List[Entity]] = [[] for _ in texts]
+    if todo:
+        results = _get_pipeline(model)([texts[i] for i in todo], batch_size=batch_size)
+        for i, items in zip(todo, results):
+            out[i] = _finish(texts[i], _model_entities(texts[i], model, items), min_score)
+    return out
 
 
 # ---------------------------------------------------------------- redaction
 _FIRST = ["Alex", "Jordan", "Taylor", "Morgan", "Casey", "Riley", "Jamie", "Avery", "Quinn", "Rowan", "Drew", "Skyler"]
 _LAST = ["Rivera", "Brooks", "Hayes", "Bennett", "Foster", "Reed", "Parker", "Ellis", "Price", "Shaw", "Lane", "Cole"]
 _CARDS = ["4111 1111 1111 1111", "5500 0000 0000 0004", "3782 822463 10005", "6011 1111 1111 1117"]
+_STREETS = ["Example Street", "Sample Avenue", "Placeholder Road", "Fictional Lane", "Demo Drive"]
 _IBANS = ["GB82 WEST 1234 5698 7654 32", "DE89 3704 0044 0532 0130 00", "FR14 2004 1010 0505 0001 3M02 606"]
 
 
@@ -250,15 +302,30 @@ def fake_for(e: Entity) -> str:
         return f"D{h % 10**7:07d}"
     if e.type == "API_KEY":
         return f"sk_example_{h:016x}"[:27]
+    if e.type == "ADDRESS":
+        return f"{h % 900 + 100} {_STREETS[h % len(_STREETS)]}"
+    if e.type == "ID_NUMBER":
+        return f"ID-{h % 10**8:08d}"
+    if e.type == "DATE_OF_BIRTH":
+        return f"01/01/{1950 + h % 50}"
+    if e.type == "USERNAME":
+        return f"user{h % 10**5:05d}"
+    if e.type == "PASSWORD":
+        return "********"
     return f"[{e.type}]"
 
 
-def _apply(text: str, ents: List[Entity], mode: str) -> Tuple[str, Dict[str, str]]:
+def _apply(text: str, ents: List[Entity], mode: str, key: Optional[Dict[str, str]] = None) -> Tuple[str, Dict[str, str]]:
     if mode not in MODES:
         raise ValueError(f"mode must be one of {MODES}")
-    key: Dict[str, str] = {}
+    key = {} if key is None else key          # token -> real value; reused across calls when given
     tokens: Dict[Tuple[str, str], str] = {}
     counts: Dict[str, int] = {}
+    for tok, val in key.items():
+        m = re.fullmatch(r"<([A-Z_]+)_(\d+)>", tok)
+        if m:
+            tokens[(m[1], val)] = tok
+            counts[m[1]] = max(counts.get(m[1], 0), int(m[2]))
     out, pos = [], 0
     for e in ents:
         if mode == "label":
@@ -288,15 +355,27 @@ def redact(text: str, mode: str = "label", min_score: float = 0.5, model: str = 
     return _apply(text, find(text, min_score, model), mode)[0]
 
 
-def tokenize(text: str, min_score: float = 0.5, model: str = MODEL_ID) -> Tuple[str, Dict[str, str]]:
+def redact_many(texts: List[str], mode: str = "label", min_score: float = 0.5, model: str = MODEL_ID) -> List[str]:
+    """redact() for many texts at once (batched)."""
+    texts = list(texts)
+    return [_apply(t, ents, mode)[0] for t, ents in zip(texts, find_many(texts, min_score, model))]
+
+
+def tokenize(text: str, min_score: float = 0.5, model: str = MODEL_ID,
+             key: Optional[Dict[str, str]] = None) -> Tuple[str, Dict[str, str]]:
     """Replace personal data with tokens like <PERSON_1>. Returns (text, key).
 
     Keep the key somewhere safe; restore(text, key) puts the real values back.
-    The same value always gets the same token within one call.
+    The same value always gets the same token. Pass the key from an earlier
+    call to keep tokens consistent across several texts (e.g. a chat).
     """
-    return _apply(text, find(text, min_score, model), "token")
+    return _apply(text, find(text, min_score, model), "token", key)
 
 
 def restore(text: str, key: Dict[str, str]) -> str:
     """Put real values back into tokenized text."""
     return re.sub(r"<[A-Z_]+_\d+>", lambda m: key.get(m.group(), m.group()), text)
+
+
+from .structured import redact_csv, redact_dataframe, redact_json  # noqa: E402
+from .guard import Guard  # noqa: E402

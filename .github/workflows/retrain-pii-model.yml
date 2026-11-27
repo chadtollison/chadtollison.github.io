@@ -1,0 +1,102 @@
+# Retrains the PII model (training/retrain_pii.py) on GitHub's free runners,
+# scores old vs new, and, only if the new one is better:
+#   * refreshes the in-browser copy in models/ on the branch it runs on, and
+#   * if "publish" is ticked and the HF_TOKEN secret is set, uploads it to
+#     huggingface.co/ChadTollison/pii-distilbert-v2 (the model card is left alone).
+# Start it from the Actions tab: "Retrain PII model" -> "Run workflow", or just
+# add examples to training/examples.txt on main and it runs by itself.
+name: Retrain PII model
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Upload the new model to Hugging Face if it scores better"
+        type: boolean
+        default: false
+  # Adding lines to training/examples.txt on main retrains automatically.
+  push:
+    branches: [main, "claude/**"]
+    paths: ["training/examples.txt", "training/retrain_pii.py", "training/area_codes.txt", ".github/workflows/retrain-pii-model.yml"]
+
+concurrency:
+  group: retrain-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: |
+          pip install --extra-index-url https://download.pytorch.org/whl/cpu \
+            "torch==2.4.1" "transformers==4.46.3" "accelerate==1.1.1" \
+            "optimum[onnxruntime]==1.23.3" "onnx==1.17.0" "onnxruntime==1.20.1" "ml_dtypes" "huggingface_hub<1"
+
+      - name: Retrain and score
+        run: |
+          python training/retrain_pii.py --out build/new_model
+          cat build/new_model/report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Decide
+        id: verdict
+        run: |
+          python -c "import json; print('better=' + str(json.load(open('build/new_model/verdict.json'))['better']).lower())" >> "$GITHUB_OUTPUT"
+
+      - name: Keep the model and report for download
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: retrained-model
+          path: build/new_model
+          retention-days: 14
+
+      - name: Refresh the in-browser model
+        if: steps.verdict.outputs.better == 'true'
+        run: |
+          set -e
+          OUT=models/pii-distilbert-v2
+          optimum-cli export onnx --model build/new_model --task token-classification build/onnx/
+          # Tries several 8-bit methods and keeps the one closest to the full model.
+          python training/quantize.py build/onnx "$OUT/onnx/model_quantized.onnx" | tee -a build/new_model/report.md
+          cp build/onnx/config.json build/onnx/tokenizer.json build/onnx/tokenizer_config.json "$OUT/"
+          cp build/onnx/special_tokens_map.json "$OUT/" 2>/dev/null || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
+          # Score the new model on the public ai4privacy dataset too.
+          pip install -q "datasets==3.1.0"
+          python training/benchmark_ai4privacy.py \
+            --model build/new_model --name "Retrained model (full size)" \
+            --model "$OUT" --name "In-browser model (this site)"
+          cat benchmarks/ai4privacy.md >> "$GITHUB_STEP_SUMMARY"
+          git add "$OUT" benchmarks
+          git commit -m "Update in-browser PII model with the retrained version" || echo "No changes"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Publish to Hugging Face
+        if: steps.verdict.outputs.better == 'true' && inputs.publish
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          if [ -z "$HF_TOKEN" ]; then echo "::error::Add an HF_TOKEN secret first (Settings > Secrets and variables > Actions)."; exit 1; fi
+          python - <<'PY'
+          from huggingface_hub import HfApi
+          HfApi().upload_folder(repo_id="ChadTollison/pii-distilbert-v2", folder_path="build/new_model",
+                                ignore_patterns=["report.md", "verdict.json", "README.md"],
+                                commit_message="Retrain: phones in every format, Spanish, passports, driver licenses, API keys and IBANs")
+          print("Uploaded to https://huggingface.co/ChadTollison/pii-distilbert-v2")
+          PY
+

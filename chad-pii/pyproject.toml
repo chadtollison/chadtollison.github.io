@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "chad-pii"
-version = "0.1.0"
+version = "0.2.0"
 description = "Find and redact personal data (names, emails, phones, SSNs, cards, IPs, passports, driver's licenses, API keys, IBANs) with a fine-tuned DistilBERT model plus checksum rules."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -20,15 +20,20 @@ classifiers = [
 dependencies = ["transformers>=4.40", "torch>=2.6"]
 
 [project.optional-dependencies]
-test = ["pytest>=7"]
+test = ["pytest>=7", "pandas", "fastapi", "httpx"]
+server = ["fastapi>=0.100", "uvicorn>=0.20"]
+pandas = ["pandas>=1.5"]
 
 [project.scripts]
 chad-pii = "chad_pii.cli:main"
 
 [project.urls]
 Homepage = "https://chadtollison.github.io/redact.html"
-Model = "https://huggingface.co/ChadTollison/pii-distilbert-v2"
+Model = "https://huggingface.co/ChadTollison/pii-distilbert-v3"
 Source = "https://github.com/chadtollison/chadtollison.github.io/tree/main/chad-pii"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/chad_pii"]
+
+[tool.hatch.build.targets.sdist]
+exclude = ["index.html"]

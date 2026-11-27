@@ -19,7 +19,7 @@
     <section class="demo-hero">
       <p class="kicker">LIVE DEMO · PII DETECTOR</p>
       <h1>Redact me<em>.</em></h1>
-      <p class="lead">Type or paste anything below. My fine-tuned DistilBERT model finds names, emails, phone numbers, Social Security numbers, card numbers and IP addresses as you type. It runs entirely in your browser, so nothing you enter ever leaves this page.</p>
+      <p class="lead">Type or paste anything below. My fine-tuned DistilBERT model finds names, addresses, emails, phone numbers, Social Security numbers, card numbers, ID numbers, dates of birth, usernames, passwords, IP addresses, passports, driver's licenses, API keys and IBANs as you type, in English or Spanish. It runs entirely in your browser, so nothing you enter ever leaves this page.</p>
       <div class="try-row">
         <button type="button" id="try" class="try-btn">▶ Try me</button>
         <span>Watch it catch personal data in a sample message, or type your own below.</span>
@@ -41,6 +41,7 @@
               <button type="button" data-sample="0">Support ticket</button>
               <button type="button" data-sample="1">Order email</button>
               <button type="button" data-sample="2">HR note</button>
+              <button type="button" data-sample="3">En español</button>
               <label class="upload" for="file-input">Upload PDF or CSV</label>
               <input id="file-input" type="file" accept=".pdf,.csv,.txt,.md,text/plain,text/csv,application/pdf" hidden>
             </div>
@@ -106,13 +107,13 @@
       <div class="steps">
         <article><small>01</small><h3>Tokenize</h3><p>Your text is split into the same word pieces the model was trained on.</p></article>
         <article><small>02</small><h3>Classify</h3><p>A DistilBERT model I fine-tuned labels every piece and gives a confidence score, running on your device with ONNX Runtime.</p></article>
-        <article><small>03</small><h3>Validate</h3><p>Card numbers must pass a Luhn checksum and SSNs a format check, the same rule-based safety net used in the full service.</p></article>
+        <article><small>03</small><h3>Validate</h3><p>Card numbers must pass a Luhn checksum, IBANs their bank checksum and SSNs a format check, the same rule-based safety net used in the full service.</p></article>
       </div>
       <div id="bench" class="bench" hidden>
-        <h2>How well it works</h2>
+        <h2>How it compares</h2>
         <p class="use-lead" id="bench-lead"></p>
-        <div class="bench-wrap"><table class="bench-table"><thead><tr><th>Type</th><th>Items</th><th>Found</th><th>Was personal data</th><th>Right type</th></tr></thead><tbody id="bench-rows"></tbody></table></div>
-        <p class="bench-note"><strong>Found</strong> is the share of the marked items it caught (covering the item counts, since that is what hides it). <strong>Was personal data</strong> is the share of its finds that landed on something personal, like a username flagged as a name. <strong>Right type</strong> also needs the label to match. <a href="benchmarks/ai4privacy.md" target="_blank" rel="noreferrer">Full results</a></p>
+        <div class="bench-wrap"><table class="bench-table"><thead id="bench-head"></thead><tbody id="bench-rows"></tbody></table></div>
+        <p class="bench-note">Each score is F1 (0 to 1, higher is better) of <strong>caught</strong> (share of the marked personal data that was hidden) and <strong>was personal</strong> (share of the finds that really were personal data). These are scores for the full model in the Python package; this page runs an 8-bit copy of it. <a href="benchmarks/compare.md" target="_blank" rel="noreferrer">Full results, by type</a></p>
       </div>
 
       <div class="use">
@@ -146,20 +147,20 @@ Hi, I'm &lt;PERSON_1&gt;. Email &lt;EMAIL_1&gt; or call &lt;PHONE_1&gt;.
 True</code></pre></div>
           </li>
         </ol>
-        <p class="use-more">Use <code>find(text)</code> to get each item's type, position and confidence, or run <code>chad-pii "some text"</code> on the command line. The package checks card numbers with Luhn, IBANs with their bank checksum and SSNs by format, and catches 10-digit phone numbers with a real area code. See <a href="https://pypi.org/project/chad-pii/" target="_blank" rel="noreferrer">chad-pii on PyPI</a>, or use the raw model with <code>transformers</code> from <a href="https://huggingface.co/ChadTollison/pii-distilbert-v2" target="_blank" rel="noreferrer">Hugging Face</a>.</p>
+        <p class="use-more">It finds names, addresses, emails, phones, SSNs, card numbers, ID numbers, dates of birth, usernames, passwords, IP addresses, passports, driver's licenses, API keys and IBANs, in English and Spanish. Use <code>find(text)</code> to get each item's type, position and confidence, or run <code>chad-pii "some text"</code> on the command line. The package checks card numbers with Luhn, IBANs with their bank checksum and SSNs by format, and catches 10-digit phone numbers with a real area code. See <a href="https://pypi.org/project/chad-pii/" target="_blank" rel="noreferrer">chad-pii on PyPI</a>, or use the raw model with <code>transformers</code> from <a href="https://huggingface.co/ChadTollison/pii-distilbert-v3" target="_blank" rel="noreferrer">Hugging Face</a>.</p>
       </div>
 
       <div class="buttons">
         <a class="primary" href="https://pypi.org/project/chad-pii/" target="_blank" rel="noreferrer">pip install chad-pii ↗</a>
         <a class="secondary" href="https://github.com/chadtollison/PII-Detector" target="_blank" rel="noreferrer">View the code ↗</a>
-        <a class="secondary" href="https://huggingface.co/ChadTollison/pii-distilbert-v2" target="_blank" rel="noreferrer">Model on Hugging Face ↗</a>
+        <a class="secondary" href="https://huggingface.co/ChadTollison/pii-distilbert-v3" target="_blank" rel="noreferrer">Model on Hugging Face ↗</a>
       </div>
       <p class="note">This is a demo of a research model, so it can miss things or flag things by mistake. Please don't rely on it for real compliance work.</p>
     </section>
   </main>
 
   <footer><span>Michael Chad Tollison</span><span>Software & Data Engineer</span><span><a href="./">Portfolio</a></span></footer>
-  <script type="module" src="redact.js?v=2026-11-27e2"></script>
+  <script type="module" src="redact.js?v=2026-11-27g"></script>
   <script data-goatcounter="https://chadtollison.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>

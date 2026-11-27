@@ -1,0 +1,15 @@
+# Your own training examples. Add a line, commit it to main, and GitHub
+# retrains the model. The new model replaces the one on the site only if it
+# scores at least as well on every type (see the "Retrain PII model" run).
+#
+# One example per line. Mark personal data as [TYPE: the text].
+# Anything not marked is taught as "not personal data", so lines with no
+# marks are a good way to fix false alarms. Lines starting with # are ignored.
+#
+# Types: PERSON EMAIL PHONE SSN CREDIT_CARD IP_ADDRESS PASSPORT DRIVER_LICENSE API_KEY IBAN
+#
+[PERSON: Chad Tollison] is from Eupora. His phone is [PHONE: 6626341142]
+Text me at [PHONE: 6626341141] or [PHONE: 662.634.1142]
+Your order number is 4567891234.
+Ship it to 42 Maple Street, Springfield, IL 62704.
+Server [IP_ADDRESS: 192.168.1.24] logged a failed login from [IP_ADDRESS: 10.0.0.7].
