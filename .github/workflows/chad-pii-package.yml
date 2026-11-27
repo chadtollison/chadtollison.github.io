@@ -1,0 +1,68 @@
+# Tests the chad-pii Python package (in chad-pii/) and, when you ask it to,
+# publishes it to PyPI. Publishing uses PyPI "trusted publishing", so there is
+# no token to store: PyPI trusts this workflow once you add it as a publisher.
+# Publish: Actions tab -> "chad-pii package" -> Run workflow -> tick "publish".
+name: chad-pii package
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish this version to PyPI"
+        type: boolean
+        default: false
+  push:
+    branches: [main, "claude/**"]
+    paths: ["chad-pii/**", ".github/workflows/chad-pii-package.yml"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          pip install --extra-index-url https://download.pytorch.org/whl/cpu "torch==2.4.1" build
+          pip install "./chad-pii[test]"
+      - name: Unit tests
+        run: pytest -q chad-pii/tests
+      - name: Try it with the real model
+        run: |
+          python - <<'PY'
+          from chad_pii import redact, tokenize, restore, find
+          text = "Hi, I'm Sarah Johnson. Email sarah.j@example.com or call 6626341142. IBAN GB82 WEST 1234 5698 7654 32."
+          print(redact(text))
+          for m in ("mask", "fake"):
+              print(m, "->", redact(text, mode=m))
+          safe, key = tokenize(text)
+          print(safe, key)
+          assert restore(safe, key) == text
+          out = redact(text)
+          for secret in ("Sarah Johnson", "sarah.j@example.com", "6626341142", "GB82 WEST"):
+              assert secret not in out, secret
+          PY
+          chad-pii --find "My SSN is 123-45-6789"
+      - name: Build
+        run: python -m build chad-pii --outdir dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chad-pii-dist
+          path: dist
+
+  publish:
+    needs: test
+    if: github.event_name == 'workflow_dispatch' && inputs.publish
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: chad-pii-dist
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@release/v1
