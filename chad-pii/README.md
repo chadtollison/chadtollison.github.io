@@ -13,14 +13,30 @@ redact("Hi, I'm Sarah Johnson. Email sarah.j@example.com or call 6626341142.")
 # "Hi, I'm [PERSON]. Email [EMAIL] or call [PHONE]."
 ```
 
-It finds **names, emails, phone numbers, Social Security numbers, card
-numbers, IP addresses, passports, driver's licenses, API keys and IBANs**, in
-English and Spanish. A fine-tuned DistilBERT model
-([ChadTollison/pii-distilbert-v2](https://huggingface.co/ChadTollison/pii-distilbert-v2))
+It finds **names, addresses, emails, phone numbers, Social Security numbers,
+card numbers, IBANs, passports, driver's licenses, ID numbers, dates of birth,
+usernames, passwords, IP addresses and API keys**, in English and Spanish. A
+fine-tuned DistilBERT model
+([ChadTollison/pii-distilbert-v3](https://huggingface.co/ChadTollison/pii-distilbert-v3))
 does the finding, and rules double-check it: card numbers must pass Luhn,
-IBANs their bank checksum, SSNs the SSA format. The rules also catch 10-digit
-US phone numbers with a real area code, valid IBANs and well-known API key
-formats even if the model misses them.
+IBANs their bank checksum, SSNs the SSA format. The rules also catch what the
+model misses: Luhn-valid card numbers, SSNs, emails, IP addresses, US phone
+numbers with a real area code, valid IBANs, well-known API key formats and
+dates right after "born" or "DOB".
+
+## How it compares
+
+F1 on held-out public data (full results in
+[benchmarks/compare.md](https://github.com/chadtollison/chadtollison.github.io/blob/main/benchmarks/compare.md)):
+
+| Dataset | chad-pii | Microsoft Presidio | spaCy |
+|---|---:|---:|---:|
+| ai4privacy, English | 0.99 | 0.81 | 0.68 |
+| ai4privacy, Spanish | 0.99 | 0.63 | 0.46 |
+| Gretel PII, English | 0.99 | 0.85 | 0.36 |
+| Gretel finance (never trained on) | 0.79 | 0.52 | 0.58 |
+
+Presidio is about 4x faster per text.
 
 The model (about 260 MB) downloads on first use and is cached, so after that
 it works offline. Nothing is sent anywhere.

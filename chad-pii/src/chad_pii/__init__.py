@@ -4,7 +4,7 @@
     >>> redact("Hi, I'm Sarah Johnson. Call 662-634-1142.")
     "Hi, I'm [PERSON]. Call [PHONE]."
 
-A fine-tuned DistilBERT model (ChadTollison/pii-distilbert-v2) finds the
+A fine-tuned DistilBERT model (ChadTollison/pii-distilbert-v3) finds the
 items, and checksum and format rules double-check them: card numbers must
 pass Luhn, IBANs their bank checksum, SSNs the SSA format. The rules also
 catch 10-digit US phone numbers with a real area code, valid IBANs and
@@ -27,7 +27,7 @@ __all__ = ["Entity", "find", "find_many", "redact", "redact_many", "tokenize", "
            "redact_json", "redact_csv", "redact_dataframe", "Guard"]
 __version__ = "0.2.0"
 
-MODEL_ID = "ChadTollison/pii-distilbert-v2"
+MODEL_ID = "ChadTollison/pii-distilbert-v3"
 MODES = ("label", "mask", "fake", "token")
 SURE = 0.95     # model confidence that overrides a failed format/checksum check
 # Long text is read in windows of this many tokens. The model learned on short

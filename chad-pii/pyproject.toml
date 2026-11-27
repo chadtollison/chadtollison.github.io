@@ -29,7 +29,7 @@ chad-pii = "chad_pii.cli:main"
 
 [project.urls]
 Homepage = "https://chadtollison.github.io/redact.html"
-Model = "https://huggingface.co/ChadTollison/pii-distilbert-v2"
+Model = "https://huggingface.co/ChadTollison/pii-distilbert-v3"
 Source = "https://github.com/chadtollison/chadtollison.github.io/tree/main/chad-pii"
 
 [tool.hatch.build.targets.wheel]
