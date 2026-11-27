@@ -61,3 +61,10 @@ def test_date_of_birth_rule(monkeypatch):
                       ("fecha de nacimiento: 14 de marzo de 1986", "14 de marzo de 1986")]:
         assert [(e.type, e.text) for e in cp.find(text)] == [("DATE_OF_BIRTH", dob)]
     assert cp.find("Meeting on 03/14/2026.") == []
+
+
+def test_email_and_ip_rules(monkeypatch):
+    monkeypatch.setattr(cp, "_model_entities", fake_model([]))
+    text = "Mail ana.ruiz@banco.es from 10.0.4.17 or 2001:db8::8a2e:370:7334; not 999.1.1.1, not 10:30:00."
+    assert {(e.type, e.text) for e in cp.find(text)} == {("EMAIL", "ana.ruiz@banco.es"), ("IP_ADDRESS", "10.0.4.17"),
+                                                        ("IP_ADDRESS", "2001:db8::8a2e:370:7334")}

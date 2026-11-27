@@ -11,6 +11,8 @@
 - A failed check (Luhn, SSN format ...) no longer drops an item the model is 95%+ sure of: hiding beats leaking.
 - Card numbers that pass Luhn and well-formed SSNs (also `123 45 6789`, or 9 digits right after "SSN") are found
   by rule even when the model misses them.
+- Email addresses and IPv4/IPv6 addresses are found by rule too, and dates of birth right after "born", "DOB" or
+  "date of birth".
 - Long text is read in 128-token windows (`CHAD_PII_WINDOW` changes it): far more found in long documents.
 - Fake values for address, ID number, date of birth, username and password.
 
