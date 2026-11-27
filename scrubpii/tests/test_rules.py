@@ -68,3 +68,12 @@ def test_email_and_ip_rules(monkeypatch):
     text = "Mail ana.ruiz@banco.es from 10.0.4.17 or 2001:db8::8a2e:370:7334; not 999.1.1.1, not 10:30:00."
     assert {(e.type, e.text) for e in cp.find(text)} == {("EMAIL", "ana.ruiz@banco.es"), ("IP_ADDRESS", "10.0.4.17"),
                                                         ("IP_ADDRESS", "2001:db8::8a2e:370:7334")}
+
+
+def test_phone_formats(monkeypatch):
+    monkeypatch.setattr(cp, "_model_entities", fake_model([]))
+    for t in ["Emergency contact: 1-800-123-4567", "Phone Number: (123) 456-7890", "call us at +1-800-123-4567.",
+              "Contact: [+44] 1234567890", "contact us at 800-123-4567 or", "Ring me on +44 20 7946 0958 today"]:
+        assert "[PHONE]" in cp.redact(t), t
+    for t in ["Order 123-456-7890 shipped", "Version 1.2.3, build 20231127", "Score went +12 points"]:
+        assert cp.redact(t) == t, t

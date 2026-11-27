@@ -8,102 +8,173 @@ Run on 2026-11-27 on a GitHub Actions runner (CPU only). Up to 1000 texts per da
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| scrubpii v3 | 99% | 99% | 100% | **0.993** | 31 |
-| scrubpii v2 (current) | 81% | 73% | 94% | 0.869 | 30 |
-| Microsoft Presidio | 74% | 67% | 90% | 0.814 | 7 |
+| scrubpii 0.4 | 99% | 99% | 99% | **0.992** | 6 |
+| Microsoft Presidio | 74% | 67% | 90% | 0.814 | 8 |
 | spaCy (en_core_web_lg) | 52% | 46% | 98% | 0.676 | 6 |
 
 Caught, by type:
 
-| Type | Items | scrubpii v3 | scrubpii v2 (current) | Microsoft Presidio | spaCy (en_core_web_lg) |
-|---|---:|---:|---:|---:|---:|
-| ADDRESS | 319 | 99% | 68% | 66% | 61% |
-| CREDIT_CARD | 13 | 100% | 8% | 62% | 0% |
-| DRIVER_LICENSE | 12 | 100% | 17% | 67% | 17% |
-| EMAIL | 123 | 100% | 100% | 100% | 0% |
-| ID_NUMBER | 109 | 97% | 8% | 50% | 4% |
-| PASSPORT | 24 | 96% | 4% | 100% | 4% |
-| PERSON | 848 | 100% | 98% | 78% | 76% |
-| PHONE | 171 | 100% | 74% | 63% | 2% |
-| SSN | 18 | 72% | 72% | 100% | 0% |
+| Type | Items | scrubpii 0.4 | Microsoft Presidio | spaCy (en_core_web_lg) |
+|---|---:|---:|---:|---:|
+| ADDRESS | 319 | 99% | 66% | 61% |
+| CREDIT_CARD | 13 | 100% | 62% | 0% |
+| DRIVER_LICENSE | 12 | 100% | 67% | 17% |
+| EMAIL | 123 | 100% | 100% | 0% |
+| ID_NUMBER | 109 | 96% | 50% | 4% |
+| PASSPORT | 24 | 96% | 100% | 4% |
+| PERSON | 848 | 100% | 78% | 76% |
+| PHONE | 171 | 99% | 63% | 2% |
+| SSN | 18 | 72% | 100% | 0% |
 
 ## ai4privacy (Spanish)
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| scrubpii v3 | 99% | 98% | 99% | **0.991** | 39 |
-| scrubpii v2 (current) | 74% | 64% | 63% | 0.679 | 38 |
+| scrubpii 0.4 | 99% | 98% | 99% | **0.991** | 9 |
 | Microsoft Presidio | 61% | 52% | 65% | 0.629 | 7 |
 | spaCy (en_core_web_lg) | 41% | 34% | 52% | 0.461 | 6 |
 
 Caught, by type:
 
-| Type | Items | scrubpii v3 | scrubpii v2 (current) | Microsoft Presidio | spaCy (en_core_web_lg) |
-|---|---:|---:|---:|---:|---:|
-| ADDRESS | 169 | 98% | 77% | 36% | 32% |
-| CREDIT_CARD | 14 | 100% | 21% | 64% | 14% |
-| DRIVER_LICENSE | 11 | 100% | 0% | 46% | 18% |
-| EMAIL | 58 | 100% | 98% | 100% | 12% |
-| ID_NUMBER | 56 | 100% | 2% | 70% | 25% |
-| PASSPORT | 26 | 100% | 0% | 65% | 38% |
-| PERSON | 365 | 100% | 93% | 63% | 60% |
-| PHONE | 79 | 100% | 63% | 65% | 18% |
-| SSN | 12 | 67% | 42% | 100% | 25% |
+| Type | Items | scrubpii 0.4 | Microsoft Presidio | spaCy (en_core_web_lg) |
+|---|---:|---:|---:|---:|
+| ADDRESS | 169 | 98% | 36% | 32% |
+| CREDIT_CARD | 14 | 100% | 64% | 14% |
+| DRIVER_LICENSE | 11 | 100% | 46% | 18% |
+| EMAIL | 58 | 100% | 100% | 12% |
+| ID_NUMBER | 56 | 100% | 70% | 25% |
+| PASSPORT | 26 | 100% | 65% | 38% |
+| PERSON | 365 | 100% | 63% | 60% |
+| PHONE | 79 | 99% | 65% | 18% |
+| SSN | 12 | 67% | 100% | 25% |
 
 ## Gretel PII (English)
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| scrubpii v3 | 100% | 99% | 99% | **0.992** | 59 |
-| scrubpii v2 (current) | 69% | 58% | 90% | 0.781 | 58 |
-| Microsoft Presidio | 87% | 75% | 83% | 0.852 | 14 |
-| spaCy (en_core_web_lg) | 22% | 14% | 85% | 0.356 | 12 |
+| scrubpii 0.4 | 100% | 99% | 99% | **0.992** | 15 |
+| Microsoft Presidio | 87% | 75% | 83% | 0.852 | 13 |
+| spaCy (en_core_web_lg) | 22% | 14% | 85% | 0.356 | 11 |
 
 Caught, by type:
 
-| Type | Items | scrubpii v3 | scrubpii v2 (current) | Microsoft Presidio | spaCy (en_core_web_lg) |
-|---|---:|---:|---:|---:|---:|
-| ADDRESS | 312 | 100% | 92% | 81% | 75% |
-| API_KEY | 7 | 100% | 57% | 29% | 14% |
-| CREDIT_CARD | 161 | 98% | 76% | 86% | 0% |
-| DATE_OF_BIRTH | 477 | 99% | 65% | 100% | 0% |
-| EMAIL | 222 | 100% | 100% | 100% | 0% |
-| ID_NUMBER | 547 | 100% | 6% | 75% | 7% |
-| IP_ADDRESS | 166 | 100% | 100% | 99% | 2% |
-| PASSWORD | 13 | 100% | 38% | 23% | 8% |
-| PERSON | 421 | 99% | 97% | 90% | 89% |
-| PHONE | 211 | 100% | 74% | 95% | 1% |
-| SSN | 349 | 100% | 80% | 86% | 0% |
-| USERNAME | 47 | 100% | 57% | 26% | 8% |
+| Type | Items | scrubpii 0.4 | Microsoft Presidio | spaCy (en_core_web_lg) |
+|---|---:|---:|---:|---:|
+| ADDRESS | 312 | 99% | 81% | 75% |
+| API_KEY | 7 | 100% | 29% | 14% |
+| CREDIT_CARD | 161 | 98% | 86% | 0% |
+| DATE_OF_BIRTH | 477 | 99% | 100% | 0% |
+| EMAIL | 222 | 100% | 100% | 0% |
+| ID_NUMBER | 547 | 100% | 75% | 7% |
+| IP_ADDRESS | 166 | 100% | 99% | 2% |
+| PASSWORD | 13 | 100% | 23% | 8% |
+| PERSON | 421 | 99% | 90% | 89% |
+| PHONE | 211 | 100% | 95% | 1% |
+| SSN | 349 | 100% | 86% | 0% |
+| USERNAME | 47 | 100% | 26% | 8% |
 
 ## Gretel finance (English, never trained on)
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| scrubpii v3 | 74% | 68% | 84% | **0.789** | 336 |
-| scrubpii v2 (current) | 86% | 60% | 53% | 0.654 | 333 |
-| Microsoft Presidio | 81% | 56% | 38% | 0.521 | 60 |
-| spaCy (en_core_web_lg) | 55% | 34% | 61% | 0.580 | 51 |
+| scrubpii 0.4 | 74% | 67% | 86% | **0.796** | 94 |
+| Microsoft Presidio | 81% | 56% | 38% | 0.521 | 59 |
+| spaCy (en_core_web_lg) | 55% | 34% | 61% | 0.580 | 50 |
 
 Caught, by type:
 
-| Type | Items | scrubpii v3 | scrubpii v2 (current) | Microsoft Presidio | spaCy (en_core_web_lg) |
+| Type | Items | scrubpii 0.4 | Microsoft Presidio | spaCy (en_core_web_lg) |
+|---|---:|---:|---:|---:|
+| ADDRESS | 801 | 81% | 78% | 73% |
+| API_KEY | 19 | 84% | 16% | 0% |
+| CREDIT_CARD | 26 | 88% | 85% | 4% |
+| DATE_OF_BIRTH | 52 | 90% | 94% | 0% |
+| DRIVER_LICENSE | 30 | 77% | 93% | 0% |
+| EMAIL | 292 | 98% | 99% | 0% |
+| IBAN | 57 | 60% | 54% | 4% |
+| IP_ADDRESS | 73 | 73% | 99% | 6% |
+| PASSPORT | 24 | 79% | 100% | 0% |
+| PASSWORD | 33 | 67% | 39% | 3% |
+| PERSON | 1503 | 63% | 79% | 76% |
+| PHONE | 183 | 98% | 92% | 0% |
+| SSN | 32 | 88% | 75% | 0% |
+| USERNAME | 11 | 82% | 36% | 9% |
+
+## Medical records (Nemotron-PII, never trained on)
+
+| System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| ADDRESS | 801 | 82% | 91% | 78% | 73% |
-| API_KEY | 19 | 84% | 42% | 16% | 0% |
-| CREDIT_CARD | 26 | 88% | 58% | 85% | 4% |
-| DATE_OF_BIRTH | 52 | 92% | 85% | 94% | 0% |
-| DRIVER_LICENSE | 30 | 77% | 13% | 93% | 0% |
-| EMAIL | 292 | 98% | 99% | 99% | 0% |
-| IBAN | 57 | 60% | 51% | 54% | 4% |
-| IP_ADDRESS | 73 | 73% | 73% | 99% | 6% |
-| PASSPORT | 24 | 92% | 8% | 100% | 0% |
-| PASSWORD | 33 | 70% | 24% | 39% | 3% |
-| PERSON | 1503 | 65% | 86% | 79% | 76% |
-| PHONE | 183 | 70% | 95% | 92% | 0% |
-| SSN | 32 | 84% | 88% | 75% | 0% |
-| USERNAME | 11 | 91% | 46% | 36% | 9% |
+| scrubpii 0.4 | 84% | 79% | 99% | **0.912** | 48 |
+| Microsoft Presidio | 88% | 78% | 76% | 0.816 | 33 |
+| spaCy (en_core_web_lg) | 32% | 30% | 94% | 0.474 | 29 |
+
+Caught, by type:
+
+| Type | Items | scrubpii 0.4 | Microsoft Presidio | spaCy (en_core_web_lg) |
+|---|---:|---:|---:|---:|
+| ADDRESS | 248 | 84% | 64% | 52% |
+| API_KEY | 2 | 100% | 0% | 0% |
+| CREDIT_CARD | 28 | 96% | 68% | 0% |
+| DATE_OF_BIRTH | 519 | 100% | 100% | 0% |
+| EMAIL | 402 | 99% | 99% | 1% |
+| ID_NUMBER | 918 | 81% | 86% | 2% |
+| IP_ADDRESS | 5 | 100% | 100% | 0% |
+| PASSWORD | 85 | 56% | 65% | 6% |
+| PERSON | 1274 | 73% | 85% | 84% |
+| PHONE | 365 | 100% | 94% | 0% |
+| SSN | 42 | 100% | 98% | 0% |
+| USERNAME | 21 | 76% | 33% | 14% |
+
+## Support tickets, emails, transcripts (Nemotron-PII, never trained on)
+
+| System | Caught | Fully hidden | Was personal | F1 | ms/text |
+|---|---:|---:|---:|---:|---:|
+| scrubpii 0.4 | 78% | 73% | 99% | **0.871** | 56 |
+| Microsoft Presidio | 82% | 76% | 75% | 0.783 | 39 |
+| spaCy (en_core_web_lg) | 40% | 39% | 97% | 0.568 | 34 |
+
+Caught, by type:
+
+| Type | Items | scrubpii 0.4 | Microsoft Presidio | spaCy (en_core_web_lg) |
+|---|---:|---:|---:|---:|
+| ADDRESS | 188 | 71% | 63% | 56% |
+| API_KEY | 5 | 100% | 20% | 20% |
+| CREDIT_CARD | 127 | 99% | 72% | 0% |
+| DATE_OF_BIRTH | 80 | 100% | 100% | 0% |
+| EMAIL | 818 | 99% | 99% | 1% |
+| ID_NUMBER | 65 | 82% | 78% | 5% |
+| IP_ADDRESS | 67 | 100% | 98% | 0% |
+| PASSWORD | 204 | 63% | 53% | 4% |
+| PERSON | 1723 | 64% | 83% | 82% |
+| PHONE | 315 | 100% | 95% | 1% |
+| SSN | 51 | 100% | 100% | 0% |
+| USERNAME | 352 | 66% | 52% | 19% |
+
+## Logs and config files (Nemotron-PII, never trained on)
+
+| System | Caught | Fully hidden | Was personal | F1 | ms/text |
+|---|---:|---:|---:|---:|---:|
+| scrubpii 0.4 | 81% | 77% | 97% | **0.884** | 67 |
+| Microsoft Presidio | 70% | 60% | 74% | 0.717 | 35 |
+| spaCy (en_core_web_lg) | 19% | 18% | 88% | 0.313 | 30 |
+
+Caught, by type:
+
+| Type | Items | scrubpii 0.4 | Microsoft Presidio | spaCy (en_core_web_lg) |
+|---|---:|---:|---:|---:|
+| ADDRESS | 114 | 68% | 69% | 64% |
+| API_KEY | 533 | 97% | 11% | 2% |
+| CREDIT_CARD | 58 | 97% | 66% | 0% |
+| DATE_OF_BIRTH | 25 | 100% | 100% | 0% |
+| EMAIL | 447 | 99% | 100% | 2% |
+| ID_NUMBER | 102 | 78% | 79% | 1% |
+| IP_ADDRESS | 786 | 100% | 99% | 1% |
+| PASSWORD | 252 | 63% | 49% | 4% |
+| PERSON | 634 | 54% | 88% | 84% |
+| PHONE | 157 | 100% | 94% | 0% |
+| SSN | 10 | 100% | 100% | 0% |
+| USERNAME | 605 | 62% | 44% | 11% |
 
 Presidio runs with its defaults (spaCy en_core_web_lg, all recognizers, English). On Spanish text every system uses its English setup except scrubpii, which trains on Spanish too.
 
-Data: ai4privacy open-pii-masking-500k (CC BY 4.0), Gretel gretel-pii-masking-en-v1 and synthetic_pii_finance_multilingual (Apache 2.0).
+Data: ai4privacy open-pii-masking-500k (CC BY 4.0), Gretel gretel-pii-masking-en-v1 and synthetic_pii_finance_multilingual (Apache 2.0), NVIDIA Nemotron-PII (CC BY 4.0).

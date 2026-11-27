@@ -40,12 +40,19 @@ SPACY_MAP = {"PERSON": "PERSON", "GPE": "ADDRESS", "LOC": "ADDRESS", "FAC": "ADD
 def make_system(spec):
     """Return (display name, fn(text) -> [(start, end, type)])."""
     if spec.startswith("scrubpii"):
+        import os
         import scrubpii
-        model = spec.split(":", 1)[1] if ":" in spec else scrubpii.MODEL_ID
-        model, _, named = model.partition("=")
+        head, _, model = spec.partition(":")
+        backend = head.partition("@")[2]           # scrubpii@onnx / scrubpii@torch / scrubpii (default)
+        model, _, named = (model or scrubpii.MODEL_ID).partition("=")
         label = named if named else "scrubpii v3" if "v3" in model else "scrubpii v2 (current)" if "pii-distilbert-v2" in model else f"scrubpii ({model})"
-        scrubpii.find("warm up", model=model)
-        return label, lambda t: [(e.start, e.end, e.type) for e in scrubpii.find(t, model=model)]
+
+        def run(t):
+            if backend:
+                os.environ["SCRUBPII_BACKEND"] = backend
+            return [(e.start, e.end, e.type) for e in scrubpii.find(t, model=model)]
+        run("warm up")
+        return label, run
     if spec == "presidio":
         from presidio_analyzer import AnalyzerEngine
         eng = AnalyzerEngine()
@@ -98,6 +105,10 @@ DATASETS = {
     "ai4privacy (Spanish)": lambda n: pii_data.openpii("validation", langs=("es",), n=n // 2, seed=7),
     "Gretel PII (English)": lambda n: pii_data.gretel_en("test", n=n, seed=7),
     "Gretel finance (English, never trained on)": lambda n: pii_data.gretel_finance("test", n=n, seed=7),
+    "Medical records (Nemotron-PII, never trained on)": lambda n: pii_data.nemotron("medical", n=n, seed=7),
+    "Support tickets, emails, transcripts (Nemotron-PII, never trained on)":
+        lambda n: pii_data.nemotron("conversation", n=n, seed=7),
+    "Logs and config files (Nemotron-PII, never trained on)": lambda n: pii_data.nemotron("logs_config", n=n, seed=7),
 }
 
 
@@ -126,7 +137,7 @@ def report(results, stem, meta):
     L += ["Presidio runs with its defaults (spaCy en_core_web_lg, all recognizers, English). "
           "On Spanish text every system uses its English setup except scrubpii, which trains on Spanish too.", "",
           "Data: ai4privacy open-pii-masking-500k (CC BY 4.0), Gretel gretel-pii-masking-en-v1 and "
-          "synthetic_pii_finance_multilingual (Apache 2.0)."]
+          "synthetic_pii_finance_multilingual (Apache 2.0), NVIDIA Nemotron-PII (CC BY 4.0)."]
     (OUT / f"{stem}.md").write_text("\n".join(L) + "\n")
 
 

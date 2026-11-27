@@ -3,6 +3,7 @@
 POST /redact    {"text": "...", "mode": "label|mask|fake|token"}  -> {"text": "...", "key": {...}}
 POST /find      {"text": "..."}                                   -> {"entities": [...]}
 POST /restore   {"text": "...", "key": {...}}                     -> {"text": "..."}
+POST /audit     {"text": "...", "mode": "label"}                  -> redacted text and why each item was flagged
 GET  /health
 Everything runs locally; nothing is sent anywhere.
 """
@@ -13,7 +14,7 @@ from typing import Dict, Optional
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from . import MODES, __version__, _apply, find, restore
+from . import MODES, __version__, _apply, audit, find, restore
 
 app = FastAPI(title="scrubpii", version=__version__,
               description="Find and redact personal data. Runs locally; nothing leaves this machine.")
@@ -46,6 +47,13 @@ def redact_route(body: TextIn):
         return {"error": f"mode must be one of {MODES}"}
     text, key = _apply(body.text, find(body.text, body.min_score), body.mode)
     return {"text": text, "key": key if body.mode == "token" else None}
+
+
+@app.post("/audit")
+def audit_route(body: TextIn):
+    if body.mode not in MODES or body.mode == "token":
+        return {"error": "mode must be label, mask or fake"}
+    return audit(body.text, body.mode, body.min_score)
 
 
 @app.post("/restore")

@@ -31,15 +31,32 @@ F1 on held-out public data (full results in
 
 | Dataset | scrubpii | Microsoft Presidio | spaCy |
 |---|---:|---:|---:|
-| ai4privacy, English | 0.99 | 0.81 | 0.68 |
-| ai4privacy, Spanish | 0.99 | 0.63 | 0.46 |
-| Gretel PII, English | 0.99 | 0.85 | 0.36 |
-| Gretel finance (never trained on) | 0.79 | 0.52 | 0.58 |
+| ai4privacy, English | **0.99** | 0.81 | 0.68 |
+| ai4privacy, Spanish | **0.99** | 0.63 | 0.46 |
+| Gretel PII, English | **0.99** | 0.85 | 0.36 |
+| Gretel finance (never trained on) | **0.80** | 0.52 | 0.58 |
+| Medical records (never trained on) | **0.91** | 0.82 | 0.47 |
+| Support tickets, emails, transcripts (never trained on) | **0.87** | 0.78 | 0.57 |
+| Logs and config files (never trained on) | **0.88** | 0.72 | 0.31 |
 
-Presidio is about 4x faster per text.
+The last three come from NVIDIA's Nemotron-PII (CC BY 4.0). Presidio flags
+more text, so on long, unfamiliar documents it touches 3 to 7 points more of
+the real items, mostly first names on their own. But a quarter or more of what
+it flags there isn't personal data, while 97 to 99% of scrubpii's finds are.
 
-The model (about 260 MB) downloads on first use and is cached, so after that
-it works offline. Nothing is sent anywhere.
+Install and speed ([benchmarks/speed.md](https://github.com/chadtollison/chadtollison.github.io/blob/main/benchmarks/speed.md)):
+
+| | scrubpii 0.4 | Microsoft Presidio |
+|---|---:|---:|
+| Install size, with model | **288 MB** | 815 MB |
+| Start-up (new process, first answer) | **0.6 s** | 1.5 s |
+| Short texts (ai4privacy) | **6 ms** | 8 ms |
+| Long documents (finance) | 95 ms | **59 ms** |
+
+It runs on ONNX Runtime, so there is no PyTorch to install. The 8-bit model
+(about 66 MB) downloads on first use and is cached, so after that it starts in
+under a second and works offline. Nothing is sent anywhere. If you already
+use PyTorch, `pip install "scrubpii[torch]"` and set `SCRUBPII_BACKEND=torch`.
 
 Try it in your browser first: [chadtollison.github.io/redact.html](https://chadtollison.github.io/redact.html)
 
@@ -78,11 +95,67 @@ putting the real values back in its reply.
 from scrubpii import find
 
 for e in find(text):
-    print(e.type, e.text, e.start, e.end, round(e.score, 2), e.rule)
+    print(e.type, e.text, e.score, e.confidence, e.source, e.reason)
+# PERSON Sarah Johnson 0.97 high model "model 97% sure"
+# EMAIL sarah.j@example.com 1.0 high model+rule "model found it, rule confirmed: email address format"
 ```
 
 `min_score` (default 0.5) sets how sure the model must be. Items caught or
-confirmed by a rule are always returned.
+confirmed by a rule are always returned. Every item says how it was found
+(`source`: model, rule, model+rule or custom) and why (`reason`).
+
+## Your own rules
+
+Add patterns for data only you have, like employee or member IDs, without
+retraining anything:
+
+```python
+import scrubpii
+
+scrubpii.add_rule("EMPLOYEE_ID", r"\bEMP-\d{6}\b")
+scrubpii.add_rule("MEMBER_ID", r"\b\d{8}\b", context=["member", "acct"])   # only after these words
+scrubpii.add_words("CLIENT", ["Globex", "Initech"])                         # exact names, any case
+scrubpii.allow("support@acme.com")                                          # never redact this
+
+scrubpii.redact("EMP-004211 called Globex, member no. 12345678, cc support@acme.com")
+# "[EMPLOYEE_ID] called [CLIENT], member no. [MEMBER_ID], cc support@acme.com"
+```
+
+Your rules win where they overlap the model, and work in every mode, in
+`tokenize`, `Guard`, JSON/CSV and the command line. `add_rule` also takes
+`group=` (redact one regex group) and `check=` (a function that must return
+True). Keep rules in a JSON file and load them with `scrubpii.load_rules("rules.json")`
+or `scrubpii --rules rules.json`:
+
+```json
+{"rules": [{"type": "EMPLOYEE_ID", "pattern": "\\bEMP-\\d{6}\\b"},
+           {"type": "MEMBER_ID", "pattern": "\\b\\d{8}\\b", "context": ["member"]}],
+ "words": {"CLIENT": ["Globex", "Initech"]},
+ "allow": ["support@acme.com"]}
+```
+
+## Audit report
+
+For reviews and compliance logs, `audit()` redacts and explains every
+decision: what was hidden, how sure it was, what found it and why, plus what
+it looked at and left visible (too unsure, failed a checksum, on your allow
+list). The report holds no personal data unless you ask for it: values show as
+previews like `S***********n` and the input is identified by its SHA-256 hash.
+
+```python
+from scrubpii import audit, audit_markdown
+
+report = audit(text)                 # a dict, ready to json.dump into a log
+print(report["redacted"], report["counts"])
+print(audit_markdown(report))        # a readable table
+```
+
+```bash
+scrubpii --audit --file letter.txt                    # JSON
+scrubpii --audit --audit-format md --file letter.txt  # Markdown
+```
+
+The HTTP API has `POST /audit` too.
 
 ## Many texts, JSON, CSV and pandas
 
@@ -137,6 +210,8 @@ interactive docs at `/docs`. It runs on your machine, so nothing is sent anywher
 scrubpii "Call Sarah at 662-634-1142"
 cat notes.txt | scrubpii --mode mask > notes-redacted.txt
 scrubpii --find "My SSN is 123-45-6789"
+scrubpii --audit --audit-format md "Call Sarah at 662-634-1142"
+scrubpii --rules my_rules.json --file notes.txt
 scrubpii --file customers.csv --columns name,email -o customers-safe.csv   # also .json, .jsonl, .txt
 ```
 

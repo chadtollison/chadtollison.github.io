@@ -632,13 +632,13 @@ render();
     const data = await res.json();
     const sets = Object.keys(data.results);
     const systems = Object.keys(data.results[sets[0]]).filter((n) => !/v2/.test(n));
-    const short = (n) => n.replace(/^scrubpii v3$/, 'This model').replace(/ \(.*\)$/, '');
+    const short = (n) => n.replace(/^scrubpii( v3| \d[\d.]*)?$/, 'This model').replace(/ \(.*\)$/, '');
     $('bench-head').innerHTML = `<tr><th>Dataset</th>${systems.map((n) => `<th>${esc(short(n))}</th>`).join('')}</tr>`;
     $('bench-rows').innerHTML = sets.map((ds) => {
       const r = data.results[ds], best = Math.max(...systems.map((n) => r[n]?.f1 ?? 0));
       return `<tr><td>${esc(ds)}</td>${systems.map((n) => r[n] ? `<td>${r[n].f1 === best ? '<strong>' : ''}${r[n].f1.toFixed(2)}${r[n].f1 === best ? '</strong>' : ''}</td>` : '<td class="na">–</td>').join('')}</tr>`;
     }).join('');
-    $('bench-lead').innerHTML = `Scored on up to ${data.meta.rows.toLocaleString()} texts from each of ${sets.length} public datasets, against <a href="https://microsoft.github.io/presidio/" target="_blank" rel="noreferrer">Microsoft Presidio</a> and <a href="https://spacy.io/" target="_blank" rel="noreferrer">spaCy</a>. None of these texts were used in training. The finance set comes from a dataset the model never saw any part of.`;
+    $('bench-lead').innerHTML = `Scored on up to ${data.meta.rows.toLocaleString()} texts from each of ${sets.length} public datasets, against <a href="https://microsoft.github.io/presidio/" target="_blank" rel="noreferrer">Microsoft Presidio</a> and <a href="https://spacy.io/" target="_blank" rel="noreferrer">spaCy</a>. None of these texts were used in training. Four sets (finance, medical records, support tickets and emails, logs and config files) come from datasets the model never saw any part of.`;
     $('bench').hidden = false;
   } catch (e) { /* no results yet */ }
 })();
