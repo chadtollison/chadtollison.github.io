@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#090d12">
   <title>Redact Me | Live PII Detector Demo</title>
   <link rel="stylesheet" href="styles.css?v=2026-11-26b">
-  <link rel="stylesheet" href="redact.css?v=2026-11-26d">
+  <link rel="stylesheet" href="redact.css?v=2026-11-27b">
 </head>
 <body>
   <header>
@@ -56,7 +56,21 @@
               <button type="button" id="view-redact" aria-pressed="false">Redact</button>
             </div>
           </div>
+          <div class="modes" role="radiogroup" aria-label="Redact as">
+            <span>Redact as</span>
+            <button type="button" role="radio" data-mode="mask" aria-checked="true">Black bar</button>
+            <button type="button" role="radio" data-mode="label" aria-checked="false">Label</button>
+            <button type="button" role="radio" data-mode="fake" aria-checked="false">Fake data</button>
+            <button type="button" role="radio" data-mode="token" aria-checked="false">Token</button>
+          </div>
           <div id="output" class="output" aria-live="polite"></div>
+          <div id="token-key" class="token-key" hidden>
+            <p><strong>Token key.</strong> Tokens can be turned back into the real values with this key. It stays in your browser.</p>
+            <table><thead><tr><th>Token</th><th>Real value</th></tr></thead><tbody id="token-rows"></tbody></table>
+            <label for="restore-in">Paste tokenized text to restore it</label>
+            <textarea id="restore-in" rows="3" spellcheck="false" placeholder="e.g. Please call &lt;NAME_1&gt; back at &lt;PHONE_1&gt;"></textarea>
+            <div id="restore-out" class="restore-out" aria-live="polite"></div>
+          </div>
           <div class="pane-foot">
             <span id="timing">&nbsp;</span>
             <button type="button" id="copy" class="link-btn">Copy redacted text</button>
@@ -136,7 +150,7 @@ print(redact(text))
   </main>
 
   <footer><span>Michael Chad Tollison</span><span>Software & Data Engineer</span><span><a href="./">Portfolio</a></span></footer>
-  <script type="module" src="redact.js?v=2026-11-27a"></script>
+  <script type="module" src="redact.js?v=2026-11-27b"></script>
   <script data-goatcounter="https://chadtollison.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
