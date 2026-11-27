@@ -34,7 +34,22 @@ def test_rules_and_modes(monkeypatch):
     assert cp.redact(text, mode="mask").startswith("█" * 13 + ":")
 
 
+def test_sure_model_overrides_failed_check(monkeypatch):
+    text = "card 1234 5678 9012 3456"
+    monkeypatch.setattr(cp, "_model_entities", fake_model([("CREDIT_CARD", "1234 5678 9012 3456", 0.99)]))
+    assert cp.redact(text) == "card [CREDIT_CARD]"
+
+
 def test_grow_partial_email(monkeypatch):
     text = "Email sarah.j@example.com now"
     monkeypatch.setattr(cp, "_model_entities", fake_model([("EMAIL", "sarah.j", 0.8)]))
     assert cp.redact(text) == "Email [EMAIL] now"
+
+
+def test_card_and_ssn_rules_without_model(monkeypatch):
+    text = ("Card 4111-1111-1111-1111, Amex 3782 822463 10005, order 1234567890123, "
+            "SSN 219 09 9999, ssn: 078051120, ref 666-12-3456, zip 90210.")
+    monkeypatch.setattr(cp, "_model_entities", fake_model([]))
+    found = {(e.type, e.text) for e in cp.find(text)}
+    assert found == {("CREDIT_CARD", "4111-1111-1111-1111"), ("CREDIT_CARD", "3782 822463 10005"),
+                     ("SSN", "219 09 9999"), ("SSN", "078051120")}

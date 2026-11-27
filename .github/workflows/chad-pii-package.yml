@@ -37,6 +37,9 @@ jobs:
           from chad_pii import redact, tokenize, restore, find
           text = "Hi, I'm Sarah Johnson. Email sarah.j@example.com or call 6626341142. IBAN GB82 WEST 1234 5698 7654 32."
           print(redact(text))
+          from chad_pii import redact_many, redact_json, Guard
+          print(redact_many([text, "Raj Patel, raj@example.com"]))
+          print(redact_json({"a": {"b": text}}))
           for m in ("mask", "fake"):
               print(m, "->", redact(text, mode=m))
           safe, key = tokenize(text)
