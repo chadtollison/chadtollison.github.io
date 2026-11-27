@@ -1,0 +1,56 @@
+# Temporary: prints the label sets of candidate datasets so training can map them.
+name: Probe PII datasets
+on:
+  push:
+    branches: ["claude/pii-v3"]
+    paths: [".github/workflows/probe-datasets.yml"]
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -q "datasets==3.1.0" "presidio-analyzer==2.2.355" && python -m spacy download en_core_web_lg -q
+      - name: Probe
+        run: |
+          python - <<'PY'
+          import json, collections
+          from datasets import load_dataset
+          def show(name, split, text_col=None, n=20000, **kw):
+              try:
+                  ds = load_dataset(name, split=split, **kw)
+              except Exception as e:
+                  print("FAIL", name, split, e); return
+              print("\n=====", name, split, len(ds), ds.column_names)
+              row = ds[0]
+              print(json.dumps({k: (str(v)[:300]) for k, v in row.items()}, indent=1))
+              labs, langs = collections.Counter(), collections.Counter()
+              for r in ds.select(range(min(n, len(ds)))):
+                  for c in ("language", "locale", "lang"):
+                      if c in r: langs[str(r[c])] += 1
+                  for c in ("privacy_mask", "pii_spans", "spans"):
+                      if c in r:
+                          v = r[c]
+                          if isinstance(v, str):
+                              try: v = json.loads(v)
+                              except Exception: import ast; v = ast.literal_eval(v)
+                          for m in v:
+                              labs[m.get("label") or m.get("entity_type") or m.get("type")] += 1
+              print("LANGS", langs.most_common())
+              print("LABELS", labs.most_common())
+          show("ai4privacy/open-pii-masking-500k-ai4privacy", "validation")
+          show("gretelai/synthetic_pii_finance_multilingual", "test")
+          show("gretelai/gretel-pii-masking-en-v1", "test")
+          show("beki/privy", "train", n=5000)
+          PY
+      - name: Presidio smoke test
+        run: |
+          python - <<'PY'
+          from presidio_analyzer import AnalyzerEngine
+          a = AnalyzerEngine()
+          print(sorted(a.get_supported_entities()))
+          t = "Hi, I'm Sarah Johnson. Email sarah.j@example.com or call 662-634-1142. SSN 123-45-6789, IBAN GB82 WEST 1234 5698 7654 32."
+          for r in a.analyze(t, language="en"): print(r.entity_type, t[r.start:r.end], round(r.score, 2))
+          PY
