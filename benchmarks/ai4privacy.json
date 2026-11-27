@@ -1,0 +1,169 @@
+{
+  "meta": {
+    "dataset": "ai4privacy/pii-masking-200k",
+    "rows": 2000,
+    "date": "2026-11-27",
+    "labels": [
+      "ACCOUNTNAME",
+      "ACCOUNTNUMBER",
+      "AGE",
+      "AMOUNT",
+      "BIC",
+      "BITCOINADDRESS",
+      "BUILDINGNUMBER",
+      "CITY",
+      "COMPANYNAME",
+      "COUNTY",
+      "CREDITCARDCVV",
+      "CREDITCARDISSUER",
+      "CREDITCARDNUMBER",
+      "CURRENCY",
+      "CURRENCYCODE",
+      "CURRENCYNAME",
+      "CURRENCYSYMBOL",
+      "DATE",
+      "DOB",
+      "EMAIL",
+      "ETHEREUMADDRESS",
+      "EYECOLOR",
+      "FIRSTNAME",
+      "GENDER",
+      "HEIGHT",
+      "IBAN",
+      "IP",
+      "IPV4",
+      "IPV6",
+      "JOBAREA",
+      "JOBTITLE",
+      "JOBTYPE",
+      "LASTNAME",
+      "LITECOINADDRESS",
+      "MAC",
+      "MASKEDNUMBER",
+      "MIDDLENAME",
+      "NEARBYGPSCOORDINATE",
+      "ORDINALDIRECTION",
+      "PASSWORD",
+      "PHONEIMEI",
+      "PHONENUMBER",
+      "PIN",
+      "PREFIX",
+      "SECONDARYADDRESS",
+      "SEX",
+      "SSN",
+      "STATE",
+      "STREET",
+      "TIME",
+      "URL",
+      "USERAGENT",
+      "USERNAME",
+      "VEHICLEVIN",
+      "VEHICLEVRM",
+      "ZIPCODE"
+    ]
+  },
+  "models": {
+    "Published model (Hugging Face)": {
+      "PERSON": {
+        "items": 793,
+        "exact_f1": 0.334,
+        "overlap_precision": 0.334,
+        "overlap_recall": 0.881,
+        "overlap_f1": 0.484
+      },
+      "EMAIL": {
+        "items": 189,
+        "exact_f1": 0.176,
+        "overlap_precision": 0.329,
+        "overlap_recall": 1.0,
+        "overlap_f1": 0.495
+      },
+      "PHONE": {
+        "items": 106,
+        "exact_f1": 0.259,
+        "overlap_precision": 0.185,
+        "overlap_recall": 0.783,
+        "overlap_f1": 0.299
+      },
+      "SSN": {
+        "items": 100,
+        "exact_f1": 0.18,
+        "overlap_precision": 0.18,
+        "overlap_recall": 0.41,
+        "overlap_f1": 0.25
+      },
+      "CREDIT_CARD": {
+        "items": 121,
+        "exact_f1": 0.294,
+        "overlap_precision": 0.298,
+        "overlap_recall": 0.306,
+        "overlap_f1": 0.302
+      },
+      "IP_ADDRESS": {
+        "items": 295,
+        "exact_f1": 0.493,
+        "overlap_precision": 0.64,
+        "overlap_recall": 0.508,
+        "overlap_f1": 0.567
+      },
+      "ALL": {
+        "items": 1604,
+        "exact_f1": 0.307,
+        "overlap_precision": 0.323,
+        "overlap_recall": 0.748,
+        "overlap_f1": 0.451
+      }
+    },
+    "In-browser model (this site)": {
+      "PERSON": {
+        "items": 793,
+        "exact_f1": 0.184,
+        "overlap_precision": 0.27,
+        "overlap_recall": 0.928,
+        "overlap_f1": 0.418
+      },
+      "EMAIL": {
+        "items": 189,
+        "exact_f1": 0.085,
+        "overlap_precision": 0.101,
+        "overlap_recall": 1.0,
+        "overlap_f1": 0.184
+      },
+      "PHONE": {
+        "items": 106,
+        "exact_f1": 0.173,
+        "overlap_precision": 0.154,
+        "overlap_recall": 0.802,
+        "overlap_f1": 0.259
+      },
+      "SSN": {
+        "items": 100,
+        "exact_f1": 0.042,
+        "overlap_precision": 0.027,
+        "overlap_recall": 0.52,
+        "overlap_f1": 0.052
+      },
+      "CREDIT_CARD": {
+        "items": 121,
+        "exact_f1": 0.423,
+        "overlap_precision": 0.335,
+        "overlap_recall": 0.595,
+        "overlap_f1": 0.429
+      },
+      "IP_ADDRESS": {
+        "items": 295,
+        "exact_f1": 0.44,
+        "overlap_precision": 0.503,
+        "overlap_recall": 0.502,
+        "overlap_f1": 0.503
+      },
+      "ALL": {
+        "items": 1604,
+        "exact_f1": 0.155,
+        "overlap_precision": 0.169,
+        "overlap_recall": 0.799,
+        "overlap_f1": 0.279
+      }
+    }
+  }
+}
