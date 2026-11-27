@@ -196,3 +196,4 @@ footer{display:flex;justify-content:space-between;border-top:1px solid var(--lin
 /* certification badge */
 .edu.cert{align-items:center;gap:18px}.edu.cert picture{flex:none}.edu.cert img{display:block;width:72px;height:auto}.edu.cert>div{flex:1}
 @media(max-width:900px){.edu.cert{flex-direction:row;flex-wrap:wrap;align-items:center}.edu.cert p{flex-basis:100%;margin:0 0 0 90px}}
+.edu.cert .verify{color:var(--accent);font-weight:700;font-size:.85rem}.edu.cert:hover .verify{text-decoration:underline}
