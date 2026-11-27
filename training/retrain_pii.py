@@ -173,9 +173,15 @@ Thanks {PERSON}! Your account number {INVOICE} is now active.
 """.strip().splitlines()
 
 
-def make_example():
+# Every 5th sentence shape is kept out of training, so the score shows how the
+# model does on sentence shapes it has never seen, not just new values.
+TEST_TEMPLATES = TEMPLATES[2::5]
+TRAIN_TEMPLATES = [t for t in TEMPLATES if t not in TEST_TEMPLATES]
+
+
+def make_example(templates):
     """Return (text, [(start, end, label), ...])."""
-    tpl = R.choice(TEMPLATES)
+    tpl = R.choice(templates)
     text, spans, pos = "", [], 0
     for m in re.finditer(r"\{(\w+)\}", tpl):
         text += tpl[pos:m.start()]
@@ -289,8 +295,8 @@ def main():
     old = AutoModelForTokenClassification.from_pretrained(args.base)
     label2id = {k: int(v) for k, v in old.config.label2id.items()}
 
-    train = [make_example() for _ in range(args.train_size)]
-    test = [make_example() for _ in range(args.test_size)]   # same generator, unseen sentences
+    train = [make_example(TRAIN_TEMPLATES) for _ in range(args.train_size)]
+    test = [make_example(TEST_TEMPLATES) for _ in range(args.test_size)]
 
     print("Scoring the current model ...")
     before = score(old, tok, test)
@@ -317,7 +323,7 @@ def main():
     tok.save_pretrained(args.out)
 
     report = ["## Old model vs retrained model", "",
-              f"Scored on {args.test_size} new sentences the model never trained on.", "",
+              f"Scored on {args.test_size} sentences built from {len(TEST_TEMPLATES)} sentence shapes that were never used in training.", "",
               "| Type | Old F1 | New F1 | Old recall | New recall |", "|---|---|---|---|---|"]
     for lab in LABELS + ["ALL"]:
         b, a = before[lab], after[lab]
