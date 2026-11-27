@@ -3,14 +3,14 @@ requires = ["hatchling>=1.24"]
 build-backend = "hatchling.build"
 
 [project]
-name = "chad-pii"
-version = "0.2.0"
-description = "Find and redact personal data (names, emails, phones, SSNs, cards, IPs, passports, driver's licenses, API keys, IBANs) with a fine-tuned DistilBERT model plus checksum rules."
+name = "scrubpii"
+version = "0.3.0"
+description = "Find and redact 15 kinds of personal data in English and Spanish text, CSV, JSON and DataFrames, with a fine-tuned DistilBERT model plus checksum rules. Beats Microsoft Presidio on public benchmarks."
 readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"
 authors = [{ name = "Michael Chad Tollison" }]
-keywords = ["pii", "redaction", "privacy", "ner", "distilbert", "gdpr", "data-masking"]
+keywords = ["presidio", "pii", "redaction", "privacy", "ner", "distilbert", "gdpr", "data-masking"]
 classifiers = [
   "Programming Language :: Python :: 3",
   "Topic :: Security",
@@ -25,15 +25,15 @@ server = ["fastapi>=0.100", "uvicorn>=0.20"]
 pandas = ["pandas>=1.5"]
 
 [project.scripts]
-chad-pii = "chad_pii.cli:main"
+scrubpii = "scrubpii.cli:main"
 
 [project.urls]
 Homepage = "https://chadtollison.github.io/redact.html"
 Model = "https://huggingface.co/ChadTollison/pii-distilbert-v3"
-Source = "https://github.com/chadtollison/chadtollison.github.io/tree/main/chad-pii"
+Source = "https://github.com/chadtollison/chadtollison.github.io/tree/main/scrubpii"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/chad_pii"]
+packages = ["src/scrubpii"]
 
 [tool.hatch.build.targets.sdist]
 exclude = ["index.html"]

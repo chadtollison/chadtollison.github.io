@@ -1,13 +1,13 @@
-# chad-pii
+# scrubpii
 
 Find and redact personal data in text with one line of Python.
 
 ```bash
-pip install chad-pii
+pip install scrubpii
 ```
 
 ```python
-from chad_pii import redact
+from scrubpii import redact
 
 redact("Hi, I'm Sarah Johnson. Email sarah.j@example.com or call 6626341142.")
 # "Hi, I'm [PERSON]. Email [EMAIL] or call [PHONE]."
@@ -29,7 +29,7 @@ dates right after "born" or "DOB".
 F1 on held-out public data (full results in
 [benchmarks/compare.md](https://github.com/chadtollison/chadtollison.github.io/blob/main/benchmarks/compare.md)):
 
-| Dataset | chad-pii | Microsoft Presidio | spaCy |
+| Dataset | scrubpii | Microsoft Presidio | spaCy |
 |---|---:|---:|---:|
 | ai4privacy, English | 0.99 | 0.81 | 0.68 |
 | ai4privacy, Spanish | 0.99 | 0.63 | 0.46 |
@@ -60,7 +60,7 @@ range, and SSNs start with 9, which is never issued.
 ### Reversible tokens
 
 ```python
-from chad_pii import tokenize, restore
+from scrubpii import tokenize, restore
 
 safe, key = tokenize(text)
 # safe == "Call <PERSON_1> at <PHONE_1>."
@@ -75,7 +75,7 @@ putting the real values back in its reply.
 ### Just find
 
 ```python
-from chad_pii import find
+from scrubpii import find
 
 for e in find(text):
     print(e.type, e.text, e.start, e.end, round(e.score, 2), e.rule)
@@ -89,7 +89,7 @@ confirmed by a rule are always returned.
 Each of these batches the work, so it's much faster than a loop:
 
 ```python
-from chad_pii import redact_many, redact_json, redact_csv, redact_dataframe
+from scrubpii import redact_many, redact_json, redact_csv, redact_dataframe
 
 redact_many(["Call Sarah at 6626341142", "Email raj@example.com"])
 
@@ -98,13 +98,13 @@ redact_json({"user": {"name": "Sarah Johnson", "email": "sarah.j@example.com", "
 
 redact_csv(open("customers.csv").read(), columns=["name", "email", "notes"])
 
-safe_df = redact_dataframe(df, mode="fake")        # pip install "chad-pii[pandas]"
+safe_df = redact_dataframe(df, mode="fake")        # pip install "scrubpii[pandas]"
 ```
 
 ## Keep personal data out of LLM prompts
 
 ```python
-from chad_pii import Guard
+from scrubpii import Guard
 
 guard = Guard()
 safe = guard.scrub("Write to Sarah Johnson (sarah.j@example.com) about her refund")
@@ -122,8 +122,8 @@ The guard keeps one key for the whole conversation, so the same person stays
 ## HTTP API
 
 ```bash
-pip install "chad-pii[server]"
-chad-pii serve --port 8000
+pip install "scrubpii[server]"
+scrubpii serve --port 8000
 curl -X POST localhost:8000/redact -H 'content-type: application/json' \
      -d '{"text": "Call Sarah at 6626341142", "mode": "token"}'
 ```
@@ -134,10 +134,10 @@ interactive docs at `/docs`. It runs on your machine, so nothing is sent anywher
 ## Command line
 
 ```bash
-chad-pii "Call Sarah at 662-634-1142"
-cat notes.txt | chad-pii --mode mask > notes-redacted.txt
-chad-pii --find "My SSN is 123-45-6789"
-chad-pii --file customers.csv --columns name,email -o customers-safe.csv   # also .json, .jsonl, .txt
+scrubpii "Call Sarah at 662-634-1142"
+cat notes.txt | scrubpii --mode mask > notes-redacted.txt
+scrubpii --find "My SSN is 123-45-6789"
+scrubpii --file customers.csv --columns name,email -o customers-safe.csv   # also .json, .jsonl, .txt
 ```
 
 ## Offline use

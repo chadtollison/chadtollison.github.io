@@ -1,8 +1,8 @@
-# Tests the chad-pii Python package (in chad-pii/) and, when you ask it to,
-# publishes it to PyPI. Publishing uses PyPI "trusted publishing", so there is
-# no token to store: PyPI trusts this workflow once you add it as a publisher.
-# Publish: Actions tab -> "chad-pii package" -> Run workflow -> tick "publish".
-name: chad-pii package
+# Builds the small "chad-pii" alias package (alias/chad-pii/), which installs
+# scrubpii under the package's old name, and publishes it to PyPI when asked.
+# PyPI trusts this workflow file for the chad-pii project (trusted publishing).
+# Publish: Actions tab -> "chad-pii alias package" -> Run workflow -> tick "publish".
+name: chad-pii alias package
 
 on:
   workflow_dispatch:
@@ -13,52 +13,27 @@ on:
         default: false
   push:
     branches: [main, "claude/**"]
-    paths: ["chad-pii/**", ".github/workflows/chad-pii-package.yml"]
+    paths: ["alias/chad-pii/**", ".github/workflows/chad-pii-package.yml"]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install
-        run: |
-          pip install --index-url https://download.pytorch.org/whl/cpu "torch>=2.6"
-          pip install build
-          pip install "./chad-pii[test]"
-      - name: Unit tests
-        run: pytest -q chad-pii/tests
-      - name: Try it with the real model
-        run: |
-          python - <<'PY'
-          from chad_pii import redact, tokenize, restore, find
-          text = "Hi, I'm Sarah Johnson. Email sarah.j@example.com or call 6626341142. IBAN GB82 WEST 1234 5698 7654 32."
-          print(redact(text))
-          from chad_pii import redact_many, redact_json, Guard
-          print(redact_many([text, "Raj Patel, raj@example.com"]))
-          print(redact_json({"a": {"b": text}}))
-          for m in ("mask", "fake"):
-              print(m, "->", redact(text, mode=m))
-          safe, key = tokenize(text)
-          print(safe, key)
-          assert restore(safe, key) == text
-          out = redact(text)
-          for secret in ("Sarah Johnson", "sarah.j@example.com", "6626341142", "GB82 WEST"):
-              assert secret not in out, secret
-          PY
-          chad-pii --find "My SSN is 123-45-6789"
       - name: Build
-        run: python -m build chad-pii --outdir dist
+        run: |
+          pip install build
+          python -m build alias/chad-pii --outdir dist
       - uses: actions/upload-artifact@v4
         with:
           name: chad-pii-dist
           path: dist
 
   publish:
-    needs: test
+    needs: build
     if: github.event_name == 'workflow_dispatch' && inputs.publish
     runs-on: ubuntu-latest
     environment: pypi

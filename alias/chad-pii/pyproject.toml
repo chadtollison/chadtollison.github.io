@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "chad-pii"
+version = "0.3.0"
+description = "chad-pii is now scrubpii. This package installs scrubpii and keeps `import chad_pii` working."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Michael Chad Tollison" }]
+dependencies = ["scrubpii>=0.3.0"]
+
+[project.scripts]
+chad-pii = "scrubpii.cli:main"
+
+[project.urls]
+Homepage = "https://pypi.org/project/scrubpii/"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/chad_pii"]

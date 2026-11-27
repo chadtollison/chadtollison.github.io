@@ -1,4 +1,4 @@
-"""Train chad-pii v3: real public PII data plus generated data, 15 types.
+"""Train scrubpii v3: real public PII data plus generated data, 15 types.
 
 Starts from the current model (or another base), grows its output layer to
 the 15 types in pii_data.TYPES, and trains on a mix of:
@@ -7,7 +7,7 @@ the 15 types in pii_data.TYPES, and trains on a mix of:
   * the generated sentences from retrain_pii.py (phones in every format,
     look-alikes that are NOT personal data, passports, API keys, IBANs ...)
   * your own examples from training/examples.txt
-Personal data a dataset marks but chad-pii has no type for is ignored during
+Personal data a dataset marks but scrubpii has no type for is ignored during
 training, never taught as "not personal".
 
 Training stops cleanly when --minutes runs out, so it always fits in a

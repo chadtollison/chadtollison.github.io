@@ -1,5 +1,5 @@
 ---
-title: chad-pii
+title: scrubpii
 emoji: 🕶️
 colorFrom: green
 colorTo: blue
@@ -10,5 +10,5 @@ license: mit
 short_description: Find and redact personal data with one line of Python
 ---
 
-Demo of [chad-pii](https://pypi.org/project/chad-pii/): `pip install chad-pii`, then `redact(text)`.
-Docs: https://chadtollison.github.io/chad-pii/
+Demo of [scrubpii](https://pypi.org/project/scrubpii/): `pip install scrubpii`, then `redact(text)`.
+Docs: https://chadtollison.github.io/scrubpii/

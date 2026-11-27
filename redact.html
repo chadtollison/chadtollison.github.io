@@ -123,12 +123,12 @@
           <li>
             <h3>Install it</h3>
             <p>You need <a href="https://www.python.org/downloads/" target="_blank" rel="noreferrer">Python 3.9 or newer</a>. Then run this in a terminal:</p>
-            <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>pip install chad-pii</code></pre></div>
+            <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>pip install scrubpii</code></pre></div>
           </li>
           <li>
             <h3>Redact some text</h3>
             <p>Save this as <code>redact_me.py</code> and run <code>python redact_me.py</code>. The first run downloads the model (about 260 MB) from Hugging Face. After that it works offline, and nothing you redact is sent anywhere.</p>
-            <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>from chad_pii import redact, tokenize, restore
+            <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>from scrubpii import redact, tokenize, restore
 
 text = "Hi, I'm Sarah Johnson. Email sarah.j@example.com or call 6626341142."
 
@@ -147,11 +147,11 @@ Hi, I'm &lt;PERSON_1&gt;. Email &lt;EMAIL_1&gt; or call &lt;PHONE_1&gt;.
 True</code></pre></div>
           </li>
         </ol>
-        <p class="use-more">It finds names, addresses, emails, phones, SSNs, card numbers, ID numbers, dates of birth, usernames, passwords, IP addresses, passports, driver's licenses, API keys and IBANs, in English and Spanish. Use <code>find(text)</code> to get each item's type, position and confidence, or run <code>chad-pii "some text"</code> on the command line. The package checks card numbers with Luhn, IBANs with their bank checksum and SSNs by format, and catches 10-digit phone numbers with a real area code. See <a href="https://pypi.org/project/chad-pii/" target="_blank" rel="noreferrer">chad-pii on PyPI</a>, or use the raw model with <code>transformers</code> from <a href="https://huggingface.co/ChadTollison/pii-distilbert-v3" target="_blank" rel="noreferrer">Hugging Face</a>.</p>
+        <p class="use-more">It finds names, addresses, emails, phones, SSNs, card numbers, ID numbers, dates of birth, usernames, passwords, IP addresses, passports, driver's licenses, API keys and IBANs, in English and Spanish. Use <code>find(text)</code> to get each item's type, position and confidence, or run <code>scrubpii "some text"</code> on the command line. The package checks card numbers with Luhn, IBANs with their bank checksum and SSNs by format, and catches 10-digit phone numbers with a real area code. See <a href="https://pypi.org/project/scrubpii/" target="_blank" rel="noreferrer">scrubpii on PyPI</a>, or use the raw model with <code>transformers</code> from <a href="https://huggingface.co/ChadTollison/pii-distilbert-v3" target="_blank" rel="noreferrer">Hugging Face</a>.</p>
       </div>
 
       <div class="buttons">
-        <a class="primary" href="https://pypi.org/project/chad-pii/" target="_blank" rel="noreferrer">pip install chad-pii ↗</a>
+        <a class="primary" href="https://pypi.org/project/scrubpii/" target="_blank" rel="noreferrer">pip install scrubpii ↗</a>
         <a class="secondary" href="https://github.com/chadtollison/PII-Detector" target="_blank" rel="noreferrer">View the code ↗</a>
         <a class="secondary" href="https://huggingface.co/ChadTollison/pii-distilbert-v3" target="_blank" rel="noreferrer">Model on Hugging Face ↗</a>
       </div>

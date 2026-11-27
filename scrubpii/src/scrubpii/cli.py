@@ -1,10 +1,10 @@
-"""chad-pii on the command line.
+"""scrubpii on the command line.
 
-  chad-pii "Call Sarah at 662-634-1142"          -> Call [PERSON] at [PHONE]
-  cat notes.txt | chad-pii --mode mask            -> redacts standard input
-  chad-pii --file customers.csv -o safe.csv       -> CSV, JSON, JSONL or text files
-  chad-pii --find "..."                           -> what it found, as JSON
-  chad-pii serve --port 8000                      -> local HTTP API (needs chad-pii[server])
+  scrubpii "Call Sarah at 662-634-1142"          -> Call [PERSON] at [PHONE]
+  cat notes.txt | scrubpii --mode mask            -> redacts standard input
+  scrubpii --file customers.csv -o safe.csv       -> CSV, JSON, JSONL or text files
+  scrubpii --find "..."                           -> what it found, as JSON
+  scrubpii serve --port 8000                      -> local HTTP API (needs scrubpii[server])
 """
 import argparse
 import json
@@ -31,13 +31,13 @@ def _file(path, mode, min_score, columns):
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     if argv[:1] == ["serve"]:
-        sp = argparse.ArgumentParser(prog="chad-pii serve")
+        sp = argparse.ArgumentParser(prog="scrubpii serve")
         sp.add_argument("--host", default="127.0.0.1")
         sp.add_argument("--port", type=int, default=8000)
         s = sp.parse_args(argv[1:])
         from .server import run
         return run(s.host, s.port)
-    ap = argparse.ArgumentParser(prog="chad-pii", description="Find and redact personal data in text.")
+    ap = argparse.ArgumentParser(prog="scrubpii", description="Find and redact personal data in text.")
     ap.add_argument("text", nargs="?", help="text to redact (default: read standard input)")
     ap.add_argument("--file", help="redact a .csv, .json, .jsonl or text file")
     ap.add_argument("-o", "--output", help="write here instead of standard output")
@@ -45,7 +45,7 @@ def main(argv=None):
     ap.add_argument("--mode", choices=MODES, default="label", help="how to replace what it finds (default: label)")
     ap.add_argument("--min-score", type=float, default=0.5, help="model confidence needed (default: 0.5)")
     ap.add_argument("--find", action="store_true", help="print what it found as JSON instead of redacting")
-    ap.add_argument("--version", action="version", version=f"chad-pii {__version__}")
+    ap.add_argument("--version", action="version", version=f"scrubpii {__version__}")
     a = ap.parse_args(argv)
     cols = a.columns.split(",") if a.columns else None
     if a.file:

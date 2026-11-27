@@ -1,4 +1,4 @@
-# Pushes space/ to the Hugging Face Space ChadTollison/chad-pii.
+# Pushes space/ to the Hugging Face Space ChadTollison/scrubpii.
 # Needs the HF_TOKEN repository secret (a Hugging Face token with write access).
 # Start it from the Actions tab: "Deploy Hugging Face Space" -> "Run workflow".
 name: Deploy Hugging Face Space
@@ -19,7 +19,7 @@ jobs:
           python - <<'PY'
           from huggingface_hub import HfApi
           api = HfApi()
-          api.create_repo("ChadTollison/chad-pii", repo_type="space", space_sdk="gradio", exist_ok=True)
-          api.upload_folder(repo_id="ChadTollison/chad-pii", repo_type="space", folder_path="space")
-          print("Live at https://huggingface.co/spaces/ChadTollison/chad-pii")
+          api.create_repo("ChadTollison/scrubpii", repo_type="space", space_sdk="gradio", exist_ok=True)
+          api.upload_folder(repo_id="ChadTollison/scrubpii", repo_type="space", folder_path="space")
+          print("Live at https://huggingface.co/spaces/ChadTollison/scrubpii")
           PY

@@ -632,7 +632,7 @@ render();
     const data = await res.json();
     const sets = Object.keys(data.results);
     const systems = Object.keys(data.results[sets[0]]).filter((n) => !/v2/.test(n));
-    const short = (n) => n.replace(/^chad-pii v3$/, 'This model').replace(/ \(.*\)$/, '');
+    const short = (n) => n.replace(/^scrubpii v3$/, 'This model').replace(/ \(.*\)$/, '');
     $('bench-head').innerHTML = `<tr><th>Dataset</th>${systems.map((n) => `<th>${esc(short(n))}</th>`).join('')}</tr>`;
     $('bench-rows').innerHTML = sets.map((ds) => {
       const r = data.results[ds], best = Math.max(...systems.map((n) => r[n]?.f1 ?? 0));
