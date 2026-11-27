@@ -62,6 +62,7 @@ API_KEY_RE = re.compile(
 CARD_RE = re.compile(r"\b[2-6]\d{3}(?:[ -]?\d){9,15}\b")
 SSN_RE = re.compile(r"\b\d{3}([- ])\d{2}\1\d{4}\b")
 SSN_BARE_RE = re.compile(r"(?i)(?:ssn|social security(?: number| no\.?)?)\W{0,12}(\d{9})\b")
+DOB_RE = re.compile(r"(?i)\b(?:born(?: on)?|d\.?o\.?b\.?|date of birth|birth ?date|birthday|fecha de nacimiento|nacid[oa] el)\W{0,4}(\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}|\d{4}[/.-]\d{1,2}[/.-]\d{1,2}|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.? \d{1,2}(?:st|nd|rd|th)?,? \d{4}|\d{1,2}(?:st|nd|rd|th)? (?:of )?(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?,? \d{4}|\d{1,2} de [a-záéíóú]+ de \d{4})")
 SHAPES = {
     "EMAIL": re.compile(r"[\w.%+-]+@[\w.-]+\.[^\W\d_]{2,}"),
     "PHONE": PHONE_RE,
@@ -183,10 +184,11 @@ def _rules(ents: List[Entity], text: str) -> List[Entity]:
               ("API_KEY", API_KEY_RE, lambda s: True, "known API key format"),
               ("CREDIT_CARD", CARD_RE, luhn_ok, "card number with valid Luhn checksum"),
               ("SSN", SSN_RE, ssn_ok, "valid SSN format"),
-              ("SSN", SSN_BARE_RE, ssn_ok, "9 digits right after 'SSN'")]
+              ("SSN", SSN_BARE_RE, ssn_ok, "9 digits right after 'SSN'"),
+              ("DATE_OF_BIRTH", DOB_RE, lambda s: True, "a date right after 'born' or 'DOB'")]
     for typ, rx, ok, why in checks:
         for m in rx.finditer(text):
-            g = 1 if rx is SSN_BARE_RE else 0
+            g = 1 if rx in (SSN_BARE_RE, DOB_RE) else 0
             ms, me = m.start(g), m.end(g)
             if not ok(m.group(g)):
                 continue
