@@ -87,7 +87,7 @@ jobs:
           from huggingface_hub import HfApi
           HfApi().upload_folder(repo_id="ChadTollison/pii-distilbert-v2", folder_path="build/new_model",
                                 ignore_patterns=["report.md", "verdict.json", "README.md"],
-                                commit_message="Retrain: phones in every format, fewer false alarms on order numbers and places")
+                                commit_message="Retrain: phones in every format, Spanish, passports, driver licenses, API keys and IBANs")
           print("Uploaded to https://huggingface.co/ChadTollison/pii-distilbert-v2")
           PY
 

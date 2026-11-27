@@ -2,7 +2,7 @@
 
 Uses ai4privacy/pii-masking-200k from Hugging Face: real-looking English text
 written by a different team, with every piece of personal data marked. Their
-labels are mapped onto this model's six types (FIRSTNAME + LASTNAME -> PERSON,
+labels are mapped onto this model's types (FIRSTNAME + LASTNAME -> PERSON,
 PHONENUMBER -> PHONE and so on); their other types (addresses, usernames ...)
 are ignored, because this model doesn't look for them.
 
@@ -30,7 +30,7 @@ from datasets import load_dataset
 from transformers import AutoModelForTokenClassification, AutoTokenizer, pipeline
 
 DATASET = "ai4privacy/pii-masking-200k"
-TYPES = ["PERSON", "EMAIL", "PHONE", "SSN", "CREDIT_CARD", "IP_ADDRESS"]
+TYPES = ["PERSON", "EMAIL", "PHONE", "SSN", "CREDIT_CARD", "IP_ADDRESS", "PASSPORT", "DRIVER_LICENSE", "API_KEY", "IBAN"]
 OUT = Path(__file__).resolve().parent.parent / "benchmarks"
 
 
@@ -48,6 +48,12 @@ def map_label(label):
         return "CREDIT_CARD"
     if L in {"IP", "IPV4", "IPV6", "IPADDRESS"}:
         return "IP_ADDRESS"
+    if L in {"PASSPORT", "PASSPORTNUM"}:
+        return "PASSPORT"
+    if L in {"DRIVERLICENSE", "DRIVERLICENSENUM"}:
+        return "DRIVER_LICENSE"
+    if L == "IBAN":
+        return "IBAN"
     return None
 
 
@@ -168,7 +174,7 @@ def write_report(all_results, meta):
                   "|---|---:|---:|---:|---:|---:|"]
         for t in TYPES + ["ALL"]:
             r = res[t]
-            label = "**All six**" if t == "ALL" else t
+            label = "**All types**" if t == "ALL" else t
             lines.append(f"| {label} | {r['items']} | {r['overlap_recall']:.0%} | {r['overlap_precision']:.0%} | "
                          f"{r['overlap_f1']:.3f} | {r['exact_f1']:.3f} |")
         lines.append("")

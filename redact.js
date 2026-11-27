@@ -14,6 +14,7 @@ const SAMPLES = [
   "Hi team, my name is Sarah Johnson and I can't log in. You can reach me at sarah.johnson@example.com or 415-555-0198. My account was billed to the card 4111 1111 1111 1111 last week.",
   "Hi Daniel Okafor, your order #48213 has shipped! We'll text updates to (312) 555-0142. Payment: card 5500 0000 0000 0004. Questions? Reply to daniel.okafor@shopmail.com.",
   "New hire paperwork for Priya Raman: SSN 123-45-6789, personal email priya.raman88@gmail.com, cell 917-555-0133. Her laptop checked in from 192.168.4.27. Note: the test card 1234 5678 9012 3456 on file should be ignored.",
+  "Hola, soy María García López. Escríbeme a maria.garcia@correo.es o llámame al 612 345 678. Para el reembolso, mi IBAN es ES91 2100 0418 4502 0005 1332 y mi pasaporte es PAA123456.",
 ];
 
 // Friendly names and colors for the model's labels. Unknown labels still work.
@@ -27,7 +28,10 @@ const KNOWN = {
   DATE: ['Date', '#e6e36a'], DOB: ['Date of birth', '#e6e36a'],
   IP: ['IP address', '#ffa26b'], IP_ADDRESS: ['IP address', '#ffa26b'],
   ACCOUNT: ['Account no.', '#b8e986'], BANK_ACCOUNT: ['Account no.', '#b8e986'],
+  IBAN: ['IBAN', '#b8e986'], PASSPORT: ['Passport', '#9fd6ff'], DRIVER_LICENSE: ["Driver's license", '#a0f0c8'],
+  API_KEY: ['API key', '#f78fe0'],
 };
+const tokName = (t) => typeInfo(t).name.toUpperCase().replace(/'/g, '').replace(/[^A-Z]+/g, '_');
 const EXTRA_COLORS = ['#ff9f6b', '#9fd6ff', '#d6a2ff', '#a0f0c8', '#ffd27a'];
 const typeInfo = (t) => {
   const k = t.toUpperCase();
@@ -38,6 +42,17 @@ const typeInfo = (t) => {
 const isCard = (t) => /CARD|CREDIT|^CC$/i.test(t);
 const isSsn = (t) => /SSN/i.test(t);
 const isPhone = (t) => /PHONE/i.test(t);
+const isIban = (t) => /IBAN/i.test(t);
+function ibanOk(s) {
+  const v = s.replace(/\s+/g, '').toUpperCase();
+  if (!/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(v)) return false;
+  let r = 0;
+  for (const c of v.slice(4) + v.slice(0, 4)) for (const d of String(parseInt(c, 36))) r = (r * 10 + +d) % 97;
+  return r === 1;
+}
+// Well-known API key formats. Matches are redacted even if the model is unsure.
+const API_KEY_RE = /\b(?:(?:sk|pk|rk)_(?:live|test)_[A-Za-z0-9]{16,}|sk-(?:proj-)?[A-Za-z0-9_-]{32,}|AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{30,}|xox[abprs]-[A-Za-z0-9-]{20,}|AIza[0-9A-Za-z_-]{35})/g;
+const IBAN_RE = /\b[A-Z]{2}\d{2}(?: ?[A-Z0-9]{4}){2,7}(?: ?[A-Z0-9]{1,4})?\b/g;
 // Area codes in use in the US and Canada (from Google's libphonenumber data).
 const AREA_CODES = new Set('201 202 203 204 205 206 207 208 209 210 212 213 214 215 216 217 218 219 220 223 224 225 226 227 228 229 231 234 235 236 239 240 242 246 248 249 250 251 252 253 254 256 260 262 263 267 269 270 272 274 276 279 281 283 284 289 301 302 303 304 305 306 307 308 309 310 312 313 314 315 316 317 318 319 320 321 323 325 326 327 329 330 331 332 334 336 337 339 340 341 343 345 346 347 350 351 352 354 360 361 363 364 365 367 368 369 380 382 385 386 401 402 403 404 405 406 407 408 409 410 412 413 414 415 416 417 418 419 423 424 425 428 430 431 432 434 435 437 438 440 441 442 443 445 447 448 450 458 463 464 468 469 470 472 473 474 475 478 479 480 484 500 501 502 503 504 505 506 507 508 509 510 512 513 514 515 516 517 518 519 520 521 522 523 524 525 526 527 528 529 530 531 533 534 539 540 541 544 548 551 557 559 561 562 563 564 566 567 570 571 572 573 574 575 577 579 580 581 582 584 585 586 587 588 600 601 602 603 604 605 606 607 608 609 610 612 613 614 615 616 617 618 619 620 622 623 626 628 629 630 631 633 636 639 640 641 645 646 647 649 650 651 656 657 658 659 660 661 662 667 669 670 671 672 678 680 681 682 683 689 701 702 703 704 705 706 707 708 709 712 713 714 715 716 717 718 719 720 724 725 726 727 728 730 731 732 734 737 740 742 743 747 753 754 757 758 760 762 763 765 769 770 771 772 773 774 775 778 779 780 781 782 784 785 786 787 800 801 802 803 804 805 806 807 808 809 810 812 813 814 815 816 817 818 819 820 825 826 828 829 830 831 832 833 835 838 839 840 843 844 845 847 848 849 850 854 855 856 857 858 859 860 862 863 864 865 866 867 868 870 872 873 876 877 878 879 888 900 901 902 903 904 905 906 907 908 909 910 912 913 914 915 916 917 918 919 920 925 928 929 930 931 934 936 937 938 939 940 941 942 943 945 947 948 949 951 952 954 956 959 970 971 972 973 978 979 980 983 984 985 986 989'.split(' '));
 const isUsPhone = (d) => d.length === 10 && AREA_CODES.has(d.slice(0, 3)) && /^[2-9]/.test(d[3]);
@@ -48,6 +63,8 @@ const SHAPES = [
   [/SSN/i, /\b\d{3}-\d{2}-\d{4}\b/g],
   [/CARD|CREDIT/i, /\b\d{4}(?:[ -]?\d{4}){2}[ -]?\d{1,7}\b/g],
   [/IP/i, /\b(?:\d{1,3}\.){3}\d{1,3}\b/g],
+  [/IBAN/i, IBAN_RE],
+  [/API/i, API_KEY_RE],
 ];
 
 const $ = (id) => document.getElementById(id);
@@ -78,6 +95,7 @@ function validate(span) {
   }
   if (isPhone(span.type) && digits.length < 7) return { ok: false, msg: '✗ Too few digits for a phone number' };
   if (/EMAIL/i.test(span.type) && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(span.text)) return { ok: false, msg: '✗ Not an email address' };
+  if (isIban(span.type)) return ibanOk(span.text) ? { ok: true, msg: '✓ Passes IBAN checksum' } : { ok: false, msg: '✗ Fails IBAN checksum' };
   if (/IP/i.test(span.type)) {
     const parts = span.text.split('.');
     if (parts.length !== 4 || parts.some((p) => !/^\d{1,3}$/.test(p) || +p > 255)) return { ok: false, msg: '✗ Not a valid IP address' };
@@ -194,6 +212,16 @@ function mergeSpans(text, labeled) {
       }
     }
   }
+  // Same idea for IBANs (with a valid checksum) and well-known API key formats.
+  for (const [type, re, ok, why] of [['IBAN', IBAN_RE, ibanOk, 'passes the IBAN checksum'], ['API_KEY', API_KEY_RE, () => true, 'matches a known API key format']]) {
+    for (const m of text.matchAll(re)) {
+      const a = m.index, b = a + m[0].length;
+      if (!ok(m[0])) continue;
+      const hits = spans.filter((s) => s.start < b && s.end > a);
+      if (!hits.length) { spans.push({ type, start: a, end: b, scores: [1], rule: 'found', why }); continue; }
+      for (const s of hits) { s.type = type; s.rule = 'confirmed'; s.why = why; s.start = Math.min(s.start, a); s.end = Math.max(s.end, b); }
+    }
+  }
   // Drop entities swallowed by a grown one, then build the results.
   const kept = [];
   for (const s of spans.sort((a, b) => a.start - b.start)) {
@@ -203,7 +231,8 @@ function mergeSpans(text, labeled) {
   }
   return kept.map((s) => {
     const span = { type: s.type, start: s.start, end: s.end, text: text.slice(s.start, s.end), score: s.scores.reduce((a, b) => a + b, 0) / s.scores.length, rule: s.rule === 'found', sure: !!s.rule };
-    span.check = s.rule === 'found' ? { ok: true, msg: `✓ Caught by the area code rule (${s.area} is a real area code)` }
+    span.check = s.why ? { ok: true, msg: s.rule === 'found' ? `✓ Caught by a rule (${s.why})` : `✓ ${s.why[0].toUpperCase()}${s.why.slice(1)}` }
+      : s.rule === 'found' ? { ok: true, msg: `✓ Caught by the area code rule (${s.area} is a real area code)` }
       : s.rule === 'confirmed' ? { ok: true, msg: `✓ ${s.area} is a real area code` } : validate(span);
     return span;
   });
@@ -267,6 +296,11 @@ function fakeFor(s) {
   if (/SSN/.test(t)) return `9${String(h % 100).padStart(2, '0')}-${String((h >>> 7) % 90 + 10)}-${String((h >>> 3) % 9000 + 1000)}`; // SSNs never start with 9
   if (/CARD|CREDIT/.test(t)) { const c = TEST_CARDS.filter((x) => x.replace(/\D/g, '') !== s.text.replace(/\D/g, '')); return pick(c, h); } // public test card numbers
   if (/IP/.test(t)) return `203.0.113.${h % 254 + 1}`;                                   // documentation-only range
+  if (/IBAN/.test(t)) return pick(['GB82 WEST 1234 5698 7654 32', 'DE89 3704 0044 0532 0130 00', 'FR14 2004 1010 0505 0001 3M02 606']
+    .filter((x) => x.replace(/\s/g, '') !== s.text.replace(/\s/g, '')), h); // published example IBANs
+  if (/PASSPORT/.test(t)) return `X${String(h % 1e8).padStart(8, '0')}`;
+  if (/DRIVER|LICEN/.test(t)) return `D${String(h % 1e7).padStart(7, '0')}`;
+  if (/API/.test(t)) return `sk_example_${(h.toString(16) + (h >>> 5).toString(16)).padEnd(16, '0')}`;
   return `[${typeInfo(s.type).name.toUpperCase()}]`;
 }
 function tokenTable() {
@@ -275,7 +309,7 @@ function tokenTable() {
     if (!redactable(s)) continue;
     const key = s.type + '|' + s.text;
     if (byValue.has(key)) continue;
-    const name = typeInfo(s.type).name.toUpperCase().replace(/[^A-Z]+/g, '_');
+    const name = tokName(s.type);
     counts[name] = (counts[name] || 0) + 1;
     byValue.set(key, `<${name}_${counts[name]}>`);
   }
@@ -351,7 +385,7 @@ function applyRedaction(text, spans, tokens, counts) {
     if (!redactable(s)) continue;
     const key = s.type + '|' + s.text;
     if (mode === 'token' && !tokens.has(key)) {
-      const name = typeInfo(s.type).name.toUpperCase().replace(/[^A-Z]+/g, '_');
+      const name = tokName(s.type);
       counts[name] = (counts[name] || 0) + 1; tokens.set(key, `<${name}_${counts[name]}>`);
     }
     out += text.slice(pos, s.start) + replacementFor(s, tokens); pos = s.end;
@@ -575,10 +609,10 @@ render();
     const r = data.models[name];
     if (!r) return;
     const pct = (x) => `${Math.round(x * 100)}%`;
-    const names = { PERSON: 'Names', EMAIL: 'Emails', PHONE: 'Phone numbers', SSN: 'Social Security numbers', CREDIT_CARD: 'Card numbers', IP_ADDRESS: 'IP addresses', ALL: 'All of them' };
-    $('bench-rows').innerHTML = Object.keys(names).filter((t) => r[t]).map((t) => {
+    const names = { PERSON: 'Names', EMAIL: 'Emails', PHONE: 'Phone numbers', SSN: 'Social Security numbers', CREDIT_CARD: 'Card numbers', IP_ADDRESS: 'IP addresses', PASSPORT: 'Passports', DRIVER_LICENSE: "Driver's licenses", API_KEY: 'API keys', IBAN: 'IBANs', ALL: 'All of them' };
+    // Types the dataset doesn't mark are left out rather than shown as zero.
+    $('bench-rows').innerHTML = Object.keys(names).filter((t) => r[t] && r[t].items).map((t) => {
       const x = r[t];
-      if (!x.items) return `<tr><td>${names[t]}</td><td>0</td><td class="na" colspan="3">not in the sample</td></tr>`;
       return `<tr><td>${names[t]}</td><td>${x.items.toLocaleString()}</td><td>${pct(x.overlap_recall)}</td><td>${pct(x.overlap_precision)}</td><td>${x.overlap_f1.toFixed(2)}</td></tr>`;
     }).join('');
     const ds = data.meta.dataset;

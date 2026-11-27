@@ -19,7 +19,7 @@
     <section class="demo-hero">
       <p class="kicker">LIVE DEMO · PII DETECTOR</p>
       <h1>Redact me<em>.</em></h1>
-      <p class="lead">Type or paste anything below. My fine-tuned DistilBERT model finds names, emails, phone numbers, Social Security numbers, card numbers and IP addresses as you type. It runs entirely in your browser, so nothing you enter ever leaves this page.</p>
+      <p class="lead">Type or paste anything below. My fine-tuned DistilBERT model finds names, emails, phone numbers, Social Security numbers, card numbers, IP addresses, passports, driver's licenses, API keys and IBANs as you type, in English or Spanish. It runs entirely in your browser, so nothing you enter ever leaves this page.</p>
       <div class="try-row">
         <button type="button" id="try" class="try-btn">▶ Try me</button>
         <span>Watch it catch personal data in a sample message, or type your own below.</span>
@@ -41,6 +41,7 @@
               <button type="button" data-sample="0">Support ticket</button>
               <button type="button" data-sample="1">Order email</button>
               <button type="button" data-sample="2">HR note</button>
+              <button type="button" data-sample="3">En español</button>
               <label class="upload" for="file-input">Upload PDF or CSV</label>
               <input id="file-input" type="file" accept=".pdf,.csv,.txt,.md,text/plain,text/csv,application/pdf" hidden>
             </div>
@@ -106,7 +107,7 @@
       <div class="steps">
         <article><small>01</small><h3>Tokenize</h3><p>Your text is split into the same word pieces the model was trained on.</p></article>
         <article><small>02</small><h3>Classify</h3><p>A DistilBERT model I fine-tuned labels every piece and gives a confidence score, running on your device with ONNX Runtime.</p></article>
-        <article><small>03</small><h3>Validate</h3><p>Card numbers must pass a Luhn checksum and SSNs a format check, the same rule-based safety net used in the full service.</p></article>
+        <article><small>03</small><h3>Validate</h3><p>Card numbers must pass a Luhn checksum, IBANs their bank checksum and SSNs a format check, the same rule-based safety net used in the full service.</p></article>
       </div>
       <div id="bench" class="bench" hidden>
         <h2>How well it works</h2>
@@ -156,7 +157,7 @@ print(redact(text))
 # Hi, I'm [PERSON]. Email [EMAIL] or call [PHONE].</code></pre></div>
           </li>
         </ol>
-        <p class="use-more">It finds <strong>PERSON, EMAIL, PHONE, SSN, CREDIT_CARD</strong> and <strong>IP_ADDRESS</strong>. For the full service with the Luhn and format checks and a ready-to-run API in Docker, see the <a href="https://github.com/chadtollison/PII-Detector" target="_blank" rel="noreferrer">PII-Detector repository</a>.</p>
+        <p class="use-more">It finds <strong>PERSON, EMAIL, PHONE, SSN, CREDIT_CARD, IP_ADDRESS, PASSPORT, DRIVER_LICENSE, API_KEY</strong> and <strong>IBAN</strong>, in English and Spanish. For the full service with the Luhn and format checks and a ready-to-run API in Docker, see the <a href="https://github.com/chadtollison/PII-Detector" target="_blank" rel="noreferrer">PII-Detector repository</a>.</p>
       </div>
 
       <div class="buttons">
@@ -168,7 +169,7 @@ print(redact(text))
   </main>
 
   <footer><span>Michael Chad Tollison</span><span>Software & Data Engineer</span><span><a href="./">Portfolio</a></span></footer>
-  <script type="module" src="redact.js?v=2026-11-27e"></script>
+  <script type="module" src="redact.js?v=2026-11-27f"></script>
   <script data-goatcounter="https://chadtollison.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
