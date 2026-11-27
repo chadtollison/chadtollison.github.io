@@ -7,6 +7,13 @@
 - `SCRUBPII_BACKEND=torch` (with `pip install "scrubpii[torch]"`) uses the PyTorch model as before.
   `SCRUBPII_THREADS` sets how many CPU threads ONNX Runtime uses.
 - Passwords stop at a comma or a closing full stop, not just at a space.
+- Your own rules: `add_rule`, `add_words`, `allow`, `load_rules` and `--rules` add patterns (employee IDs,
+  client names ...) without retraining, and keep chosen values visible.
+- Every item now has `confidence` (high/medium/low), `source` (model, rule, model+rule, custom) and `reason`.
+- `audit()` and `audit_markdown()` (also `scrubpii --audit` and `POST /audit`) explain each decision, including
+  what was left visible and why. Reports hold no personal data unless `include_values=True`.
+- More phone numbers: international numbers with a +country code, numbers written like `(123) 456-7890` or
+  `1-800-123-4567`, and any phone-shaped number right after "phone", "call", "contact" and similar words.
 
 ## 0.3.0
 - Renamed from `chad-pii` to `scrubpii` (import `scrubpii`, command `scrubpii`). `pip install chad-pii`

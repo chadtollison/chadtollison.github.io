@@ -80,11 +80,67 @@ putting the real values back in its reply.
 from scrubpii import find
 
 for e in find(text):
-    print(e.type, e.text, e.start, e.end, round(e.score, 2), e.rule)
+    print(e.type, e.text, e.score, e.confidence, e.source, e.reason)
+# PERSON Sarah Johnson 0.97 high model "model 97% sure"
+# EMAIL sarah.j@example.com 1.0 high model+rule "model found it, rule confirmed: email address format"
 ```
 
 `min_score` (default 0.5) sets how sure the model must be. Items caught or
-confirmed by a rule are always returned.
+confirmed by a rule are always returned. Every item says how it was found
+(`source`: model, rule, model+rule or custom) and why (`reason`).
+
+## Your own rules
+
+Add patterns for data only you have, like employee or member IDs, without
+retraining anything:
+
+```python
+import scrubpii
+
+scrubpii.add_rule("EMPLOYEE_ID", r"\bEMP-\d{6}\b")
+scrubpii.add_rule("MEMBER_ID", r"\b\d{8}\b", context=["member", "acct"])   # only after these words
+scrubpii.add_words("CLIENT", ["Globex", "Initech"])                         # exact names, any case
+scrubpii.allow("support@acme.com")                                          # never redact this
+
+scrubpii.redact("EMP-004211 called Globex, member no. 12345678, cc support@acme.com")
+# "[EMPLOYEE_ID] called [CLIENT], member no. [MEMBER_ID], cc support@acme.com"
+```
+
+Your rules win where they overlap the model, and work in every mode, in
+`tokenize`, `Guard`, JSON/CSV and the command line. `add_rule` also takes
+`group=` (redact one regex group) and `check=` (a function that must return
+True). Keep rules in a JSON file and load them with `scrubpii.load_rules("rules.json")`
+or `scrubpii --rules rules.json`:
+
+```json
+{"rules": [{"type": "EMPLOYEE_ID", "pattern": "\\bEMP-\\d{6}\\b"},
+           {"type": "MEMBER_ID", "pattern": "\\b\\d{8}\\b", "context": ["member"]}],
+ "words": {"CLIENT": ["Globex", "Initech"]},
+ "allow": ["support@acme.com"]}
+```
+
+## Audit report
+
+For reviews and compliance logs, `audit()` redacts and explains every
+decision: what was hidden, how sure it was, what found it and why, plus what
+it looked at and left visible (too unsure, failed a checksum, on your allow
+list). The report holds no personal data unless you ask for it: values show as
+previews like `S***********n` and the input is identified by its SHA-256 hash.
+
+```python
+from scrubpii import audit, audit_markdown
+
+report = audit(text)                 # a dict, ready to json.dump into a log
+print(report["redacted"], report["counts"])
+print(audit_markdown(report))        # a readable table
+```
+
+```bash
+scrubpii --audit --file letter.txt                    # JSON
+scrubpii --audit --audit-format md --file letter.txt  # Markdown
+```
+
+The HTTP API has `POST /audit` too.
 
 ## Many texts, JSON, CSV and pandas
 
@@ -139,6 +195,8 @@ interactive docs at `/docs`. It runs on your machine, so nothing is sent anywher
 scrubpii "Call Sarah at 662-634-1142"
 cat notes.txt | scrubpii --mode mask > notes-redacted.txt
 scrubpii --find "My SSN is 123-45-6789"
+scrubpii --audit --audit-format md "Call Sarah at 662-634-1142"
+scrubpii --rules my_rules.json --file notes.txt
 scrubpii --file customers.csv --columns name,email -o customers-safe.csv   # also .json, .jsonl, .txt
 ```
 
