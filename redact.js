@@ -100,6 +100,14 @@ function pieces(word) {
   return ids;
 }
 
+// The model runs one call at a time (typing and file jobs share it).
+let modelQueue = Promise.resolve();
+function runModel(feeds) {
+  const next = modelQueue.then(() => model(feeds));
+  modelQueue = next.catch(() => {});
+  return next;
+}
+
 async function classify(text) {
   const ws = words(text);
   const cls = tokenizer.cls_token_id ?? 101, sep = tokenizer.sep_token_id ?? 102;
@@ -119,7 +127,7 @@ async function classify(text) {
     for (const w of win) { firstIdx.push(ids.length); ids.push(...w.ids); }
     ids.push(sep);
     const shape = [1, ids.length];
-    const { logits } = await model({
+    const { logits } = await runModel({
       input_ids: new Tensor('int64', BigInt64Array.from(ids, BigInt), shape),
       attention_mask: new Tensor('int64', new BigInt64Array(ids.length).fill(1n), shape),
     });
@@ -320,7 +328,169 @@ async function analyze() {
   render();
 }
 
+// ---------- files: CSV, PDF and long text, all in the browser ----------
+const MAX_FILE = 15 * 1024 * 1024;
+const loadScript = (src) => new Promise((ok, fail) => {
+  const el = document.createElement('script'); el.src = src; el.onload = ok; el.onerror = () => fail(new Error('Could not load ' + src));
+  document.head.appendChild(el);
+});
+const PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+const JSPDF = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+
+function fileStatus(msg) { $('file-status').textContent = msg; }
+function download(name, blob) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+const baseName = (n) => n.replace(/\.[^.]+$/, '');
+
+// Replace the redactable spans of `text`, sharing one token table across a file.
+function applyRedaction(text, spans, tokens, counts) {
+  let out = '', pos = 0;
+  for (const s of spans) {
+    if (!redactable(s)) continue;
+    const key = s.type + '|' + s.text;
+    if (mode === 'token' && !tokens.has(key)) {
+      const name = typeInfo(s.type).name.toUpperCase().replace(/[^A-Z]+/g, '_');
+      counts[name] = (counts[name] || 0) + 1; tokens.set(key, `<${name}_${counts[name]}>`);
+    }
+    out += text.slice(pos, s.start) + replacementFor(s, tokens); pos = s.end;
+  }
+  return out + text.slice(pos);
+}
+
+function parseCsv(src) {
+  const rows = []; let row = [], cell = '', q = false;
+  for (let i = 0; i < src.length; i++) {
+    const c = src[i];
+    if (q) { if (c === '"') { if (src[i + 1] === '"') { cell += '"'; i++; } else q = false; } else cell += c; }
+    else if (c === '"') q = true;
+    else if (c === ',') { row.push(cell); cell = ''; }
+    else if (c === '\n' || c === '\r') { if (c === '\r' && src[i + 1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+    else cell += c;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  return rows;
+}
+const csvCell = (v) => (/[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v);
+
+async function redactCsv(file) {
+  const rows = parseCsv(await file.text());
+  if (!rows.length) throw new Error('That CSV looks empty.');
+  const [header, ...body] = rows;
+  // One cell per line, so entities never run across cells; the model reads them in big batches.
+  const cells = []; body.forEach((r, ri) => r.forEach((v, ci) => { if (v.trim()) cells.push({ ri, ci, v: v.replace(/[\r\n]+/g, ' ') }); }));
+  const out = body.map((r) => r.slice());
+  const tokens = new Map(), counts = {}; let found = 0;
+  const CHUNK = 300;
+  for (let i = 0; i < cells.length; i += CHUNK) {
+    fileStatus(`Checking cells ${i + 1} to ${Math.min(i + CHUNK, cells.length)} of ${cells.length}…`);
+    const part = cells.slice(i, i + CHUNK), text = part.map((c) => c.v).join('\n');
+    const spans = await classify(text);
+    let off = 0;
+    for (const c of part) {
+      const end = off + c.v.length;
+      const mine = spans.filter((s) => s.start >= off && s.end <= end).map((s) => ({ ...s, start: s.start - off, end: s.end - off }));
+      found += mine.filter(redactable).length;
+      out[c.ri][c.ci] = applyRedaction(c.v, mine, tokens, counts);
+      off = end + 1;
+    }
+  }
+  const csv = [header, ...out].map((r) => r.map(csvCell).join(',')).join('\r\n');
+  const preview = [header, ...out.slice(0, 15)];
+  $('file-preview').innerHTML = `<div class="csv-wrap"><table class="csv">${preview.map((r, i) => `<tr>${r.map((v) => `<${i ? 'td' : 'th'}>${esc(v)}</${i ? 'td' : 'th'}>`).join('')}</tr>`).join('')}</table></div>`
+    + (out.length > 15 ? `<p class="file-note">Showing the first 15 of ${out.length} rows. The download has them all.</p>` : '');
+  return { found, blob: new Blob([csv], { type: 'text/csv' }), name: baseName(file.name) + '-redacted.csv', tokens };
+}
+
+async function redactPdf(file) {
+  fileStatus('Loading the PDF reader…');
+  if (!window.pdfjsLib) await loadScript(PDFJS + 'pdf.min.js');
+  pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS + 'pdf.worker.min.js';
+  const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+  const pages = []; let found = 0;
+  $('file-preview').innerHTML = '<div class="pdf-pages" id="pdf-pages"></div>';
+  for (let n = 1; n <= pdf.numPages; n++) {
+    fileStatus(`Reading page ${n} of ${pdf.numPages}…`);
+    const page = await pdf.getPage(n), viewport = page.getViewport({ scale: 2 });
+    const canvas = document.createElement('canvas'); canvas.width = viewport.width; canvas.height = viewport.height;
+    const ctx = canvas.getContext('2d');
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    // Rebuild the page text and remember where each text piece sits.
+    const tc = await page.getTextContent();
+    const items = tc.items.filter((it) => it.str !== undefined);
+    // Measure with the PDF's own font family so boxes land on the right characters.
+    const meas = document.createElement('canvas').getContext('2d');
+    const widthOf = (it, str) => { meas.font = `100px ${(tc.styles[it.fontName] || {}).fontFamily || 'sans-serif'}`; return meas.measureText(str).width; };
+    let text = ''; const ranges = [];
+    for (const it of items) { ranges.push([text.length, text.length + it.str.length, it]); text += it.str + (it.hasEOL ? '\n' : ' '); }
+    const spans = text.trim() ? (await classify(text)).filter(redactable) : [];
+    found += spans.length;
+    ctx.fillStyle = '#000';
+    for (const s of spans) {
+      for (const [a, b, it] of ranges) {
+        if (b <= s.start || a >= s.end || !it.str.length) continue;
+        const from = Math.max(s.start, a) - a, to = Math.min(s.end, b) - a;
+        const [, , , d, x, y] = it.transform, h = Math.abs(d) || it.height || 10;
+        const full = widthOf(it, it.str) || 1, pad = h * 0.3;
+        const x1 = x + it.width * (widthOf(it, it.str.slice(0, from)) / full) - pad;
+        const x2 = x + it.width * (widthOf(it, it.str.slice(0, to)) / full) + pad;
+        const [l, t, r, btm] = viewport.convertToViewportRectangle([x1, y - h * 0.25, x2, y + h * 0.95]);
+        ctx.fillRect(Math.min(l, r) - 2, Math.min(t, btm) - 2, Math.abs(r - l) + 4, Math.abs(btm - t) + 4);
+      }
+    }
+    canvas.className = 'pdf-page'; $('pdf-pages').appendChild(canvas);
+    pages.push({ canvas, w: viewport.width / 2, h: viewport.height / 2 });
+  }
+  if (!pages.some((p) => p)) throw new Error('No pages found.');
+  fileStatus('Building the redacted PDF…');
+  if (!window.jspdf) await loadScript(JSPDF);
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: [pages[0].w, pages[0].h], orientation: pages[0].w > pages[0].h ? 'l' : 'p' });
+  pages.forEach((p, i) => {
+    if (i) doc.addPage([p.w, p.h], p.w > p.h ? 'l' : 'p');
+    doc.addImage(p.canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, p.w, p.h);
+  });
+  return { found, blob: doc.output('blob'), name: baseName(file.name) + '-redacted.pdf', pdf: true };
+}
+
+async function redactTextFile(file) {
+  const text = await file.text();
+  fileStatus('Checking the text…');
+  const spans = await classify(text);
+  const tokens = new Map(), out = applyRedaction(text, spans, tokens, {});
+  $('file-preview').innerHTML = `<pre class="txt-preview">${esc(out.slice(0, 3000))}${out.length > 3000 ? '\n…' : ''}</pre>`;
+  return { found: spans.filter(redactable).length, blob: new Blob([out], { type: 'text/plain' }), name: baseName(file.name) + '-redacted.txt', tokens };
+}
+
+let fileResult = null;
+async function handleFile(file) {
+  const panel = $('file-panel'); panel.hidden = false; $('file-name').textContent = file.name;
+  $('file-download').hidden = true; $('file-preview').innerHTML = ''; fileResult = null;
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  try {
+    if (file.size > MAX_FILE) throw new Error('That file is over 15 MB. Try a smaller one.');
+    if (!model) { fileStatus('Waiting for the model to finish loading…'); while (!model) await new Promise((r) => setTimeout(r, 300)); }
+    const ext = file.name.toLowerCase().split('.').pop();
+    const t0 = performance.now();
+    if (ext === 'csv') fileResult = await redactCsv(file);
+    else if (ext === 'pdf') fileResult = await redactPdf(file);
+    else if (ext === 'txt' || ext === 'md' || file.type.startsWith('text/')) fileResult = await redactTextFile(file);
+    else throw new Error('Please choose a PDF, CSV or text file.');
+    const secs = ((performance.now() - t0) / 1000).toFixed(1);
+    const how = fileResult.pdf ? 'blacked out (the PDF is rebuilt as images, so hidden text can\'t be copied back out)' : `redacted as “${document.querySelector('[data-mode][aria-checked="true"]').textContent}”`;
+    fileStatus(`Found ${fileResult.found} item${fileResult.found === 1 ? '' : 's'} in ${secs} s, ${how}. Nothing left your device.`);
+    $('file-download').hidden = false;
+  } catch (e) { console.error(e); fileStatus(e.message || 'Something went wrong reading that file.'); }
+}
+
 // ---------- wiring ----------
+$('file-input').addEventListener('change', (e) => { const f = e.target.files[0]; if (f) handleFile(f); e.target.value = ''; });
+$('file-download').addEventListener('click', () => { if (fileResult) download(fileResult.name, fileResult.blob); });
+const drop = document.querySelector('.panes');
+drop.addEventListener('dragover', (e) => { if ([...e.dataTransfer.types].includes('Files')) { e.preventDefault(); drop.classList.add('dropping'); } });
+drop.addEventListener('dragleave', () => drop.classList.remove('dropping'));
+drop.addEventListener('drop', (e) => { const f = e.dataTransfer.files[0]; drop.classList.remove('dropping'); if (f) { e.preventDefault(); handleFile(f); } });
 input.addEventListener('input', () => { $('count').textContent = `${input.value.length} / 5000`; schedule(); });
 document.querySelectorAll('[data-sample]').forEach((b) => b.addEventListener('click', () => { input.value = SAMPLES[+b.dataset.sample]; schedule(0); }));
 $('clear').addEventListener('click', () => { input.value = ''; input.focus(); schedule(0); });
