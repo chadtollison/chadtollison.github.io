@@ -53,3 +53,11 @@ def test_card_and_ssn_rules_without_model(monkeypatch):
     found = {(e.type, e.text) for e in cp.find(text)}
     assert found == {("CREDIT_CARD", "4111-1111-1111-1111"), ("CREDIT_CARD", "3782 822463 10005"),
                      ("SSN", "219 09 9999"), ("SSN", "078051120")}
+
+
+def test_date_of_birth_rule(monkeypatch):
+    monkeypatch.setattr(cp, "_model_entities", fake_model([]))
+    for text, dob in [("Jordan, born 03/14/1986, called.", "03/14/1986"), ("DOB: March 14, 1986", "March 14, 1986"),
+                      ("fecha de nacimiento: 14 de marzo de 1986", "14 de marzo de 1986")]:
+        assert [(e.type, e.text) for e in cp.find(text)] == [("DATE_OF_BIRTH", dob)]
+    assert cp.find("Meeting on 03/14/2026.") == []
