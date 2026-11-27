@@ -10,8 +10,9 @@ pass Luhn, IBANs their bank checksum, SSNs the SSA format. The rules also
 catch 10-digit US phone numbers with a real area code, valid IBANs and
 well-known API key formats even when the model misses them.
 
-The model (about 260 MB) downloads from Hugging Face on first use and is
-cached, so later runs work offline.
+The 8-bit model (about 66 MB) runs with ONNX Runtime, so PyTorch is not
+needed. It downloads from Hugging Face on first use and is cached, so later
+runs start fast and work offline.
 """
 from __future__ import annotations
 
@@ -25,7 +26,7 @@ from typing import Dict, List, Optional, Tuple
 
 __all__ = ["Entity", "find", "find_many", "redact", "redact_many", "tokenize", "restore", "fake_for", "MODEL_ID",
            "redact_json", "redact_csv", "redact_dataframe", "Guard"]
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 MODEL_ID = "ChadTollison/pii-distilbert-v3"
 MODES = ("label", "mask", "fake", "token")
@@ -35,8 +36,7 @@ SURE = 0.95     # model confidence that overrides a failed format/checksum check
 # pieces (finance set: 0.65 F1 with 512-token windows, 0.76 with 128).
 WINDOW = int(os.environ.get("SCRUBPII_WINDOW") or os.environ.get("CHAD_PII_WINDOW") or "128")
 
-_pipeline = None
-_pipeline_id = None
+_pipelines: Dict[Tuple[str, str], object] = {}
 
 
 @dataclass
@@ -76,6 +76,7 @@ def ip_ok(s: str) -> bool:
 
 
 SHAPES = {
+    "PASSWORD": re.compile(r"[^\s,;]+(?<![.!?])"),   # the whole password, symbols included
     "EMAIL": re.compile(r"[\w.%+-]+@[\w.-]+\.[^\W\d_]{2,}"),
     "PHONE": PHONE_RE,
     "SSN": re.compile(r"\b\d{3}-\d{2}-\d{4}\b"),
@@ -137,16 +138,32 @@ def _valid(e: Entity) -> bool:
 
 
 # ---------------------------------------------------------------- model
+def _backend() -> str:
+    """'onnx' (default: small and fast) or 'torch' (pip install scrubpii[torch])."""
+    choice = os.environ.get("SCRUBPII_BACKEND", "").lower()
+    if choice in ("onnx", "torch"):
+        return choice
+    try:
+        import onnxruntime  # noqa: F401
+        return "onnx"
+    except ImportError:
+        return "torch"
+
+
 def _get_pipeline(model: str):
-    global _pipeline, _pipeline_id
-    if _pipeline is None or _pipeline_id != model:
-        from transformers import AutoTokenizer, pipeline
-        tok = AutoTokenizer.from_pretrained(model, model_input_names=["input_ids", "attention_mask"])
-        tok.model_max_length = min(tok.model_max_length, WINDOW)
-        _pipeline = pipeline("token-classification", model=model, tokenizer=tok,
-                             aggregation_strategy="max", stride=WINDOW // 4)
-        _pipeline_id = model
-    return _pipeline
+    """Load the model once, on first use (importing scrubpii stays instant)."""
+    key = (_backend(), model)
+    if key not in _pipelines:
+        if key[0] == "onnx":
+            from ._onnx import OnnxTagger
+            _pipelines[key] = OnnxTagger(model, window=WINDOW, stride=WINDOW // 4)
+        else:
+            from transformers import AutoTokenizer, pipeline
+            tok = AutoTokenizer.from_pretrained(model, model_input_names=["input_ids", "attention_mask"])
+            tok.model_max_length = min(tok.model_max_length, WINDOW)
+            _pipelines[key] = pipeline("token-classification", model=model, tokenizer=tok,
+                                       aggregation_strategy="max", stride=WINDOW // 4)
+    return _pipelines[key]
 
 
 def _model_entities(text: str, model: str, items=None) -> List[Entity]:

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "scrubpii"
-version = "0.3.0"
+version = "0.4.0"
 description = "Find and redact 15 kinds of personal data in English and Spanish text, CSV, JSON and DataFrames, with a fine-tuned DistilBERT model plus checksum rules. Beats Microsoft Presidio on public benchmarks."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -17,12 +17,13 @@ classifiers = [
   "Topic :: Text Processing :: Linguistic",
   "Intended Audience :: Developers",
 ]
-dependencies = ["transformers>=4.40", "torch>=2.6"]
+dependencies = ["onnxruntime>=1.17", "tokenizers>=0.15", "huggingface_hub>=0.20", "numpy"]
 
 [project.optional-dependencies]
 test = ["pytest>=7", "pandas", "fastapi", "httpx"]
 server = ["fastapi>=0.100", "uvicorn>=0.20"]
 pandas = ["pandas>=1.5"]
+torch = ["transformers>=4.40", "torch>=2.6"]
 
 [project.scripts]
 scrubpii = "scrubpii.cli:main"

@@ -38,8 +38,10 @@ F1 on held-out public data (full results in
 
 Presidio is about 4x faster per text.
 
-The model (about 260 MB) downloads on first use and is cached, so after that
-it works offline. Nothing is sent anywhere.
+It runs on ONNX Runtime, so there is no PyTorch to install. The 8-bit model
+(about 66 MB) downloads on first use and is cached, so after that it starts in
+a couple of seconds and works offline. Nothing is sent anywhere. If you already
+use PyTorch, `pip install "scrubpii[torch]"` and set `SCRUBPII_BACKEND=torch`.
 
 Try it in your browser first: [chadtollison.github.io/redact.html](https://chadtollison.github.io/redact.html)
 

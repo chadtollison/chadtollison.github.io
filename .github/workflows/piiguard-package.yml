@@ -27,9 +27,9 @@ jobs:
           python-version: "3.11"
       - name: Install
         run: |
-          pip install --index-url https://download.pytorch.org/whl/cpu "torch>=2.6"
           pip install build
           pip install "./scrubpii[test]"
+          python -c "import importlib.util as u; assert u.find_spec('torch') is None, 'torch should not be a default dependency'"
       - name: Unit tests
         run: pytest -q scrubpii/tests
       - name: Try it with the real model
@@ -51,6 +51,11 @@ jobs:
               assert secret not in out, secret
           PY
           scrubpii --find "My SSN is 123-45-6789"
+      - name: Same answers with the PyTorch backend
+        run: |
+          pip install --index-url https://download.pytorch.org/whl/cpu "torch>=2.6"
+          pip install "./scrubpii[torch]"
+          SCRUBPII_BACKEND=torch python -c "from scrubpii import redact; out = redact('Hi, I am Sarah Johnson, sarah.j@example.com'); print(out); assert 'Sarah Johnson' not in out"
       - name: Build
         run: python -m build scrubpii --outdir dist
       - uses: actions/upload-artifact@v4

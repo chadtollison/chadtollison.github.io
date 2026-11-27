@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0
+- Runs on ONNX Runtime by default: no PyTorch or transformers needed. Installs far smaller and starts much
+  faster, and the model download is the 66 MB 8-bit ONNX file instead of 260 MB.
+- The model loads on first use and is kept for the process, one copy per model.
+- `SCRUBPII_BACKEND=torch` (with `pip install "scrubpii[torch]"`) uses the PyTorch model as before.
+  `SCRUBPII_THREADS` sets how many CPU threads ONNX Runtime uses.
+- Passwords stop at a comma or a closing full stop, not just at a space.
+
 ## 0.3.0
 - Renamed from `chad-pii` to `scrubpii` (import `scrubpii`, command `scrubpii`). `pip install chad-pii`
   still works: it installs scrubpii and keeps `import chad_pii` and the `chad-pii` command working.

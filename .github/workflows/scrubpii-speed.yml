@@ -1,0 +1,87 @@
+# Install size, start-up time and speed: scrubpii (ONNX, default) vs scrubpii
+# with PyTorch vs Microsoft Presidio. Commits benchmarks/speed.{md,json}.
+name: scrubpii speed
+on:
+  workflow_dispatch:
+  push:
+    branches: ["claude/**"]
+    paths: ["scrubpii/src/**", "training/cold_start.py", "training/speed_report.py", ".github/workflows/scrubpii-speed.yml"]
+concurrency:
+  group: speed-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: write
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      matrix:
+        system: [scrubpii, scrubpii-torch, presidio]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install into a fresh venv, then time two cold starts
+        run: |
+          python -m venv /tmp/v && . /tmp/v/bin/activate && pip install -q -U pip
+          export HF_HOME=/tmp/hf
+          t0=$(date +%s)
+          case "${{ matrix.system }}" in
+            scrubpii) pip install -q ./scrubpii ;;
+            scrubpii-torch) pip install -q --extra-index-url https://download.pytorch.org/whl/cpu "./scrubpii[torch]"; export SCRUBPII_BACKEND=torch ;;
+            presidio) pip install -q "presidio-analyzer==2.2.355" && python -m spacy download en_core_web_lg -q ;;
+          esac
+          t1=$(date +%s)
+          kind=${{ matrix.system }}; kind=${kind%-torch}
+          first=$(python training/cold_start.py $kind | python -c "import sys,json;print(json.load(sys.stdin)['seconds'])")
+          warm=$(python training/cold_start.py $kind | python -c "import sys,json;print(json.load(sys.stdin)['seconds'])")
+          mb=$(( ( $(du -sk /tmp/v | cut -f1) + $(du -sk /tmp/hf 2>/dev/null | cut -f1 || echo 0) ) / 1024 ))
+          names='{"scrubpii":"scrubpii 0.4 (ONNX, default)","scrubpii-torch":"scrubpii with PyTorch (0.3 setup)","presidio":"Microsoft Presidio + spaCy lg"}'
+          python -c "import json,sys;n=json.loads(sys.argv[1]);print(json.dumps({'name':n['${{ matrix.system }}'],'mb':$mb,'install_s':$((t1-t0)),'first_s':$first,'warm_s':$warm}))" "$names" > setup-${{ matrix.system }}.jsonl
+          cat setup-${{ matrix.system }}.jsonl
+      - uses: actions/upload-artifact@v4
+        with: { name: "setup-${{ matrix.system }}", path: "setup-${{ matrix.system }}.jsonl" }
+
+  accuracy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install
+        run: |
+          pip install --extra-index-url https://download.pytorch.org/whl/cpu "torch==2.4.1" "transformers==4.46.3" \
+            "datasets==3.1.0" "huggingface_hub<1" "presidio-analyzer==2.2.355" onnxruntime tokenizers
+          python -m spacy download en_core_web_lg -q
+          pip install --no-deps ./scrubpii
+      - name: ONNX vs PyTorch vs Presidio
+        run: |
+          cd training
+          python compare.py --rows 1000 --out compare-backends \
+            --system "scrubpii@onnx:ChadTollison/pii-distilbert-v3=scrubpii 0.4 (ONNX 8-bit)" \
+            --system "scrubpii@torch:ChadTollison/pii-distilbert-v3=scrubpii (PyTorch)" --system presidio
+      - uses: actions/upload-artifact@v4
+        with: { name: accuracy, path: benchmarks/compare-backends.* }
+
+  report:
+    needs: [setup, accuracy]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { path: art }
+      - name: Build report
+        run: |
+          cat art/setup-*/setup-*.jsonl > setup.jsonl
+          cp art/accuracy/compare-backends.* benchmarks/
+          python training/speed_report.py >> "$GITHUB_STEP_SUMMARY"
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
+          git add benchmarks/speed.* benchmarks/compare-backends.*
+          git commit -m "scrubpii: install size, start-up and speed benchmark" || exit 0
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
