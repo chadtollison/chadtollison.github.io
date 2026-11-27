@@ -68,6 +68,7 @@
         "items": 793,
         "exact_f1": 0.334,
         "overlap_precision": 0.334,
+        "pii_precision": 0.95,
         "overlap_recall": 0.881,
         "overlap_f1": 0.484
       },
@@ -75,6 +76,7 @@
         "items": 189,
         "exact_f1": 0.176,
         "overlap_precision": 0.329,
+        "pii_precision": 0.992,
         "overlap_recall": 1.0,
         "overlap_f1": 0.495
       },
@@ -82,6 +84,7 @@
         "items": 106,
         "exact_f1": 0.259,
         "overlap_precision": 0.185,
+        "pii_precision": 0.981,
         "overlap_recall": 0.783,
         "overlap_f1": 0.299
       },
@@ -89,6 +92,7 @@
         "items": 100,
         "exact_f1": 0.18,
         "overlap_precision": 0.18,
+        "pii_precision": 0.967,
         "overlap_recall": 0.41,
         "overlap_f1": 0.25
       },
@@ -96,6 +100,7 @@
         "items": 121,
         "exact_f1": 0.294,
         "overlap_precision": 0.298,
+        "pii_precision": 1.0,
         "overlap_recall": 0.306,
         "overlap_f1": 0.302
       },
@@ -103,6 +108,7 @@
         "items": 295,
         "exact_f1": 0.493,
         "overlap_precision": 0.64,
+        "pii_precision": 0.996,
         "overlap_recall": 0.508,
         "overlap_f1": 0.567
       },
@@ -110,6 +116,7 @@
         "items": 1604,
         "exact_f1": 0.307,
         "overlap_precision": 0.323,
+        "pii_precision": 0.966,
         "overlap_recall": 0.748,
         "overlap_f1": 0.451
       }
@@ -117,52 +124,59 @@
     "In-browser model (this site)": {
       "PERSON": {
         "items": 793,
-        "exact_f1": 0.184,
-        "overlap_precision": 0.27,
-        "overlap_recall": 0.928,
-        "overlap_f1": 0.418
+        "exact_f1": 0.327,
+        "overlap_precision": 0.336,
+        "pii_precision": 0.951,
+        "overlap_recall": 0.868,
+        "overlap_f1": 0.484
       },
       "EMAIL": {
         "items": 189,
-        "exact_f1": 0.085,
-        "overlap_precision": 0.101,
+        "exact_f1": 0.191,
+        "overlap_precision": 0.38,
+        "pii_precision": 0.99,
         "overlap_recall": 1.0,
-        "overlap_f1": 0.184
+        "overlap_f1": 0.551
       },
       "PHONE": {
         "items": 106,
-        "exact_f1": 0.173,
-        "overlap_precision": 0.154,
-        "overlap_recall": 0.802,
-        "overlap_f1": 0.259
+        "exact_f1": 0.255,
+        "overlap_precision": 0.201,
+        "pii_precision": 0.986,
+        "overlap_recall": 0.783,
+        "overlap_f1": 0.32
       },
       "SSN": {
         "items": 100,
-        "exact_f1": 0.042,
-        "overlap_precision": 0.027,
-        "overlap_recall": 0.52,
-        "overlap_f1": 0.052
+        "exact_f1": 0.188,
+        "overlap_precision": 0.166,
+        "pii_precision": 0.969,
+        "overlap_recall": 0.37,
+        "overlap_f1": 0.229
       },
       "CREDIT_CARD": {
         "items": 121,
-        "exact_f1": 0.423,
-        "overlap_precision": 0.335,
-        "overlap_recall": 0.595,
-        "overlap_f1": 0.429
+        "exact_f1": 0.32,
+        "overlap_precision": 0.356,
+        "pii_precision": 1.0,
+        "overlap_recall": 0.306,
+        "overlap_f1": 0.329
       },
       "IP_ADDRESS": {
         "items": 295,
-        "exact_f1": 0.44,
-        "overlap_precision": 0.503,
+        "exact_f1": 0.505,
+        "overlap_precision": 0.654,
+        "pii_precision": 0.996,
         "overlap_recall": 0.502,
-        "overlap_f1": 0.503
+        "overlap_f1": 0.568
       },
       "ALL": {
         "items": 1604,
-        "exact_f1": 0.155,
-        "overlap_precision": 0.169,
-        "overlap_recall": 0.799,
-        "overlap_f1": 0.279
+        "exact_f1": 0.31,
+        "overlap_precision": 0.336,
+        "pii_precision": 0.966,
+        "overlap_recall": 0.737,
+        "overlap_f1": 0.461
       }
     }
   }
