@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
+      fail-fast: false
       matrix:
         system: [scrubpii, scrubpii-torch, presidio]
     steps:
@@ -26,6 +27,7 @@ jobs:
         run: |
           python -m venv /tmp/v && . /tmp/v/bin/activate && pip install -q -U pip
           export HF_HOME=/tmp/hf
+          mkdir -p /tmp/hf
           t0=$(date +%s)
           case "${{ matrix.system }}" in
             scrubpii) pip install -q ./scrubpii ;;
