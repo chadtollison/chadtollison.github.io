@@ -85,13 +85,14 @@ def load_rows(n, max_tokens, tok):
         text = r["source_text"]
         if len(tok(text)["input_ids"]) > max_tokens:
             continue
-        gold = []
+        gold, anything = [], []
         for m in parse_mask(r["privacy_mask"]):
             seen_labels.add(m["label"])
             t = map_label(m["label"])
+            anything.append((int(m["start"]), int(m["end"])))
             if t:
                 gold.append((int(m["start"]), int(m["end"]), t))
-        rows.append((text, merge(gold, text)))
+        rows.append((text, merge(gold, text), anything))
         if len(rows) >= n:
             break
     return rows, sorted(seen_labels)
@@ -128,8 +129,9 @@ def f1(tp, fp, fn):
 
 
 def evaluate(pii, rows):
-    c = {t: {"gold": 0, "pred": 0, "exact": 0, "found": 0, "right": 0} for t in TYPES}
-    for text, gold in rows:
+    keys = ("gold", "pred", "exact", "found", "right", "pii")
+    c = {t: {k: 0 for k in keys} for t in TYPES}
+    for text, gold, anything in rows:
         pred = predict(pii, text)
         for t in TYPES:
             g = [(s, e) for s, e, tt in gold if tt == t]
@@ -139,8 +141,10 @@ def evaluate(pii, rows):
             c[t]["exact"] += len(set(g) & set(p))
             c[t]["found"] += sum(any(ps < ge and gs < pe for ps, pe in p) for gs, ge in g)
             c[t]["right"] += sum(any(ps < ge and gs < pe for gs, ge in g) for ps, pe in p)
+            # Did the find land on personal data of any kind (a username flagged as a name still hides PII)?
+            c[t]["pii"] += sum(any(ps < ge and gs < pe for gs, ge in anything) for ps, pe in p)
     result = {}
-    tot = {k: 0 for k in ("gold", "pred", "exact", "found", "right")}
+    tot = {k: 0 for k in keys}
     for t in TYPES + ["ALL"]:
         k = tot if t == "ALL" else c[t]
         if t != "ALL":
@@ -148,9 +152,10 @@ def evaluate(pii, rows):
                 tot[key] += k[key]
         ep, er, ef = f1(k["exact"], k["pred"] - k["exact"], k["gold"] - k["exact"])
         op = k["right"] / k["pred"] if k["pred"] else 0.0
+        pp = k["pii"] / k["pred"] if k["pred"] else 0.0
         orr = k["found"] / k["gold"] if k["gold"] else 0.0
         of = 2 * op * orr / (op + orr) if op + orr else 0.0
-        result[t] = {"items": k["gold"], "exact_f1": round(ef, 3), "overlap_precision": round(op, 3),
+        result[t] = {"items": k["gold"], "exact_f1": round(ef, 3), "overlap_precision": round(op, 3), "pii_precision": round(pp, 3),
                      "overlap_recall": round(orr, 3), "overlap_f1": round(of, 3)}
     return result
 
@@ -162,14 +167,16 @@ def write_report(all_results, meta):
              f"{meta['rows']} English texts picked at random from [{DATASET}](https://huggingface.co/datasets/{DATASET}), "
              f"a public dataset this model was never trained on. Run on {meta['date']}.", "",
              "**Overlap** counts a find that touches the marked item (what matters for redaction). "
-             "**Exact** needs the same characters.", ""]
+             "**Exact** needs the same characters. **Was personal data** is the share of the model's finds that "
+             "landed on anything the dataset marks as personal, including types this model has no label for "
+             "(a username flagged as a name still hides personal data).", ""]
     for name, res in all_results.items():
-        lines += [f"## {name}", "", "| Type | Items | Found (recall) | Right (precision) | Overlap F1 | Exact F1 |",
-                  "|---|---:|---:|---:|---:|---:|"]
+        lines += [f"## {name}", "", "| Type | Items | Found (recall) | Right type (precision) | Was personal data | Overlap F1 | Exact F1 |",
+                  "|---|---:|---:|---:|---:|---:|---:|"]
         for t in TYPES + ["ALL"]:
             r = res[t]
             label = "**All six**" if t == "ALL" else t
-            lines.append(f"| {label} | {r['items']} | {r['overlap_recall']:.0%} | {r['overlap_precision']:.0%} | "
+            lines.append(f"| {label} | {r['items']} | {r['overlap_recall']:.0%} | {r['overlap_precision']:.0%} | {r['pii_precision']:.0%} | "
                          f"{r['overlap_f1']:.3f} | {r['exact_f1']:.3f} |")
         lines.append("")
     lines += ["Dataset labels used: " + ", ".join(l for l in meta["labels"] if map_label(l)) + ".", "",
@@ -192,7 +199,7 @@ def main():
         tok, pii = load_model(path)
         if rows is None:
             rows, labels = load_rows(a.rows, 512, tok)
-            print(f"{len(rows)} rows, {sum(len(g) for _, g in rows)} items to find")
+            print(f"{len(rows)} rows, {sum(len(r[1]) for r in rows)} items to find")
         t0 = time.time()
         prev[name] = evaluate(pii, rows)
         print(name, f"({time.time() - t0:.0f} s)", json.dumps(prev[name]["ALL"]))

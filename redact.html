@@ -111,8 +111,8 @@
       <div id="bench" class="bench" hidden>
         <h2>How well it works</h2>
         <p class="use-lead" id="bench-lead"></p>
-        <div class="bench-wrap"><table class="bench-table"><thead><tr><th>Type</th><th>Items</th><th>Found</th><th>Right</th><th>F1</th></tr></thead><tbody id="bench-rows"></tbody></table></div>
-        <p class="bench-note"><strong>Found</strong> is the share of real items it caught. <strong>Right</strong> is the share of its finds that were real. Its finds count when they cover the item, since that is what hides it. <a href="benchmarks/ai4privacy.md" target="_blank" rel="noreferrer">Full results</a></p>
+        <div class="bench-wrap"><table class="bench-table"><thead><tr><th>Type</th><th>Items</th><th>Found</th><th>Was personal data</th><th>Right type</th></tr></thead><tbody id="bench-rows"></tbody></table></div>
+        <p class="bench-note"><strong>Found</strong> is the share of the marked items it caught (covering the item counts, since that is what hides it). <strong>Was personal data</strong> is the share of its finds that landed on something personal, like a username flagged as a name. <strong>Right type</strong> also needs the label to match. <a href="benchmarks/ai4privacy.md" target="_blank" rel="noreferrer">Full results</a></p>
       </div>
 
       <div class="use">
@@ -168,7 +168,7 @@ print(redact(text))
   </main>
 
   <footer><span>Michael Chad Tollison</span><span>Software & Data Engineer</span><span><a href="./">Portfolio</a></span></footer>
-  <script type="module" src="redact.js?v=2026-11-27e"></script>
+  <script type="module" src="redact.js?v=2026-11-27e2"></script>
   <script data-goatcounter="https://chadtollison.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>

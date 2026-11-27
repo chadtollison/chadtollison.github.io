@@ -579,7 +579,7 @@ render();
     $('bench-rows').innerHTML = Object.keys(names).filter((t) => r[t]).map((t) => {
       const x = r[t];
       if (!x.items) return `<tr><td>${names[t]}</td><td>0</td><td class="na" colspan="3">not in the sample</td></tr>`;
-      return `<tr><td>${names[t]}</td><td>${x.items.toLocaleString()}</td><td>${pct(x.overlap_recall)}</td><td>${pct(x.overlap_precision)}</td><td>${x.overlap_f1.toFixed(2)}</td></tr>`;
+      return `<tr><td>${names[t]}</td><td>${x.items.toLocaleString()}</td><td>${pct(x.overlap_recall)}</td><td>${x.pii_precision === undefined ? '–' : pct(x.pii_precision)}</td><td>${pct(x.overlap_precision)}</td></tr>`;
     }).join('');
     const ds = data.meta.dataset;
     $('bench-lead').innerHTML = `Tested on ${data.meta.rows.toLocaleString()} English texts from <a href="https://huggingface.co/datasets/${esc(ds)}" target="_blank" rel="noreferrer">${esc(ds)}</a>, a public dataset written by another team that this model never trained on. These are the scores for the model running on this page.`;
