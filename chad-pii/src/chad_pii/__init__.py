@@ -16,6 +16,7 @@ cached, so later runs work offline.
 from __future__ import annotations
 
 import hashlib
+import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -28,6 +29,10 @@ __version__ = "0.2.0"
 MODEL_ID = "ChadTollison/pii-distilbert-v2"
 MODES = ("label", "mask", "fake", "token")
 SURE = 0.95     # model confidence that overrides a failed format/checksum check
+# Long text is read in windows of this many tokens. The model learned on short
+# texts, and on long documents it finds much more when it reads them in short
+# pieces (finance set: 0.65 F1 with 512-token windows, 0.76 with 128).
+WINDOW = int(os.environ.get("CHAD_PII_WINDOW", "128"))
 
 _pipeline = None
 _pipeline_id = None
@@ -54,6 +59,9 @@ IBAN_RE = re.compile(r"\b[A-Z]{2}\d{2}(?: ?[A-Z0-9]{4}){2,7}(?: ?[A-Z0-9]{1,4})?
 API_KEY_RE = re.compile(
     r"\b(?:(?:sk|pk|rk)_(?:live|test)_[A-Za-z0-9]{16,}|sk-(?:proj-)?[A-Za-z0-9_-]{32,}|AKIA[0-9A-Z]{16}"
     r"|gh[pousr]_[A-Za-z0-9]{30,}|xox[abprs]-[A-Za-z0-9-]{20,}|AIza[0-9A-Za-z_-]{35})")
+CARD_RE = re.compile(r"\b[2-6]\d{3}(?:[ -]?\d){9,15}\b")
+SSN_RE = re.compile(r"\b\d{3}([- ])\d{2}\1\d{4}\b")
+SSN_BARE_RE = re.compile(r"(?i)(?:ssn|social security(?: number| no\.?)?)\W{0,12}(\d{9})\b")
 SHAPES = {
     "EMAIL": re.compile(r"[\w.%+-]+@[\w.-]+\.[^\W\d_]{2,}"),
     "PHONE": PHONE_RE,
@@ -86,7 +94,7 @@ def iban_ok(s: str) -> bool:
 
 
 def ssn_ok(s: str) -> bool:
-    m = re.fullmatch(r"(\d{3})-?(\d{2})-?(\d{4})", s.strip())
+    m = re.fullmatch(r"(\d{3})[- ]?(\d{2})[- ]?(\d{4})", s.strip())
     return bool(m) and m[1] not in ("000", "666") and m[1][0] != "9" and m[2] != "00" and m[3] != "0000"
 
 
@@ -121,8 +129,9 @@ def _get_pipeline(model: str):
     if _pipeline is None or _pipeline_id != model:
         from transformers import AutoTokenizer, pipeline
         tok = AutoTokenizer.from_pretrained(model, model_input_names=["input_ids", "attention_mask"])
+        tok.model_max_length = min(tok.model_max_length, WINDOW)
         _pipeline = pipeline("token-classification", model=model, tokenizer=tok,
-                             aggregation_strategy="max", stride=64)
+                             aggregation_strategy="max", stride=WINDOW // 4)
         _pipeline_id = model
     return _pipeline
 
@@ -171,21 +180,26 @@ def _grow(ents: List[Entity], text: str) -> None:
 def _rules(ents: List[Entity], text: str) -> List[Entity]:
     checks = [("PHONE", PHONE_RE, us_phone_ok, "real US/Canada area code"),
               ("IBAN", IBAN_RE, iban_ok, "IBAN checksum"),
-              ("API_KEY", API_KEY_RE, lambda s: True, "known API key format")]
+              ("API_KEY", API_KEY_RE, lambda s: True, "known API key format"),
+              ("CREDIT_CARD", CARD_RE, luhn_ok, "card number with valid Luhn checksum"),
+              ("SSN", SSN_RE, ssn_ok, "valid SSN format"),
+              ("SSN", SSN_BARE_RE, ssn_ok, "9 digits right after 'SSN'")]
     for typ, rx, ok, why in checks:
         for m in rx.finditer(text):
-            if not ok(m.group()):
+            g = 1 if rx is SSN_BARE_RE else 0
+            ms, me = m.start(g), m.end(g)
+            if not ok(m.group(g)):
                 continue
-            hits = [e for e in ents if e.start < m.end() and e.end > m.start()]
+            hits = [e for e in ents if e.start < me and e.end > ms]
             if not hits:
-                ents.append(Entity(typ, m.group(), m.start(), m.end(), 1.0, why))
+                ents.append(Entity(typ, m.group(g), ms, me, 1.0, why))
             for e in hits:
-                # A phone rule only overrides the model when the model's own
-                # label fails its check (e.g. "card number" that fails Luhn).
-                if typ == "PHONE" and e.type != "PHONE" and _valid(e):
+                # Phone, card and SSN rules only relabel the model's find when
+                # its own label fails its check (e.g. "card number" that fails Luhn).
+                if typ in ("PHONE", "CREDIT_CARD", "SSN") and e.type != typ and _valid(e):
                     continue
                 e.type, e.rule, e.score = typ, why, 1.0
-                e.start, e.end = min(e.start, m.start()), max(e.end, m.end())
+                e.start, e.end = min(e.start, ms), max(e.end, me)
                 e.text = text[e.start:e.end]
     ents.sort(key=lambda e: (e.start, -e.end))
     kept: List[Entity] = []
