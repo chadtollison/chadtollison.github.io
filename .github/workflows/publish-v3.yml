@@ -1,0 +1,37 @@
+# Upload the trained v3 model and its model card to Hugging Face as
+# ChadTollison/pii-distilbert-v3. Needs the HF_TOKEN secret (write access).
+name: Publish v3 to Hugging Face
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Run of the 'chad-pii v3' workflow whose v3-model to publish"
+        default: "45961921851"
+permissions:
+  contents: read
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - uses: actions/download-artifact@v4
+        with: { name: v3-model, path: build/v3, run-id: "${{ inputs.run_id }}", github-token: "${{ github.token }}" }
+      - name: Upload
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          if [ -z "$HF_TOKEN" ]; then echo "::error::Add an HF_TOKEN secret first (Settings > Secrets and variables > Actions)."; exit 1; fi
+          pip install -q "huggingface_hub<1"
+          cp training/model_card/README_v3.md build/v3/README.md
+          mkdir -p build/v3/onnx && cp models/pii-distilbert-v3/onnx/model_quantized.onnx build/v3/onnx/
+          python - <<'PY'
+          from huggingface_hub import HfApi
+          api = HfApi()
+          api.create_repo("ChadTollison/pii-distilbert-v3", exist_ok=True)
+          api.upload_folder(repo_id="ChadTollison/pii-distilbert-v3", folder_path="build/v3",
+                            commit_message="pii-distilbert-v3: 15 types, trained on public PII data")
+          print("https://huggingface.co/ChadTollison/pii-distilbert-v3")
+          PY
