@@ -209,18 +209,20 @@ function render() {
   const text = input.value;
   if (!text.trim()) { output.innerHTML = '<span class="empty">Your highlighted text will appear here.</span>'; }
   else {
-    let html = '', pos = 0;
+    let html = '', pos = 0; const tokens = tokenTable();
     for (const s of lastSpans) {
       const info = typeInfo(s.type), live = redactable(s);
       const tip = `${info.name} · ${s.rule ? 'format rule' : Math.round(s.score * 100) + '% confident'}${s.check ? ' · ' + s.check.msg.replace(/^[✓✗] /, '') : ''}${live ? '' : ' · not redacted'}`;
       html += esc(text.slice(pos, s.start));
-      html += `<mark class="pii${live ? '' : ' low'}" style="--c:${info.color}" title="${esc(tip)}">${esc(s.text)}<span class="lbl">${esc(info.name.toUpperCase())}${live ? '' : ' ?'}</span></mark>`;
+      if (live && view === 'redact' && mode !== 'mask') html += `<mark class="pii swap" style="--c:${info.color}" title="${esc(info.name)}: replaced">${esc(replacementFor(s, tokens))}</mark>`;
+      else html += `<mark class="pii${live ? '' : ' low'}" style="--c:${info.color}" title="${esc(tip)}">${esc(s.text)}<span class="lbl">${esc(info.name.toUpperCase())}${live ? '' : ' ?'}</span></mark>`;
       pos = s.end;
     }
     html += esc(text.slice(pos));
     output.innerHTML = html;
   }
-  output.classList.toggle('redacted', view === 'redact');
+  output.classList.toggle('redacted', view === 'redact' && mode === 'mask');
+  renderTokenKey();
 
   const live = lastSpans.filter(redactable);
   const byType = {};
@@ -240,10 +242,59 @@ function render() {
   }).join('') : `<li class="none">${model ? 'No personal data found yet. Try one of the examples.' : 'Waiting for the model to load…'}</li>`;
 }
 
+// ---------- redaction modes ----------
+// mask: black bar · label: [NAME] · fake: realistic stand-in · token: <NAME_1>, reversible with the key
+let mode = 'mask';
+const hash = (str) => { let h = 2166136261; for (const c of str) h = Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0; return h; };
+const pick = (arr, h) => arr[h % arr.length];
+const FAKE_FIRST = ['Alex', 'Jordan', 'Taylor', 'Morgan', 'Casey', 'Riley', 'Jamie', 'Avery', 'Quinn', 'Rowan', 'Drew', 'Skyler'];
+const FAKE_LAST = ['Rivera', 'Brooks', 'Hayes', 'Bennett', 'Foster', 'Reed', 'Parker', 'Ellis', 'Morgan', 'Price', 'Shaw', 'Lane'];
+const TEST_CARDS = ['4111 1111 1111 1111', '5500 0000 0000 0004', '3782 822463 10005', '6011 1111 1111 1117'];
+function fakeFor(s) {
+  const t = s.type.toUpperCase(), h = hash(t + '|' + s.text);
+  const first = pick(FAKE_FIRST, h), last = pick(FAKE_LAST, h >>> 8);
+  if (/PERSON|NAME|PER$/.test(t)) return s.text.trim().includes(' ') ? `${first} ${last}` : first;
+  if (/EMAIL/.test(t)) return `${first}.${last}@example.com`.toLowerCase();
+  if (/PHONE/.test(t)) return `(202) 555-01${String(h % 100).padStart(2, '0')}`;     // 555-0100..0199 are reserved for fiction
+  if (/SSN/.test(t)) return `9${String(h % 100).padStart(2, '0')}-${String((h >>> 7) % 90 + 10)}-${String((h >>> 3) % 9000 + 1000)}`; // SSNs never start with 9
+  if (/CARD|CREDIT/.test(t)) { const c = TEST_CARDS.filter((x) => x.replace(/\D/g, '') !== s.text.replace(/\D/g, '')); return pick(c, h); } // public test card numbers
+  if (/IP/.test(t)) return `203.0.113.${h % 254 + 1}`;                                   // documentation-only range
+  return `[${typeInfo(s.type).name.toUpperCase()}]`;
+}
+function tokenTable() {
+  const byValue = new Map(), counts = {};
+  for (const s of lastSpans) {
+    if (!redactable(s)) continue;
+    const key = s.type + '|' + s.text;
+    if (byValue.has(key)) continue;
+    const name = typeInfo(s.type).name.toUpperCase().replace(/[^A-Z]+/g, '_');
+    counts[name] = (counts[name] || 0) + 1;
+    byValue.set(key, `<${name}_${counts[name]}>`);
+  }
+  return byValue;
+}
+function replacementFor(s, tokens) {
+  if (mode === 'label') return `[${typeInfo(s.type).name.toUpperCase()}]`;
+  if (mode === 'fake') return fakeFor(s);
+  if (mode === 'token') return tokens.get(s.type + '|' + s.text);
+  return '█'.repeat(s.text.length);
+}
 function redactedText() {
-  const text = input.value; let out = '', pos = 0;
-  for (const s of lastSpans) { if (!redactable(s)) continue; out += text.slice(pos, s.start) + `[${typeInfo(s.type).name.toUpperCase()}]`; pos = s.end; }
+  const text = input.value, tokens = tokenTable(); let out = '', pos = 0;
+  for (const s of lastSpans) { if (!redactable(s)) continue; out += text.slice(pos, s.start) + replacementFor(s, tokens); pos = s.end; }
   return out + text.slice(pos);
+}
+function renderTokenKey() {
+  const box = $('token-key'), tokens = tokenTable();
+  box.hidden = !(view === 'redact' && mode === 'token' && tokens.size);
+  if (box.hidden) return;
+  $('token-rows').innerHTML = [...tokens].map(([k, tok]) => `<tr><td><code>${esc(tok)}</code></td><td>${esc(k.slice(k.indexOf('|') + 1))}</td></tr>`).join('');
+  restore();
+}
+function restore() {
+  const tokens = tokenTable(), back = new Map([...tokens].map(([k, tok]) => [tok, k.slice(k.indexOf('|') + 1)]));
+  const src = $('restore-in').value;
+  $('restore-out').textContent = src ? src.replace(/<[A-Z_]+_\d+>/g, (m) => back.get(m) ?? m) : '';
 }
 
 let timer;
@@ -277,6 +328,12 @@ threshold.addEventListener('input', () => { $('threshold-value').textContent = `
 const setView = (v) => { view = v; $('view-highlight').setAttribute('aria-pressed', v === 'highlight'); $('view-redact').setAttribute('aria-pressed', v === 'redact'); render(); };
 $('view-highlight').addEventListener('click', () => setView('highlight'));
 $('view-redact').addEventListener('click', () => setView('redact'));
+document.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => {
+  mode = b.dataset.mode;
+  document.querySelectorAll('[data-mode]').forEach((x) => x.setAttribute('aria-checked', x === b));
+  setView('redact');
+}));
+$('restore-in').addEventListener('input', restore);
 $('copy').addEventListener('click', async () => {
   const btn = $('copy');
   try { await navigator.clipboard.writeText(redactedText()); btn.textContent = 'Copied!'; }

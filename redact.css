@@ -97,6 +97,22 @@ footer a{color:var(--accent)}
 .copy-code{position:absolute;top:8px;right:8px;border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:6px;padding:3px 9px;font-size:.72rem;cursor:pointer}
 .copy-code:hover{color:var(--text);border-color:#3d5264}
 .use-more{margin-top:18px;font-size:.92rem}
+.modes{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line);font-size:.75rem;color:var(--muted)}
+.modes span{margin-right:4px}
+.modes button{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:30px;padding:3px 10px;font-size:.74rem;cursor:pointer}
+.modes button:hover{color:var(--text);border-color:#3d5264}
+.modes button[aria-checked="true"]{border-color:var(--accent);color:var(--accent);font-weight:700}
+mark.pii.swap{color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);border-bottom-style:dotted;font-weight:600}
+.token-key{border-top:1px solid var(--line);padding:12px 14px;font-size:.82rem;color:var(--muted)}
+.token-key p{margin:0 0 8px}
+.token-key table{width:100%;border-collapse:collapse;margin-bottom:10px}
+.token-key th,.token-key td{text-align:left;padding:4px 6px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+.token-key th{font-size:.7rem;letter-spacing:.06em;text-transform:uppercase}
+.token-key td{color:var(--text)}
+.token-key label{display:block;font-weight:700;color:var(--text);margin-bottom:4px}
+.token-key textarea{min-height:0;flex:none;width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:8px;font:inherit;font-size:.85rem;resize:vertical}
+.restore-out{margin-top:6px;color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere}
+.restore-out:not(:empty):before{content:"Restored: ";color:var(--accent);font-weight:700}
 @media(max-width:900px){.panes{grid-template-columns:1fr}.steps{grid-template-columns:1fr}textarea,.output{min-height:200px}}
 @media(max-width:560px){
   main>section{padding-left:16px;padding-right:16px}
