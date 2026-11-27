@@ -1,6 +1,6 @@
-"""Hugging Face Space for piiguard (Gradio). Deployed by .github/workflows/deploy-space.yml."""
+"""Hugging Face Space for scrubpii (Gradio). Deployed by .github/workflows/deploy-space.yml."""
 import gradio as gr
-from piiguard import MODES, find, _apply
+from scrubpii import MODES, find, _apply
 
 EXAMPLES = [
     "Hi team, my name is Sarah Johnson and I can't log in. Reach me at sarah.johnson@example.com or 6626341142.",
@@ -23,9 +23,9 @@ def run(text, mode, min_score):
     return spans, redacted, table
 
 
-with gr.Blocks(title="piiguard: redact personal data") as demo:
-    gr.Markdown("# piiguard\nFind and redact personal data. `pip install piiguard` · "
-                "[docs](https://chadtollison.github.io/piiguard/) · runs locally in your own code")
+with gr.Blocks(title="scrubpii: redact personal data") as demo:
+    gr.Markdown("# scrubpii\nFind and redact personal data. `pip install scrubpii` · "
+                "[docs](https://chadtollison.github.io/scrubpii/) · runs locally in your own code")
     with gr.Row():
         with gr.Column():
             text = gr.Textbox(label="Text", lines=6, value=EXAMPLES[0])

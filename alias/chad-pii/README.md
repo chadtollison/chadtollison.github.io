@@ -1,10 +1,10 @@
-# chad-pii is now piiguard
+# chad-pii is now scrubpii
 
 This package was renamed. Install the new name:
 
 ```
-pip install piiguard
+pip install scrubpii
 ```
 
-`pip install chad-pii` still works: it installs piiguard, and `import chad_pii` and the `chad-pii`
-command keep working. See [piiguard on PyPI](https://pypi.org/project/piiguard/).
+`pip install chad-pii` still works: it installs scrubpii, and `import chad_pii` and the `chad-pii`
+command keep working. See [scrubpii on PyPI](https://pypi.org/project/scrubpii/).

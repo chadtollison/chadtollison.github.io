@@ -4,7 +4,7 @@ import re
 
 import pytest
 
-import piiguard as cp
+import scrubpii as cp
 
 NAMES = ["Sarah Johnson", "Raj Patel"]
 
@@ -86,7 +86,7 @@ def test_new_type_fakes():
 def test_server():
     pytest.importorskip("fastapi")
     from fastapi.testclient import TestClient
-    from piiguard.server import app
+    from scrubpii.server import app
     c = TestClient(app)
     assert c.get("/health").json()["ok"]
     r = c.post("/redact", json={"text": "Sarah Johnson, sarah@x.com", "mode": "token"}).json()
@@ -95,7 +95,7 @@ def test_server():
 
 
 def test_cli_file(tmp_path, capsys):
-    from piiguard.cli import main
+    from scrubpii.cli import main
     f = tmp_path / "x.json"
     f.write_text(json.dumps([{"who": "Sarah Johnson"}]))
     main(["--file", str(f)])

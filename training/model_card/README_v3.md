@@ -15,20 +15,20 @@ A DistilBERT (cased, 66M parameters) token classifier that finds 15 kinds of per
 names, addresses, emails, phone numbers, SSNs, card numbers, IBANs, passports, driver's licenses, ID numbers,
 dates of birth, usernames, passwords, IP addresses and API keys (BIO labels).
 
-The easiest way to use it is the [piiguard](https://pypi.org/project/piiguard/) package, which adds checksum rules
+The easiest way to use it is the [scrubpii](https://pypi.org/project/scrubpii/) package, which adds checksum rules
 (Luhn, IBAN, SSN), email/IP/API-key rules and reads long text in 128-token windows:
 
 ```python
-pip install piiguard
-from piiguard import redact
+pip install scrubpii
+from scrubpii import redact
 redact("Email sarah.j@example.com or call 415-555-0198")   # 'Email [EMAIL] or call [PHONE]'
 ```
 
 Try it in the browser (nothing leaves the page): https://chadtollison.github.io/redact.html
 
-## Head-to-head (F1, piiguard package with this model)
+## Head-to-head (F1, scrubpii package with this model)
 
-| Dataset (held-out texts) | piiguard | Microsoft Presidio | spaCy |
+| Dataset (held-out texts) | scrubpii | Microsoft Presidio | spaCy |
 |---|---:|---:|---:|
 | ai4privacy, English | 0.99 | 0.81 | 0.68 |
 | ai4privacy, Spanish | 0.99 | 0.63 | 0.46 |

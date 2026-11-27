@@ -3,7 +3,7 @@ requires = ["hatchling>=1.24"]
 build-backend = "hatchling.build"
 
 [project]
-name = "piiguard"
+name = "scrubpii"
 version = "0.3.0"
 description = "Find and redact 15 kinds of personal data in English and Spanish text, CSV, JSON and DataFrames, with a fine-tuned DistilBERT model plus checksum rules. Beats Microsoft Presidio on public benchmarks."
 readme = "README.md"
@@ -25,15 +25,15 @@ server = ["fastapi>=0.100", "uvicorn>=0.20"]
 pandas = ["pandas>=1.5"]
 
 [project.scripts]
-piiguard = "piiguard.cli:main"
+scrubpii = "scrubpii.cli:main"
 
 [project.urls]
 Homepage = "https://chadtollison.github.io/redact.html"
 Model = "https://huggingface.co/ChadTollison/pii-distilbert-v3"
-Source = "https://github.com/chadtollison/chadtollison.github.io/tree/main/piiguard"
+Source = "https://github.com/chadtollison/chadtollison.github.io/tree/main/scrubpii"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/piiguard"]
+packages = ["src/scrubpii"]
 
 [tool.hatch.build.targets.sdist]
 exclude = ["index.html"]

@@ -1,5 +1,5 @@
 # Builds the small "chad-pii" alias package (alias/chad-pii/), which installs
-# piiguard under the package's old name, and publishes it to PyPI when asked.
+# scrubpii under the package's old name, and publishes it to PyPI when asked.
 # PyPI trusts this workflow file for the chad-pii project (trusted publishing).
 # Publish: Actions tab -> "chad-pii alias package" -> Run workflow -> tick "publish".
 name: chad-pii alias package

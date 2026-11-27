@@ -1,7 +1,7 @@
-"""Public PII datasets, mapped onto piiguard's types.
+"""Public PII datasets, mapped onto scrubpii's types.
 
 Every loader returns a list of (text, spans), where each span is
-(start, end, TYPE) for a type piiguard models, or (start, end, None) for
+(start, end, TYPE) for a type scrubpii models, or (start, end, None) for
 personal data it doesn't label (dates, ages, company names ...). Training
 ignores the None spans instead of teaching them as "not personal data", and
 the benchmark still counts finds there as landing on personal data.
@@ -19,7 +19,7 @@ import re
 TYPES = ["PERSON", "EMAIL", "PHONE", "SSN", "CREDIT_CARD", "IP_ADDRESS", "PASSPORT", "DRIVER_LICENSE",
          "API_KEY", "IBAN", "ADDRESS", "ID_NUMBER", "DATE_OF_BIRTH", "USERNAME", "PASSWORD"]
 
-# Dataset label (lower case, no separators) -> piiguard type. Missing -> None (ignored).
+# Dataset label (lower case, no separators) -> scrubpii type. Missing -> None (ignored).
 LABEL_MAP = {
     # people
     "givenname": "PERSON", "surname": "PERSON", "name": "PERSON", "firstname": "PERSON", "lastname": "PERSON",

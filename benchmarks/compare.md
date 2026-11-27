@@ -1,4 +1,4 @@
-# piiguard vs Microsoft Presidio vs spaCy
+# scrubpii vs Microsoft Presidio vs spaCy
 
 Run on 2026-11-27 on a GitHub Actions runner (CPU only). Up to 1000 texts per dataset.
 
@@ -8,14 +8,14 @@ Run on 2026-11-27 on a GitHub Actions runner (CPU only). Up to 1000 texts per da
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| piiguard v3 | 99% | 99% | 100% | **0.993** | 31 |
-| piiguard v2 (current) | 81% | 73% | 94% | 0.869 | 30 |
+| scrubpii v3 | 99% | 99% | 100% | **0.993** | 31 |
+| scrubpii v2 (current) | 81% | 73% | 94% | 0.869 | 30 |
 | Microsoft Presidio | 74% | 67% | 90% | 0.814 | 7 |
 | spaCy (en_core_web_lg) | 52% | 46% | 98% | 0.676 | 6 |
 
 Caught, by type:
 
-| Type | Items | piiguard v3 | piiguard v2 (current) | Microsoft Presidio | spaCy (en_core_web_lg) |
+| Type | Items | scrubpii v3 | scrubpii v2 (current) | Microsoft Presidio | spaCy (en_core_web_lg) |
 |---|---:|---:|---:|---:|---:|
 | ADDRESS | 319 | 99% | 68% | 66% | 61% |
 | CREDIT_CARD | 13 | 100% | 8% | 62% | 0% |
@@ -31,14 +31,14 @@ Caught, by type:
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| piiguard v3 | 99% | 98% | 99% | **0.991** | 39 |
-| piiguard v2 (current) | 74% | 64% | 63% | 0.679 | 38 |
+| scrubpii v3 | 99% | 98% | 99% | **0.991** | 39 |
+| scrubpii v2 (current) | 74% | 64% | 63% | 0.679 | 38 |
 | Microsoft Presidio | 61% | 52% | 65% | 0.629 | 7 |
 | spaCy (en_core_web_lg) | 41% | 34% | 52% | 0.461 | 6 |
 
 Caught, by type:
 
-| Type | Items | piiguard v3 | piiguard v2 (current) | Microsoft Presidio | spaCy (en_core_web_lg) |
+| Type | Items | scrubpii v3 | scrubpii v2 (current) | Microsoft Presidio | spaCy (en_core_web_lg) |
 |---|---:|---:|---:|---:|---:|
 | ADDRESS | 169 | 98% | 77% | 36% | 32% |
 | CREDIT_CARD | 14 | 100% | 21% | 64% | 14% |
@@ -54,14 +54,14 @@ Caught, by type:
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| piiguard v3 | 100% | 99% | 99% | **0.992** | 59 |
-| piiguard v2 (current) | 69% | 58% | 90% | 0.781 | 58 |
+| scrubpii v3 | 100% | 99% | 99% | **0.992** | 59 |
+| scrubpii v2 (current) | 69% | 58% | 90% | 0.781 | 58 |
 | Microsoft Presidio | 87% | 75% | 83% | 0.852 | 14 |
 | spaCy (en_core_web_lg) | 22% | 14% | 85% | 0.356 | 12 |
 
 Caught, by type:
 
-| Type | Items | piiguard v3 | piiguard v2 (current) | Microsoft Presidio | spaCy (en_core_web_lg) |
+| Type | Items | scrubpii v3 | scrubpii v2 (current) | Microsoft Presidio | spaCy (en_core_web_lg) |
 |---|---:|---:|---:|---:|---:|
 | ADDRESS | 312 | 100% | 92% | 81% | 75% |
 | API_KEY | 7 | 100% | 57% | 29% | 14% |
@@ -80,14 +80,14 @@ Caught, by type:
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| piiguard v3 | 74% | 68% | 84% | **0.789** | 336 |
-| piiguard v2 (current) | 86% | 60% | 53% | 0.654 | 333 |
+| scrubpii v3 | 74% | 68% | 84% | **0.789** | 336 |
+| scrubpii v2 (current) | 86% | 60% | 53% | 0.654 | 333 |
 | Microsoft Presidio | 81% | 56% | 38% | 0.521 | 60 |
 | spaCy (en_core_web_lg) | 55% | 34% | 61% | 0.580 | 51 |
 
 Caught, by type:
 
-| Type | Items | piiguard v3 | piiguard v2 (current) | Microsoft Presidio | spaCy (en_core_web_lg) |
+| Type | Items | scrubpii v3 | scrubpii v2 (current) | Microsoft Presidio | spaCy (en_core_web_lg) |
 |---|---:|---:|---:|---:|---:|
 | ADDRESS | 801 | 82% | 91% | 78% | 73% |
 | API_KEY | 19 | 84% | 42% | 16% | 0% |
@@ -104,6 +104,6 @@ Caught, by type:
 | SSN | 32 | 84% | 88% | 75% | 0% |
 | USERNAME | 11 | 91% | 46% | 36% | 9% |
 
-Presidio runs with its defaults (spaCy en_core_web_lg, all recognizers, English). On Spanish text every system uses its English setup except piiguard, which trains on Spanish too.
+Presidio runs with its defaults (spaCy en_core_web_lg, all recognizers, English). On Spanish text every system uses its English setup except scrubpii, which trains on Spanish too.
 
 Data: ai4privacy open-pii-masking-500k (CC BY 4.0), Gretel gretel-pii-masking-en-v1 and synthetic_pii_finance_multilingual (Apache 2.0).

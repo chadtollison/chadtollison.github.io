@@ -1,5 +1,5 @@
 """Tests that don't need the model: a fake pipeline stands in for it."""
-import piiguard as cp
+import scrubpii as cp
 
 
 def fake_model(found):

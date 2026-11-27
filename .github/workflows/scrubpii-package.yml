@@ -1,8 +1,8 @@
-# Tests the piiguard Python package (in piiguard/) and, when you ask it to,
+# Tests the scrubpii Python package (in scrubpii/) and, when you ask it to,
 # publishes it to PyPI. Publishing uses PyPI "trusted publishing", so there is
 # no token to store: PyPI trusts this workflow once you add it as a publisher.
-# Publish: Actions tab -> "piiguard package" -> Run workflow -> tick "publish".
-name: piiguard package
+# Publish: Actions tab -> "scrubpii package" -> Run workflow -> tick "publish".
+name: scrubpii package
 
 on:
   workflow_dispatch:
@@ -13,7 +13,7 @@ on:
         default: false
   push:
     branches: [main, "claude/**"]
-    paths: ["piiguard/**", ".github/workflows/piiguard-package.yml"]
+    paths: ["scrubpii/**", ".github/workflows/scrubpii-package.yml"]
 
 jobs:
   test:
@@ -28,16 +28,16 @@ jobs:
         run: |
           pip install --index-url https://download.pytorch.org/whl/cpu "torch>=2.6"
           pip install build
-          pip install "./piiguard[test]"
+          pip install "./scrubpii[test]"
       - name: Unit tests
-        run: pytest -q piiguard/tests
+        run: pytest -q scrubpii/tests
       - name: Try it with the real model
         run: |
           python - <<'PY'
-          from piiguard import redact, tokenize, restore, find
+          from scrubpii import redact, tokenize, restore, find
           text = "Hi, I'm Sarah Johnson. Email sarah.j@example.com or call 6626341142. IBAN GB82 WEST 1234 5698 7654 32."
           print(redact(text))
-          from piiguard import redact_many, redact_json, Guard
+          from scrubpii import redact_many, redact_json, Guard
           print(redact_many([text, "Raj Patel, raj@example.com"]))
           print(redact_json({"a": {"b": text}}))
           for m in ("mask", "fake"):
@@ -49,12 +49,12 @@ jobs:
           for secret in ("Sarah Johnson", "sarah.j@example.com", "6626341142", "GB82 WEST"):
               assert secret not in out, secret
           PY
-          piiguard --find "My SSN is 123-45-6789"
+          scrubpii --find "My SSN is 123-45-6789"
       - name: Build
-        run: python -m build piiguard --outdir dist
+        run: python -m build scrubpii --outdir dist
       - uses: actions/upload-artifact@v4
         with:
-          name: piiguard-dist
+          name: scrubpii-dist
           path: dist
 
   publish:
@@ -67,6 +67,6 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: piiguard-dist
+          name: scrubpii-dist
           path: dist
       - uses: pypa/gh-action-pypi-publish@release/v1

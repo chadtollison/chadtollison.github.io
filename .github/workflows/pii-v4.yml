@@ -1,8 +1,8 @@
-# piiguard v4 candidates, trained side by side on free CPU runners:
+# scrubpii v4 candidates, trained side by side on free CPU runners:
 #   long:  v3 trained further with long documents (joined texts, 512 tokens)
 #   large: DeBERTa-v3-small, a bigger model for the Python package
 # Then both are compared with v3, Presidio and spaCy (benchmarks/compare-v4.*).
-name: piiguard v4 candidates
+name: scrubpii v4 candidates
 on:
   workflow_dispatch:
     inputs:
@@ -61,7 +61,7 @@ jobs:
         run: |
           pip install --extra-index-url https://download.pytorch.org/whl/cpu ${{ env.PIP_DEPS }} "presidio-analyzer==2.2.355"
           python -m spacy download en_core_web_lg -q
-          pip install --no-deps ./piiguard
+          pip install --no-deps ./scrubpii
       - uses: actions/download-artifact@v4
         with: { name: v3-model, path: build/v3, run-id: "${{ env.V3_RUN }}", github-token: "${{ github.token }}" }
       - uses: actions/download-artifact@v4
@@ -73,9 +73,9 @@ jobs:
       - name: Compare
         run: |
           cd training
-          S="--system piiguard:../build/v3=piiguard-v3"
-          [ -f ../build/long/config.json ] && S="$S --system piiguard:../build/long=v4-long-documents"
-          [ -f ../build/large/config.json ] && S="$S --system piiguard:../build/large=v4-large-DeBERTa"
+          S="--system scrubpii:../build/v3=scrubpii-v3"
+          [ -f ../build/long/config.json ] && S="$S --system scrubpii:../build/long=v4-long-documents"
+          [ -f ../build/large/config.json ] && S="$S --system scrubpii:../build/large=v4-large-DeBERTa"
           python compare.py --rows 1000 --out compare-v4 $S --system presidio --system spacy
           cat ../benchmarks/compare-v4.md >> "$GITHUB_STEP_SUMMARY"
           cat ../build/*/training.json || true
@@ -84,6 +84,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
           git add benchmarks/compare-v4.*
-          git commit -m "piiguard v4 candidates: benchmark vs v3, Presidio and spaCy" || exit 0
+          git commit -m "scrubpii v4 candidates: benchmark vs v3, Presidio and spaCy" || exit 0
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"

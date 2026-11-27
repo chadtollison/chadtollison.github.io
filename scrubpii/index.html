@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="piiguard: find and redact personal data in Python with one line. Fine-tuned transformer plus checksum rules, runs fully offline, benchmarked against Microsoft Presidio.">
+  <meta name="description" content="scrubpii: find and redact personal data in Python with one line. Fine-tuned transformer plus checksum rules, runs fully offline, benchmarked against Microsoft Presidio.">
   <meta name="theme-color" content="#090d12">
-  <title>piiguard | Redact personal data in Python</title>
+  <title>scrubpii | Redact personal data in Python</title>
   <link rel="stylesheet" href="../styles.css?v=2026-11-26b">
   <link rel="stylesheet" href="../redact.css?v=2026-11-27d">
   <style>
@@ -44,16 +44,16 @@
   <main>
     <section class="demo-hero docs">
       <p class="kicker">PYTHON PACKAGE · MIT · RUNS OFFLINE</p>
-      <h1>piiguard<em>.</em></h1>
+      <h1>scrubpii<em>.</em></h1>
       <p class="lead">Find and redact personal data with one line of Python. A fine-tuned transformer finds names, emails, phones, IDs, cards, addresses, keys and more, in English and Spanish, and checksum rules double-check it. Everything runs on your machine.</p>
-      <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>pip install piiguard</code></pre></div>
-      <div class="code"><pre><code>&gt;&gt;&gt; from piiguard import redact
+      <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>pip install scrubpii</code></pre></div>
+      <div class="code"><pre><code>&gt;&gt;&gt; from scrubpii import redact
 &gt;&gt;&gt; redact("Hi, I'm Sarah Johnson. Email sarah.j@example.com or call 6626341142.")
 "Hi, I'm [PERSON]. Email [EMAIL] or call [PHONE]."</code></pre></div>
       <div class="buttons">
-        <a class="primary" href="https://pypi.org/project/piiguard/" target="_blank" rel="noreferrer">PyPI ↗</a>
+        <a class="primary" href="https://pypi.org/project/scrubpii/" target="_blank" rel="noreferrer">PyPI ↗</a>
         <a class="secondary" href="../redact.html">Try it in the browser</a>
-        <a class="secondary" href="https://github.com/chadtollison/chadtollison.github.io/tree/main/piiguard" target="_blank" rel="noreferrer">Source ↗</a>
+        <a class="secondary" href="https://github.com/chadtollison/chadtollison.github.io/tree/main/scrubpii" target="_blank" rel="noreferrer">Source ↗</a>
       </div>
       <nav class="toc" aria-label="On this page">
         <a href="#why">Why</a><a href="#benchmark">Benchmark</a><a href="#modes">Redaction modes</a><a href="#data">JSON, CSV, pandas</a>
@@ -62,7 +62,7 @@
     </section>
 
     <section class="docs">
-      <h2 id="why">Why piiguard</h2>
+      <h2 id="why">Why scrubpii</h2>
       <div class="facts">
         <div><strong>One line</strong><span><code>redact(text)</code>. No engines, recognizers or NLP models to configure.</span></div>
         <div><strong>Model plus rules</strong><span>A transformer for context, and Luhn, IBAN and SSN checks for certainty.</span></div>
@@ -74,7 +74,7 @@
       <div id="cmp" class="cmp"></div>
 
       <h2 id="modes">Redaction modes</h2>
-      <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>from piiguard import redact, tokenize, restore
+      <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>from scrubpii import redact, tokenize, restore
 
 text = "Call Sarah Johnson at 662-634-1142."
 redact(text)                 # Call [PERSON] at [PHONE].
@@ -87,17 +87,17 @@ restore(safe, key) == text   # True</code></pre></div>
 
       <h2 id="data">JSON, CSV and pandas</h2>
       <p>These collect every string and run the model in batches, so they're much faster than a loop.</p>
-      <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>from piiguard import redact_many, redact_json, redact_csv, redact_dataframe
+      <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>from scrubpii import redact_many, redact_json, redact_csv, redact_dataframe
 
 redact_many(["Call Sarah at 6626341142", "Email raj@example.com"])
 redact_json({"user": {"name": "Sarah Johnson", "email": "sarah.j@example.com", "age": 41}})
 # {"user": {"name": "[PERSON]", "email": "[EMAIL]", "age": 41}}
 redact_csv(open("customers.csv").read(), columns=["name", "email", "notes"], mode="token")
-safe_df = redact_dataframe(df, mode="fake")     # pip install "piiguard[pandas]"</code></pre></div>
+safe_df = redact_dataframe(df, mode="fake")     # pip install "scrubpii[pandas]"</code></pre></div>
 
       <h2 id="llm">Keep personal data out of LLM prompts</h2>
       <p>Scrub prompts before they reach a hosted model, then put the real values back into its reply. One key covers the whole conversation, so the same person stays <code>&lt;PERSON_1&gt;</code> in every turn.</p>
-      <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>from piiguard import Guard
+      <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>from scrubpii import Guard
 
 guard = Guard()
 safe = guard.scrub("Write to Sarah Johnson (sarah.j@example.com) about her refund")
@@ -109,18 +109,18 @@ ask = guard.wrap(call_your_llm)            # or wrap the call once
 scrub, unscrub = guard.langchain()         # LangChain: scrub | prompt | llm | parser | unscrub</code></pre></div>
 
       <h2 id="api">HTTP API</h2>
-      <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>pip install "piiguard[server]"
-piiguard serve --port 8000
+      <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>pip install "scrubpii[server]"
+scrubpii serve --port 8000
 
 curl -X POST localhost:8000/redact -H 'content-type: application/json' \
      -d '{"text": "Call Sarah at 6626341142", "mode": "token"}'</code></pre></div>
       <p>The endpoints are <code>POST /redact</code>, <code>POST /find</code>, <code>POST /restore</code> and <code>GET /health</code>, with interactive docs at <code>/docs</code>.</p>
 
       <h2 id="cli">Command line</h2>
-      <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>piiguard "Call Sarah at 662-634-1142"
-cat notes.txt | piiguard --mode mask &gt; notes-safe.txt
-piiguard --file customers.csv --columns name,email -o customers-safe.csv   # .csv .json .jsonl .txt
-piiguard --find "My SSN is 123-45-6789"</code></pre></div>
+      <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>scrubpii "Call Sarah at 662-634-1142"
+cat notes.txt | scrubpii --mode mask &gt; notes-safe.txt
+scrubpii --file customers.csv --columns name,email -o customers-safe.csv   # .csv .json .jsonl .txt
+scrubpii --find "My SSN is 123-45-6789"</code></pre></div>
 
       <h2 id="types">What it finds</h2>
       <div class="wrap-x"><table class="plain">
@@ -141,13 +141,13 @@ piiguard --find "My SSN is 123-45-6789"</code></pre></div>
       <p>The last two rows arrive with the v3 model, trained on public PII data.</p>
 
       <h2 id="privacy">Privacy</h2>
-      <p>piiguard downloads its model once from Hugging Face and caches it. After that, nothing you redact goes anywhere. Set <code>HF_HUB_OFFLINE=1</code> to make sure no network call is even attempted. The browser demo runs the same model on your device with ONNX Runtime.</p>
+      <p>scrubpii downloads its model once from Hugging Face and caches it. After that, nothing you redact goes anywhere. Set <code>HF_HUB_OFFLINE=1</code> to make sure no network call is even attempted. The browser demo runs the same model on your device with ONNX Runtime.</p>
       <p>Training data credits: <a href="https://huggingface.co/datasets/ai4privacy/open-pii-masking-500k-ai4privacy" target="_blank" rel="noreferrer">ai4privacy open-pii-masking-500k</a> (CC BY 4.0) and <a href="https://huggingface.co/datasets/gretelai/gretel-pii-masking-en-v1" target="_blank" rel="noreferrer">Gretel PII masking</a> (Apache 2.0), plus generated data.</p>
       <p class="note">This is a research model, so it can miss things or flag things by mistake. Please don't rely on it alone for compliance work.</p>
     </section>
   </main>
 
-  <footer><span>Michael Chad Tollison</span><span>piiguard · MIT</span><span><a href="../">Portfolio</a></span></footer>
+  <footer><span>Michael Chad Tollison</span><span>scrubpii · MIT</span><span><a href="../">Portfolio</a></span></footer>
   <script>
     document.querySelectorAll('.copy-code').forEach((b) => b.addEventListener('click', async () => {
       try { await navigator.clipboard.writeText(b.nextElementSibling.innerText); b.textContent = 'Copied'; setTimeout(() => (b.textContent = 'Copy'), 1400); } catch (e) {}

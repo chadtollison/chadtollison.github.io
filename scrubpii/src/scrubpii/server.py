@@ -1,4 +1,4 @@
-"""A small HTTP API:  pip install "piiguard[server]"  then  piiguard serve
+"""A small HTTP API:  pip install "scrubpii[server]"  then  scrubpii serve
 
 POST /redact    {"text": "...", "mode": "label|mask|fake|token"}  -> {"text": "...", "key": {...}}
 POST /find      {"text": "..."}                                   -> {"entities": [...]}
@@ -15,7 +15,7 @@ from pydantic import BaseModel
 
 from . import MODES, __version__, _apply, find, restore
 
-app = FastAPI(title="piiguard", version=__version__,
+app = FastAPI(title="scrubpii", version=__version__,
               description="Find and redact personal data. Runs locally; nothing leaves this machine.")
 
 

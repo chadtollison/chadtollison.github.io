@@ -1,6 +1,6 @@
 """Find and redact personal data in text.
 
-    >>> from piiguard import redact
+    >>> from scrubpii import redact
     >>> redact("Hi, I'm Sarah Johnson. Call 662-634-1142.")
     "Hi, I'm [PERSON]. Call [PHONE]."
 
@@ -33,7 +33,7 @@ SURE = 0.95     # model confidence that overrides a failed format/checksum check
 # Long text is read in windows of this many tokens. The model learned on short
 # texts, and on long documents it finds much more when it reads them in short
 # pieces (finance set: 0.65 F1 with 512-token windows, 0.76 with 128).
-WINDOW = int(os.environ.get("PIIGUARD_WINDOW") or os.environ.get("CHAD_PII_WINDOW") or "128")
+WINDOW = int(os.environ.get("SCRUBPII_WINDOW") or os.environ.get("CHAD_PII_WINDOW") or "128")
 
 _pipeline = None
 _pipeline_id = None
