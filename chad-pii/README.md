@@ -68,13 +68,66 @@ for e in find(text):
 `min_score` (default 0.5) sets how sure the model must be. Items caught or
 confirmed by a rule are always returned.
 
+## Many texts, JSON, CSV and pandas
+
+Each of these batches the work, so it's much faster than a loop:
+
+```python
+from chad_pii import redact_many, redact_json, redact_csv, redact_dataframe
+
+redact_many(["Call Sarah at 6626341142", "Email raj@example.com"])
+
+redact_json({"user": {"name": "Sarah Johnson", "email": "sarah.j@example.com", "age": 41}})
+# {"user": {"name": "[PERSON]", "email": "[EMAIL]", "age": 41}}
+
+redact_csv(open("customers.csv").read(), columns=["name", "email", "notes"])
+
+safe_df = redact_dataframe(df, mode="fake")        # pip install "chad-pii[pandas]"
+```
+
+## Keep personal data out of LLM prompts
+
+```python
+from chad_pii import Guard
+
+guard = Guard()
+safe = guard.scrub("Write to Sarah Johnson (sarah.j@example.com) about her refund")
+# "Write to <PERSON_1> (<EMAIL_1>) about her refund"   <- this is all the LLM sees
+reply = call_your_llm(safe)                            # "Dear <PERSON_1>, ..."
+guard.restore(reply)                                   # "Dear Sarah Johnson, ..."
+
+ask = guard.wrap(call_your_llm)                        # or wrap the call once
+```
+
+The guard keeps one key for the whole conversation, so the same person stays
+`<PERSON_1>` in every turn. With LangChain:
+`scrub, restore = guard.langchain()` then `chain = scrub | prompt | llm | parser | restore`.
+
+## HTTP API
+
+```bash
+pip install "chad-pii[server]"
+chad-pii serve --port 8000
+curl -X POST localhost:8000/redact -H 'content-type: application/json' \
+     -d '{"text": "Call Sarah at 6626341142", "mode": "token"}'
+```
+
+Endpoints: `POST /redact`, `POST /find`, `POST /restore`, `GET /health`, with
+interactive docs at `/docs`. It runs on your machine, so nothing is sent anywhere.
+
 ## Command line
 
 ```bash
 chad-pii "Call Sarah at 662-634-1142"
 cat notes.txt | chad-pii --mode mask > notes-redacted.txt
 chad-pii --find "My SSN is 123-45-6789"
+chad-pii --file customers.csv --columns name,email -o customers-safe.csv   # also .json, .jsonl, .txt
 ```
+
+## Offline use
+
+After the first run the model is cached, and nothing is ever sent anywhere.
+To be sure no network call is attempted, set `HF_HUB_OFFLINE=1`.
 
 ## Limits
 

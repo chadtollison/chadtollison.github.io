@@ -21,8 +21,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-__all__ = ["Entity", "find", "redact", "tokenize", "restore", "MODEL_ID"]
-__version__ = "0.1.0"
+__all__ = ["Entity", "find", "find_many", "redact", "redact_many", "tokenize", "restore", "fake_for", "MODEL_ID",
+           "redact_json", "redact_csv", "redact_dataframe", "Guard"]
+__version__ = "0.2.0"
 
 MODEL_ID = "ChadTollison/pii-distilbert-v2"
 MODES = ("label", "mask", "fake", "token")
@@ -125,9 +126,9 @@ def _get_pipeline(model: str):
     return _pipeline
 
 
-def _model_entities(text: str, model: str) -> List[Entity]:
+def _model_entities(text: str, model: str, items=None) -> List[Entity]:
     out = []
-    for item in _get_pipeline(model)(text):
+    for item in (items if items is not None else _get_pipeline(model)(text)):
         s, e = item["start"], item["end"]
         while s < e and text[s].isspace():
             s += 1
@@ -206,16 +207,32 @@ def find(text: str, min_score: float = 0.5, model: str = MODEL_ID) -> List[Entit
     """
     if not text.strip():
         return []
-    ents = _model_entities(text, model)
+    return _finish(text, _model_entities(text, model), min_score)
+
+
+def _finish(text: str, ents: List[Entity], min_score: float) -> List[Entity]:
     _grow(ents, text)
     ents = _rules(ents, text)
     return [e for e in ents if e.rule or (e.score >= min_score and _valid(e))]
+
+
+def find_many(texts: List[str], min_score: float = 0.5, model: str = MODEL_ID, batch_size: int = 16) -> List[List[Entity]]:
+    """find() for many texts at once. Batched, so much faster than a loop."""
+    texts = list(texts)
+    todo = [i for i, t in enumerate(texts) if t and t.strip()]
+    out: List[List[Entity]] = [[] for _ in texts]
+    if todo:
+        results = _get_pipeline(model)([texts[i] for i in todo], batch_size=batch_size)
+        for i, items in zip(todo, results):
+            out[i] = _finish(texts[i], _model_entities(texts[i], model, items), min_score)
+    return out
 
 
 # ---------------------------------------------------------------- redaction
 _FIRST = ["Alex", "Jordan", "Taylor", "Morgan", "Casey", "Riley", "Jamie", "Avery", "Quinn", "Rowan", "Drew", "Skyler"]
 _LAST = ["Rivera", "Brooks", "Hayes", "Bennett", "Foster", "Reed", "Parker", "Ellis", "Price", "Shaw", "Lane", "Cole"]
 _CARDS = ["4111 1111 1111 1111", "5500 0000 0000 0004", "3782 822463 10005", "6011 1111 1111 1117"]
+_STREETS = ["Example Street", "Sample Avenue", "Placeholder Road", "Fictional Lane", "Demo Drive"]
 _IBANS = ["GB82 WEST 1234 5698 7654 32", "DE89 3704 0044 0532 0130 00", "FR14 2004 1010 0505 0001 3M02 606"]
 
 
@@ -250,15 +267,30 @@ def fake_for(e: Entity) -> str:
         return f"D{h % 10**7:07d}"
     if e.type == "API_KEY":
         return f"sk_example_{h:016x}"[:27]
+    if e.type == "ADDRESS":
+        return f"{h % 900 + 100} {_STREETS[h % len(_STREETS)]}"
+    if e.type == "ID_NUMBER":
+        return f"ID-{h % 10**8:08d}"
+    if e.type == "DATE_OF_BIRTH":
+        return f"01/01/{1950 + h % 50}"
+    if e.type == "USERNAME":
+        return f"user{h % 10**5:05d}"
+    if e.type == "PASSWORD":
+        return "********"
     return f"[{e.type}]"
 
 
-def _apply(text: str, ents: List[Entity], mode: str) -> Tuple[str, Dict[str, str]]:
+def _apply(text: str, ents: List[Entity], mode: str, key: Optional[Dict[str, str]] = None) -> Tuple[str, Dict[str, str]]:
     if mode not in MODES:
         raise ValueError(f"mode must be one of {MODES}")
-    key: Dict[str, str] = {}
+    key = {} if key is None else key          # token -> real value; reused across calls when given
     tokens: Dict[Tuple[str, str], str] = {}
     counts: Dict[str, int] = {}
+    for tok, val in key.items():
+        m = re.fullmatch(r"<([A-Z_]+)_(\d+)>", tok)
+        if m:
+            tokens[(m[1], val)] = tok
+            counts[m[1]] = max(counts.get(m[1], 0), int(m[2]))
     out, pos = [], 0
     for e in ents:
         if mode == "label":
@@ -288,15 +320,27 @@ def redact(text: str, mode: str = "label", min_score: float = 0.5, model: str = 
     return _apply(text, find(text, min_score, model), mode)[0]
 
 
-def tokenize(text: str, min_score: float = 0.5, model: str = MODEL_ID) -> Tuple[str, Dict[str, str]]:
+def redact_many(texts: List[str], mode: str = "label", min_score: float = 0.5, model: str = MODEL_ID) -> List[str]:
+    """redact() for many texts at once (batched)."""
+    texts = list(texts)
+    return [_apply(t, ents, mode)[0] for t, ents in zip(texts, find_many(texts, min_score, model))]
+
+
+def tokenize(text: str, min_score: float = 0.5, model: str = MODEL_ID,
+             key: Optional[Dict[str, str]] = None) -> Tuple[str, Dict[str, str]]:
     """Replace personal data with tokens like <PERSON_1>. Returns (text, key).
 
     Keep the key somewhere safe; restore(text, key) puts the real values back.
-    The same value always gets the same token within one call.
+    The same value always gets the same token. Pass the key from an earlier
+    call to keep tokens consistent across several texts (e.g. a chat).
     """
-    return _apply(text, find(text, min_score, model), "token")
+    return _apply(text, find(text, min_score, model), "token", key)
 
 
 def restore(text: str, key: Dict[str, str]) -> str:
     """Put real values back into tokenized text."""
     return re.sub(r"<[A-Z_]+_\d+>", lambda m: key.get(m.group(), m.group()), text)
+
+
+from .structured import redact_csv, redact_dataframe, redact_json  # noqa: E402
+from .guard import Guard  # noqa: E402
