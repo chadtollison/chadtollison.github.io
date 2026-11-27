@@ -17,7 +17,7 @@ classifiers = [
   "Topic :: Text Processing :: Linguistic",
   "Intended Audience :: Developers",
 ]
-dependencies = ["transformers>=4.40", "torch>=2.1"]
+dependencies = ["transformers>=4.40", "torch>=2.6"]
 
 [project.optional-dependencies]
 test = ["pytest>=7"]

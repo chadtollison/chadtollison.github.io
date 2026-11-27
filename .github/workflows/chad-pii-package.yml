@@ -26,7 +26,8 @@ jobs:
           python-version: "3.11"
       - name: Install
         run: |
-          pip install --extra-index-url https://download.pytorch.org/whl/cpu "torch==2.4.1" build
+          pip install --index-url https://download.pytorch.org/whl/cpu "torch>=2.6"
+          pip install build
           pip install "./chad-pii[test]"
       - name: Unit tests
         run: pytest -q chad-pii/tests
