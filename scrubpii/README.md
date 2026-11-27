@@ -31,16 +31,31 @@ F1 on held-out public data (full results in
 
 | Dataset | scrubpii | Microsoft Presidio | spaCy |
 |---|---:|---:|---:|
-| ai4privacy, English | 0.99 | 0.81 | 0.68 |
-| ai4privacy, Spanish | 0.99 | 0.63 | 0.46 |
-| Gretel PII, English | 0.99 | 0.85 | 0.36 |
-| Gretel finance (never trained on) | 0.79 | 0.52 | 0.58 |
+| ai4privacy, English | **0.99** | 0.81 | 0.68 |
+| ai4privacy, Spanish | **0.99** | 0.63 | 0.46 |
+| Gretel PII, English | **0.99** | 0.85 | 0.36 |
+| Gretel finance (never trained on) | **0.80** | 0.52 | 0.58 |
+| Medical records (never trained on) | **0.91** | 0.82 | 0.47 |
+| Support tickets, emails, transcripts (never trained on) | **0.87** | 0.78 | 0.57 |
+| Logs and config files (never trained on) | **0.88** | 0.72 | 0.31 |
 
-Presidio is about 4x faster per text.
+The last three come from NVIDIA's Nemotron-PII (CC BY 4.0). Presidio flags
+more text, so on long, unfamiliar documents it touches 3 to 7 points more of
+the real items, mostly first names on their own. But a quarter or more of what
+it flags there isn't personal data, while 97 to 99% of scrubpii's finds are.
+
+Install and speed ([benchmarks/speed.md](https://github.com/chadtollison/chadtollison.github.io/blob/main/benchmarks/speed.md)):
+
+| | scrubpii 0.4 | Microsoft Presidio |
+|---|---:|---:|
+| Install size, with model | **288 MB** | 815 MB |
+| Start-up (new process, first answer) | **0.6 s** | 1.5 s |
+| Short texts (ai4privacy) | **6 ms** | 8 ms |
+| Long documents (finance) | 95 ms | **59 ms** |
 
 It runs on ONNX Runtime, so there is no PyTorch to install. The 8-bit model
 (about 66 MB) downloads on first use and is cached, so after that it starts in
-a couple of seconds and works offline. Nothing is sent anywhere. If you already
+under a second and works offline. Nothing is sent anywhere. If you already
 use PyTorch, `pip install "scrubpii[torch]"` and set `SCRUBPII_BACKEND=torch`.
 
 Try it in your browser first: [chadtollison.github.io/redact.html](https://chadtollison.github.io/redact.html)
