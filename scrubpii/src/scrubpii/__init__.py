@@ -121,6 +121,25 @@ def ssn_ok(s: str) -> bool:
     return bool(m) and m[1] not in ("000", "666") and m[1][0] != "9" and m[2] != "00" and m[3] != "0000"
 
 
+# Phone numbers whose area code isn't real still deserve hiding when the text
+# says they're phone numbers ("Call us at 1-800-123-4567") or when they're
+# written the way only phone numbers are written: "(123) 456-7890".
+PHONE_WORDS_RE = re.compile(r"(?i)(?:phone|tel\b|tel\.|telephone|call|contact|mobile|cell|fax|text me|whatsapp|"
+                            r"reach (?:me|us)|hotline|helpline|toll[- ]free|teléfono|telefono|móvil|movil|llam|"
+                            r"téléphone|telefon|handy)")
+FORMATTED_PHONE_RE = re.compile(r"(?<![\w+-])(?:\+?1[ .-])?\(\d{3}\) ?\d{3}[ .-]\d{4}\b"
+                                r"|(?<![\w+-])\+?1-\d{3}-\d{3}-\d{4}\b")
+INTL_PHONE_RE = re.compile(r"(?<![\w+])(?:\[\+\d{1,3}\]|\+\d{1,3})(?:[ .-]?\(?\d{1,5}\)?){1,5}(?![\w-])")
+
+
+def phone_context(text: str, start: int, window: int = 40) -> bool:
+    return bool(PHONE_WORDS_RE.search(text[max(0, start - window):start]))
+
+
+def intl_phone_ok(s: str) -> bool:
+    return 8 <= len(re.sub(r"\D", "", s)) <= 15
+
+
 def us_phone_ok(s: str) -> bool:
     d = re.sub(r"\D", "", s)
     if len(d) == 11 and d[0] == "1":
@@ -351,6 +370,9 @@ def _grow(ents: List[Entity], text: str) -> None:
 
 def _rules(ents: List[Entity], text: str) -> List[Entity]:
     checks = [("PHONE", PHONE_RE, us_phone_ok, "real US/Canada area code"),
+              ("PHONE", FORMATTED_PHONE_RE, lambda s: True, "written like a phone number"),
+              ("PHONE", INTL_PHONE_RE, intl_phone_ok, "international phone number (+country code)"),
+              ("PHONE", PHONE_RE, "context", "phone-shaped number after 'phone', 'call' or 'contact'"),
               ("IBAN", IBAN_RE, iban_ok, "IBAN checksum"),
               ("API_KEY", API_KEY_RE, lambda s: True, "known API key format"),
               ("CREDIT_CARD", CARD_RE, luhn_ok, "card number with valid Luhn checksum"),
@@ -364,7 +386,10 @@ def _rules(ents: List[Entity], text: str) -> List[Entity]:
         for m in rx.finditer(text):
             g = 1 if rx in (SSN_BARE_RE, DOB_RE) else 0
             ms, me = m.start(g), m.end(g)
-            if not ok(m.group(g)):
+            if ok == "context":
+                if not phone_context(text, ms):
+                    continue
+            elif not ok(m.group(g)):
                 continue
             hits = [e for e in ents if e.start < me and e.end > ms]
             if not hits:
