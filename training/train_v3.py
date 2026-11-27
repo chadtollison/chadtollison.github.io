@@ -72,6 +72,21 @@ def encode(tok, label2id, text, spans, max_len):
     return enc
 
 
+def join_rows(rows, frac, rng):
+    """Make long documents by joining 2-5 short texts, so the model also learns
+    to read long text (v3 trained on short texts slipped on long documents)."""
+    out = []
+    for _ in range(int(len(rows) * frac)):
+        text, spans = "", []
+        for t, sp in rng.sample(rows, rng.randint(2, 5)):
+            if text:
+                text += rng.choice(["\n\n", "\n", " "])
+            spans += [(s + len(text), e + len(text), ty) for s, e, ty in sp]
+            text += t
+        out.append((text, spans))
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", default="ChadTollison/pii-distilbert-v2")
@@ -85,6 +100,7 @@ def main():
     ap.add_argument("--max-len", type=int, default=256)
     ap.add_argument("--minutes", type=float, default=270)
     ap.add_argument("--max-steps", type=int, default=-1)
+    ap.add_argument("--join", type=float, default=0, help="add this share of long texts made by joining short ones")
     a = ap.parse_args()
 
     torch.set_num_threads(os.cpu_count() or 4)
@@ -101,6 +117,8 @@ def main():
     rows += [retrain_pii.make_example(retrain_pii.TRAIN_TEMPLATES) for _ in range(a.synthetic)]
     mine = retrain_pii.load_examples()
     rows += mine * 10
+    if a.join:
+        rows += join_rows(rows, a.join, random.Random(3))
     random.shuffle(rows)
     print(f"{len(rows)} training texts. Items by type:", dict(pii_data.label_counts(rows).most_common()))
 
@@ -138,7 +156,7 @@ def main():
     model.save_pretrained(a.out)
     tok.save_pretrained(a.out)
     Path(a.out, "training.json").write_text(json.dumps({
-        "base": a.base, "texts": len(rows), "steps": trainer.state.global_step,
+        "base": a.base, "texts": len(rows), "joined_share": a.join, "max_len": a.max_len, "steps": trainer.state.global_step,
         "minutes": round((time.time() - t0) / 60, 1), "types": pii_data.TYPES,
         "data": ["ai4privacy/open-pii-masking-500k-ai4privacy (CC BY 4.0)", "gretelai/gretel-pii-masking-en-v1 (Apache 2.0)",
                  "generated sentences (training/retrain_pii.py)"]}, indent=2))

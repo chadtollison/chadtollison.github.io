@@ -11,9 +11,6 @@ on:
       minutes:
         description: "Training time budget (minutes)"
         default: "300"
-  push:
-    branches: ["claude/**"]
-    paths: ["training/train_v3.py", "training/pii_data.py", "training/compare.py", ".github/workflows/pii-v3.yml"]
 
 concurrency:
   group: pii-v3-${{ github.ref }}

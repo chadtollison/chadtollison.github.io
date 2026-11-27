@@ -1,0 +1,89 @@
+# chad-pii v4 candidates, trained side by side on free CPU runners:
+#   long:  v3 trained further with long documents (joined texts, 512 tokens)
+#   large: DeBERTa-v3-small, a bigger model for the Python package
+# Then both are compared with v3, Presidio and spaCy (benchmarks/compare-v4.*).
+name: chad-pii v4 candidates
+on:
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: "Training time budget per model (minutes)"
+        default: "280"
+  push:
+    branches: ["claude/pii-v3"]
+    paths: [".github/workflows/pii-v4.yml"]
+concurrency:
+  group: pii-v4-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: write
+  actions: read
+env:
+  PIP_DEPS: >-
+    "torch==2.4.1" "transformers==4.46.3" "accelerate==1.1.1" "datasets==3.1.0"
+    "sentencepiece" "protobuf" "tiktoken" "huggingface_hub<1"
+  V3_RUN: "45961921851"
+jobs:
+  train:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: long
+            args: --base build/v3 --lr 3e-5 --openpii 40000 --gretel 15000 --synthetic 10000 --join 0.4 --max-len 512 --batch 8
+          - name: large
+            args: --base microsoft/deberta-v3-small --lr 6e-5 --openpii 60000 --gretel 20000 --synthetic 20000 --join 0.3 --max-len 384 --batch 16
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install
+        run: pip install --extra-index-url https://download.pytorch.org/whl/cpu ${{ env.PIP_DEPS }}
+      - uses: actions/download-artifact@v4
+        with: { name: v3-model, path: build/v3, run-id: "${{ env.V3_RUN }}", github-token: "${{ github.token }}" }
+      - name: Train
+        run: python training/train_v3.py ${{ matrix.args }} --out build/${{ matrix.name }} --minutes "${{ inputs.minutes || '280' }}"
+      - uses: actions/upload-artifact@v4
+        with: { name: "v4-${{ matrix.name }}", path: "build/${{ matrix.name }}", retention-days: 30 }
+
+  compare:
+    needs: [train]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 200
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install
+        run: |
+          pip install --extra-index-url https://download.pytorch.org/whl/cpu ${{ env.PIP_DEPS }} "presidio-analyzer==2.2.355"
+          python -m spacy download en_core_web_lg -q
+          pip install --no-deps ./chad-pii
+      - uses: actions/download-artifact@v4
+        with: { name: v3-model, path: build/v3, run-id: "${{ env.V3_RUN }}", github-token: "${{ github.token }}" }
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with: { name: v4-long, path: build/long }
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with: { name: v4-large, path: build/large }
+      - name: Compare
+        run: |
+          cd training
+          S="--system chad-pii:../build/v3=chad-pii-v3"
+          [ -f ../build/long/config.json ] && S="$S --system chad-pii:../build/long=v4-long-documents"
+          [ -f ../build/large/config.json ] && S="$S --system chad-pii:../build/large=v4-large-DeBERTa"
+          python compare.py --rows 1000 --out compare-v4 $S --system presidio --system spacy
+          cat ../benchmarks/compare-v4.md >> "$GITHUB_STEP_SUMMARY"
+          cat ../build/*/training.json || true
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
+          git add benchmarks/compare-v4.*
+          git commit -m "chad-pii v4 candidates: benchmark vs v3, Presidio and spaCy" || exit 0
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

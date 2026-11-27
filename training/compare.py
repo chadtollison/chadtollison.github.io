@@ -42,7 +42,8 @@ def make_system(spec):
     if spec.startswith("chad-pii"):
         import chad_pii
         model = spec.split(":", 1)[1] if ":" in spec else chad_pii.MODEL_ID
-        label = "chad-pii v3" if "v3" in model else "chad-pii v2 (current)" if "pii-distilbert-v2" in model else f"chad-pii ({model})"
+        model, _, named = model.partition("=")
+        label = named if named else "chad-pii v3" if "v3" in model else "chad-pii v2 (current)" if "pii-distilbert-v2" in model else f"chad-pii ({model})"
         chad_pii.find("warm up", model=model)
         return label, lambda t: [(e.start, e.end, e.type) for e in chad_pii.find(t, model=model)]
     if spec == "presidio":
@@ -100,9 +101,9 @@ DATASETS = {
 }
 
 
-def report(results, meta):
+def report(results, stem, meta):
     OUT.mkdir(exist_ok=True)
-    (OUT / "compare.json").write_text(json.dumps({"meta": meta, "results": results}, indent=2) + "\n")
+    (OUT / f"{stem}.json").write_text(json.dumps({"meta": meta, "results": results}, indent=2) + "\n")
     L = ["# chad-pii vs Microsoft Presidio vs spaCy", "",
          f"Run on {meta['date']} on a GitHub Actions runner (CPU only). Up to {meta['rows']} texts per dataset.", "",
          "**Caught**: share of marked personal-data items that any find touches. "
@@ -126,7 +127,7 @@ def report(results, meta):
           "On Spanish text every system uses its English setup except chad-pii, which trains on Spanish too.", "",
           "Data: ai4privacy open-pii-masking-500k (CC BY 4.0), Gretel gretel-pii-masking-en-v1 and "
           "synthetic_pii_finance_multilingual (Apache 2.0)."]
-    (OUT / "compare.md").write_text("\n".join(L) + "\n")
+    (OUT / f"{stem}.md").write_text("\n".join(L) + "\n")
 
 
 def main():
@@ -134,6 +135,7 @@ def main():
     ap.add_argument("--system", action="append", required=True)
     ap.add_argument("--rows", type=int, default=1000)
     ap.add_argument("--dataset", action="append", help="limit to these dataset names")
+    ap.add_argument("--out", default="compare", help="name of the report files in benchmarks/")
     a = ap.parse_args()
     systems = [make_system(s) for s in a.system]
     results = {}
@@ -147,8 +149,8 @@ def main():
             r = results[ds][name]
             print(f"{ds} | {name}: caught {r['caught']:.1%}, hidden {r['fully_hidden']:.1%}, "
                   f"personal {r['was_personal']:.1%}, F1 {r['f1']:.3f}, {r['ms_per_text']:.0f} ms", flush=True)
-    report(results, {"date": date.today().isoformat(), "rows": a.rows, "systems": [n for n, _ in systems]})
-    print((OUT / "compare.md").read_text())
+    report(results, a.out, {"date": date.today().isoformat(), "rows": a.rows, "systems": [n for n, _ in systems]})
+    print((OUT / f"{a.out}.md").read_text())
 
 
 if __name__ == "__main__":
