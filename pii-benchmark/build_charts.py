@@ -1,11 +1,10 @@
 """Rebuild every scrubpii-vs-Presidio chart from one benchmark results file.
 
-The charts on the portfolio homepage, this write-up and the privacy tools home page
-are generated from privacy-tools/benchmarks/compare.json, so the numbers can't drift
+The charts on this benchmark page are generated from privacy-tools/benchmarks/compare.json, so the numbers can't drift
 apart. Each chart lives between <!-- chart:NAME --> and <!-- /chart:NAME --> markers.
 
 Usage (from the portfolio repo, with privacy-tools checked out next to it):
-    python how-i-beat-presidio/build_charts.py ../privacy-tools/benchmarks/compare.json ../privacy-tools/index.html
+    python pii-benchmark/build_charts.py ../privacy-tools/benchmarks/compare.json
 """
 import json
 import re
@@ -78,11 +77,6 @@ def main():
     res = data["results"]
     put(HERE / "index.html", "score", sets_rows(res, None, " " * 10))
     put(HERE / "index.html", "types", type_rows(res, " " * 10))
-    put(HERE.parent / "index.html", "home", sets_rows(res, None, " " * 12))
-    if len(sys.argv) > 2:
-        four = {"ai4privacy (English)", "ai4privacy (German)", "Medical records (Nemotron-PII test split)",
-                "Gretel finance (English, never trained on)"}
-        put(Path(sys.argv[2]), "pt-home", sets_rows(res, four, " " * 14))
 
 
 if __name__ == "__main__":

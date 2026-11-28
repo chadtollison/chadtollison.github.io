@@ -64,3 +64,18 @@ footer a{color:var(--muted)}footer a:hover{color:var(--text)}
 @media(max-width:760px){.wu-stats{grid-template-columns:1fr 1fr}.wu-stats div:nth-child(2){border-right:0}.wu-stats div:nth-child(-n+2){border-bottom:1px solid var(--line)}.wu-metrics{grid-template-columns:1fr 1fr}.wu-honest{grid-template-columns:1fr}}
 @media(max-width:560px){.wu-hero{padding-top:40px}.wu-hero .lead{font-size:1rem}.wu-stats strong{font-size:1.4rem}.wu .title h2{font-size:1.55rem}.lessons li{padding:18px 16px 16px 50px}.lessons li:before{left:16px;top:20px}.steps-plot{gap:4px;height:236px;--pb:60px}.step span{font-size:.68rem}.step span em{font-size:.62rem}.wu-steps{padding:16px 12px 14px}.wu-back{display:none}}
 .wu-mini .bench-rows{padding-right:76px}.wu-mini .brow b{right:-70px}.wu-mini .brow b{white-space:nowrap}
+.wu-table{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:rgba(17,24,33,.6);margin:0 0 16px}
+.wu-table table{width:100%;border-collapse:collapse;font-size:.86rem;min-width:560px}
+.wu-table th,.wu-table td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+.wu-table th{font:700 .66rem/1 monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-top:13px}
+.wu-table tr:last-child td{border-bottom:0}
+.wu-table td{color:#c3d0dc}.wu-table td:first-child{color:var(--text);font-weight:600}
+.wu-table td em{font-style:normal;color:var(--accent)}
+.wu-table .n{text-align:right;font-family:ui-monospace,monospace;white-space:nowrap}
+.wu-config{display:grid;grid-template-columns:1fr 1.6fr 1fr;gap:10px}
+.wu-config div{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:rgba(17,24,33,.6)}
+.wu-config b{display:block;margin-bottom:6px}.wu-config p{margin:0;font-size:.86rem;line-height:1.6;color:var(--muted)}
+.wu-warn{margin:0 0 20px;border:1px solid rgba(245,196,107,.4);border-left:3px solid #f5c46b;border-radius:12px;padding:16px 20px;background:rgba(245,196,107,.05)}
+.wu-warn b{display:block;color:#f5c46b;margin-bottom:6px}.wu-warn p{margin:0;line-height:1.65;color:#c3d0dc;font-size:.95rem}
+.wu-honest{grid-template-columns:1fr 1fr}
+@media(max-width:760px){.wu-config{grid-template-columns:1fr}.wu-honest{grid-template-columns:1fr}}

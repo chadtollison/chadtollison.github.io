@@ -11,7 +11,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://chadtollison.github.io/">
   <meta property="og:title" content="Michael Chad Tollison | Software & Data Engineer">
-  <meta property="og:description" content="Identity, privacy and data systems at work. Open-source tools you can try, including a PII redactor that beats Microsoft Presidio.">
+  <meta property="og:description" content="Identity, privacy and data systems at work. On my own time, open-source privacy tools that detect and redact personal data on your own device.">
   <meta property="og:image" content="https://chadtollison.github.io/images/og-card.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -43,7 +43,7 @@
         <div class="hero-copy">
           <p class="kicker">SOFTWARE & DATA ENGINEER · C#/.NET · PYTHON · AWS · GOOGLE CLOUD</p>
           <h1>I build <em>backend systems, data platforms &amp; AI.</em></h1>
-          <p class="lead">I'm Chad, a software and data engineer with 10 years in C#/.NET and Python, on AWS and Google Cloud. At work I own identity, privacy and data systems, including SSO used by 300+ customer organizations. On my own time I build open-source tools you can try right here, like a PII redactor that beats Microsoft Presidio.</p>
+          <p class="lead">I'm Chad, a software and data engineer with 10 years in C#/.NET and Python, on AWS and Google Cloud. At work I own identity, privacy and data systems, including SSO used by 300+ customer organizations. On my own time I build open-source privacy tools that detect and redact personal data on your own device, with browser demos and a Python package.</p>
           <div class="buttons">
             <a class="primary magnetic" href="#projects">See what I've built <span>↓</span></a>
             <a class="secondary magnetic" href="#work">My work at Babel Street <span>↓</span></a>
@@ -94,7 +94,7 @@
       <a class="path-card reactive" data-glow href="#projects">
         <small>BUILT BY ME · OPEN SOURCE</small>
         <strong>Things you can use right now</strong>
-        <p>Five privacy tools built on a PII redactor that beats Microsoft Presidio, plus a SAML &amp; SCIM debugger. Click, paste, try.</p>
+        <p>Five privacy tools that find and redact personal data on your own device, plus a SAML &amp; SCIM debugger. Click, paste, try.</p>
         <b>See my projects <span>↓</span></b>
       </a>
       <a class="path-card reactive" data-glow href="#work">
@@ -113,7 +113,7 @@
         <div class="flag-copy">
           <small>FLAGSHIP · FREE PRIVACY TOOLS · OPEN SOURCE</small>
           <h3>Privacy tools</h3>
-          <p class="headline">Five free tools that hide personal data on your own device, built on scrubpii, my PII redactor that beats Microsoft Presidio on all 10 benchmark sets.</p>
+          <p class="headline">Five free tools that detect and redact personal data on your own device, built on scrubpii, my open-source PII redactor. Browser demos, a Python package and a browser extension.</p>
           <ul class="tool-list">
             <li><b>Prompt Shield</b> hides names and numbers from ChatGPT and Claude, then restores them in the answer.</li>
             <li><b>Log Scrubber</b> cleans logs, with a Python logging filter and a GitHub Action.</li>
@@ -123,34 +123,26 @@
           </ul>
           <div class="code-line"><span>$</span> pip install scrubpii</div>
           <div class="flag-stats">
-            <div><strong>99.5%</strong><span>of English personal data fully hidden, vs Presidio's 67%</span></div>
-            <div><strong>288 MB</strong><span>to install, vs 815 MB for Presidio</span></div>
-            <div><strong>0.6 s</strong><span>cold start, vs 1.5 s</span></div>
+            <div><strong>15</strong><span>types of personal data, from names to IBANs</span></div>
+            <div><strong>5</strong><span>languages: English, Spanish, French, German, Italian</span></div>
+            <div><strong>0</strong><span>servers: runs offline, no API key</span></div>
           </div>
           <div class="links">
             <a class="projectlink live" href="https://chadtollison.github.io/privacy-tools/">See all the tools <span>→</span></a>
-            <a class="projectlink" href="how-i-beat-presidio/">How I beat Presidio <span>→</span></a>
+            <a class="projectlink" href="pii-benchmark/">How I built and measured it <span>→</span></a>
             <a class="projectlink" href="https://chadtollison.github.io/privacy-tools/pii/">Try the live demo <span>→</span></a>
             <a class="projectlink" href="https://pypi.org/project/scrubpii/" target="_blank" rel="noreferrer">PyPI <span>↗</span></a>
           </div>
         </div>
-        <figure class="bench" data-chart aria-labelledby="bench-cap">
-          <figcaption id="bench-cap"><small>PERSONAL DATA FULLY HIDDEN · HIGHER IS BETTER</small><span><i class="k-me"></i>scrubpii <i class="k-them"></i>Microsoft Presidio</span></figcaption>
-          <div class="bench-rows">
-            <!-- chart:home -->
-            <div class="brow" style="--a:99.5%;--b:66.8%"><span>ai4privacy, English</span><div><i class="me"><b>99.5%</b></i><i class="them"><b>67%</b></i></div></div>
-            <div class="brow" style="--a:99.0%;--b:51.5%"><span>ai4privacy, Spanish <em>Presidio in English mode</em></span><div><i class="me"><b>99%</b></i><i class="them"><b>52%</b></i></div></div>
-            <div class="brow" style="--a:98.3%;--b:57.7%"><span>ai4privacy, French <em>Presidio in English mode</em></span><div><i class="me"><b>98%</b></i><i class="them"><b>58%</b></i></div></div>
-            <div class="brow" style="--a:97.2%;--b:65.2%"><span>ai4privacy, German <em>Presidio in English mode</em></span><div><i class="me"><b>97%</b></i><i class="them"><b>65%</b></i></div></div>
-            <div class="brow" style="--a:98.4%;--b:58.0%"><span>ai4privacy, Italian <em>Presidio in English mode</em></span><div><i class="me"><b>98%</b></i><i class="them"><b>58%</b></i></div></div>
-            <div class="brow" style="--a:99.2%;--b:75.0%"><span>Gretel PII</span><div><i class="me"><b>99%</b></i><i class="them"><b>75%</b></i></div></div>
-            <div class="brow" style="--a:98.2%;--b:78.1%"><span>Medical records</span><div><i class="me"><b>98%</b></i><i class="them"><b>78%</b></i></div></div>
-            <div class="brow" style="--a:97.6%;--b:76.2%"><span>Support tickets, emails, chats</span><div><i class="me"><b>98%</b></i><i class="them"><b>76%</b></i></div></div>
-            <div class="brow" style="--a:95.5%;--b:59.6%"><span>Logs &amp; config files</span><div><i class="me"><b>96%</b></i><i class="them"><b>60%</b></i></div></div>
-            <div class="brow" style="--a:77.6%;--b:56.4%"><span>Finance documents <em>source never seen in training</em></span><div><i class="me"><b>78%</b></i><i class="them"><b>56%</b></i></div></div>
-            <!-- /chart:home -->
-          </div>
-          <p class="bench-note">Share of personal-data items at least 90% redacted, on held-out public test data. The finance set comes from a source the model never saw. Presidio has no non-English models by default, so it ran in English mode on those sets. <a href="how-i-beat-presidio/">How I did it →</a></p>
+        <figure class="pipe" aria-labelledby="pipe-cap">
+          <figcaption id="pipe-cap"><small>HOW IT DECIDES WHAT TO HIDE</small></figcaption>
+          <ol>
+            <li><b>Read</b><span>A DistilBERT model I fine-tuned on public PII datasets reads the text in overlapping 128-token windows.</span></li>
+            <li><b>Confirm</b><span>Number-shaped finds must pass real checks: Luhn for cards, SSN, IBAN and IP validity, US area codes.</span></li>
+            <li><b>Explain</b><span>Every redaction carries its reason, like <code>rule confirmed: valid Luhn checksum</code>, so it can be audited.</span></li>
+            <li><b>Redact</b><span>As labels, black bars, realistic fake values or reversible tokens you can restore later.</span></li>
+          </ol>
+          <a class="pipe-link" href="pii-benchmark/">Benchmarks: datasets, setup and scoring <span>→</span></a>
         </figure>
       </article>
 
