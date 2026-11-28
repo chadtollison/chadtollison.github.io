@@ -17,7 +17,10 @@ from __future__ import annotations
 import datetime
 import fnmatch
 import html
+import io
 import json
+import re
+import zipfile
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -26,7 +29,7 @@ from typing import Dict, Iterable, Iterator, List, Optional, Tuple
 from . import MODEL_ID, __version__, _preview, find
 
 SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "venv", ".tox", ".mypy_cache", ".idea", "dist", "build"}
-SKIP_EXT = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".pdf", ".zip", ".gz", ".tgz", ".bz2", ".xz", ".7z",
+SKIP_EXT = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".zip", ".gz", ".tgz", ".bz2", ".xz", ".7z",
             ".onnx", ".bin", ".pt", ".safetensors", ".parquet", ".so", ".dll", ".exe", ".woff", ".woff2", ".ttf",
             ".mp3", ".mp4", ".mov", ".pyc", ".class", ".jar", ".db", ".sqlite"}
 # Types that are a risk wherever they show up. Names and similar model finds
@@ -59,6 +62,51 @@ class FileResult:
 
 def _looks_binary(data: bytes) -> bool:
     return b"\x00" in data[:8192]
+
+
+# Word, Excel, PowerPoint and OpenDocument files are zips of XML; the words live in these parts.
+DOC_EXT = {".docx", ".docm", ".xlsx", ".xlsm", ".pptx", ".pptm", ".odt", ".ods", ".odp"}
+_DOC_PARTS = re.compile(r"^word/(document|header\d*|footer\d*|footnotes|endnotes|comments)\.xml$"
+                        r"|^xl/(sharedStrings|comments\d*)\.xml$|^xl/worksheets/sheet\d+\.xml$"
+                        r"|^ppt/(slides/slide|notesSlides/notesSlide|comments/comment)\d*\.xml$|^(content|styles)\.xml$")
+
+
+def _xml_text(xml: str) -> str:
+    xml = re.sub(r"<(w:tab|text:tab)\b[^>]*/>", "\t", xml)
+    xml = re.sub(r"<(w:br|a:br|text:line-break)\b[^>]*/>", "\n", xml)
+    xml = re.sub(r"</(w:p|a:p|text:p|text:h|si|row|table:table-row)>", "\n", xml)
+    xml = re.sub(r"</(c|table:table-cell)>", "\t", xml)
+    return html.unescape(re.sub(r"<[^>]+>", "", xml))
+
+
+def _doc_text(name: str, data: bytes) -> str:
+    """Plain text from an Office/OpenDocument file, or a PDF (needs pypdf). Raises ValueError when it can't."""
+    if name.lower().endswith(".pdf"):
+        try:
+            from pypdf import PdfReader
+        except ImportError as e:
+            raise ValueError("PDF needs pypdf: pip install pypdf") from e
+        reader = PdfReader(io.BytesIO(data))
+        if reader.is_encrypted:
+            raise ValueError("password-protected PDF")
+        text = "\n\f\n".join(page.extract_text() or "" for page in reader.pages)
+        if not text.strip():
+            raise ValueError("no text layer (a scanned image?)")
+        return text
+    try:
+        z = zipfile.ZipFile(io.BytesIO(data))
+    except zipfile.BadZipFile as e:
+        raise ValueError("password-protected or damaged document") from e
+    parts = sorted((n for n in z.namelist() if _DOC_PARTS.match(n)), key=lambda n: (re.sub(r"\d+\.xml$", "", n), int((re.search(r"(\d+)\.xml$", n) or [0, 0])[1])))
+    if not parts:
+        raise ValueError("no text parts found")
+    out = []
+    for n in parts:
+        xml = z.read(n).decode("utf-8", errors="replace")
+        if n.startswith("xl/worksheets/"):   # cells pointing at shared strings are already in sharedStrings.xml
+            xml = re.sub(r"<c\b[^>]*\bt=\"s\"[^>]*>.*?</c>", "<c></c>", xml)
+        out.append(_xml_text(xml))
+    return "\n".join(out)
 
 
 def _scan_text(path: str, size: int, text: str, fast: bool, min_score: float, model: str, max_samples: int) -> FileResult:
@@ -202,6 +250,19 @@ def scan(targets: Iterable[str], fast: bool = False, min_score: float = 0.5, mod
             data = read()
         except Exception as e:  # unreadable object: note it and go on
             files.append(FileResult(name, size, skipped=f"could not read: {e.__class__.__name__}"))
+            continue
+        if ext in DOC_EXT or ext == ".pdf":
+            try:
+                text = _doc_text(name, data)
+            except ValueError as e:
+                if ext == ".pdf" and "pypdf" in str(e):
+                    ignored += 1          # as before 0.7.1: PDFs are read only when pypdf is installed
+                    continue
+                files.append(FileResult(name, size, skipped=f"could not read the document: {e}"))
+                continue
+            files.append(_scan_text(name, size, text, fast, min_score, model, max_samples))
+            if progress:
+                progress(name)
             continue
         if _looks_binary(data):
             ignored += 1

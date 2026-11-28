@@ -25,13 +25,14 @@ server = ["fastapi>=0.100", "uvicorn>=0.20"]
 pandas = ["pandas>=1.5"]
 torch = ["transformers>=4.40", "torch>=2.6"]
 presidio = ["presidio-analyzer>=2.2"]
+pdf = ["pypdf>=4"]
 
 [project.scripts]
 scrubpii = "scrubpii.cli:main"
 
 [project.urls]
 Homepage = "https://chadtollison.github.io/privacy-tools/scrubpii/"
-Model = "https://huggingface.co/ChadTollison/pii-distilbert-v3"
+Model = "https://huggingface.co/ChadTollison/pii-distilbert-v5"
 Source = "https://github.com/chadtollison/chadtollison.github.io/tree/main/scrubpii"
 
 [tool.hatch.build.targets.wheel]

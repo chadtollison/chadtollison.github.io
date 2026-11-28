@@ -71,7 +71,7 @@ Five free tools use scrubpii: [chadtollison.github.io/privacy-tools](https://cha
 
 ```bash
 scrubpii proxy --upstream https://api.openai.com      # then OPENAI_BASE_URL=http://127.0.0.1:8787/v1
-scrubpii scan ./exports s3://bucket/logs --report pii-report.html
+scrubpii scan ./exports s3://bucket/logs --report pii-report.html   # text, Office docs, PDFs (with scrubpii[pdf])
 tail -f app.log | scrubpii --fast                      # rules only, streams line by line
 ```
 

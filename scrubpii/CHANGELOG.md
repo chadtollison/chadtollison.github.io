@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.7.1
+- The package's Model link points at the v5 model it actually uses.
 - `scrubpii scan` now tells "checked and found nothing" apart from "couldn't check". A target that doesn't
   exist (or a bucket it can't list) exits with status 2; with `--fail`/`--fail-on`, so does a scan that checked
   no text files or skipped files over `--max-bytes` (`--allow-skipped` to accept that). Reports gain
@@ -11,6 +12,9 @@
   addresses, social profile links, and `user=` / `name=` hints in logs.
 - Fewer false alarms: `password = input.value`, version numbers like `v1.2.3.4`, and 2147483647 are left alone;
   `user:password@host` is no longer read as an email.
+- `scrubpii scan` reads the words inside Word, Excel, PowerPoint and OpenDocument files, and PDFs when
+  `pypdf` is installed (`pip install scrubpii[pdf]`). A password-protected or scanned document is reported
+  as not checked.
 - `mode="fake"` stand-ins keep the original's format (card length and dashes, phone and SSN layout, date
   format), two people never share a stand-in, "Maria" after "Maria Lopez" gets the same stand-in first name,
   and a person's email follows their stand-in in the same pattern (`mlopez@` becomes `rcarter@`).

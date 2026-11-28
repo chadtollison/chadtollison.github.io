@@ -281,3 +281,21 @@ def test_fakes_keep_format_stay_unique_and_follow_the_person():
     assert f.get(E("SSN", "123.45.6789")).count(".") == 2
     names = {f.get(E("PERSON", f"Person{i} Name{i}")) for i in range(300)}
     assert len(names) == 300
+
+
+def test_scan_reads_office_documents(tmp_path):
+    import zipfile
+    from scrubpii import scan as sc
+    with zipfile.ZipFile(tmp_path / "hr.docx", "w") as z:
+        z.writestr("word/document.xml", "<w:document><w:body><w:p><w:r><w:t>SSN 123-45-6789</w:t></w:r></w:p>"
+                   "<w:p><w:r><w:t>mail jo&amp;co@acme.io</w:t></w:r></w:p></w:body></w:document>")
+    with zipfile.ZipFile(tmp_path / "c.xlsx", "w") as z:
+        z.writestr("xl/sharedStrings.xml", "<sst><si><t>card 4111 1111 1111 1111</t></si></sst>")
+        z.writestr("xl/worksheets/sheet1.xml", '<worksheet><sheetData><row><c t="s"><v>0</v></c></row></sheetData></worksheet>')
+    (tmp_path / "locked.docx").write_bytes(b"\xd0\xcf\x11\xe0" + b"\0" * 100)
+    rep = sc.scan([str(tmp_path)], fast=True)
+    by = {f["path"].split("/")[-1]: f for f in rep["files"]}
+    assert by["hr.docx"]["counts"].get("SSN") == 1
+    assert by["c.xlsx"]["counts"].get("CREDIT_CARD") == 1
+    assert "password-protected" in by["locked.docx"]["skipped"]
+    assert rep["complete"] is False
