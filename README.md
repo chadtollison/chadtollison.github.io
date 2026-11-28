@@ -23,4 +23,7 @@ If you retrain the model on Hugging Face, open **Actions → Build in-browser PI
 - `sso/xmldsig.js`: XML Signature verify and sign (exclusive and inclusive C14N, X.509 parsing, WebCrypto).
 - `sso/saml.js`: decoding (Base64, URL, DEFLATE) and SAML 2.0 checks.
 - `sso/scim.js`: SCIM 2.0 checks, filter and PATCH path parser.
+- `sso/flow.js`: the animated sign-in flow. `sso/attacks.js`: the attack playground. `sso/fixes.js`: Entra ID, Okta and Google fix guides.
+- `sso/fakeidp.js`: the Test IdP tab. It makes its own key and self-signed certificate in the visitor's browser (kept in localStorage), signs responses and posts them to an ACS URL. An app that uses this page as its IdP sign-in URL can start SP-initiated sign-in here.
+- `sso/report.js` + `sso/scrub.js`: redacted reports; the optional deep scan loads the scrubpii model from `models/pii-distilbert-v3`.
 - `sso/samples.js`: examples. SAML examples are signed live with a **public demo key** that no real system should trust.
