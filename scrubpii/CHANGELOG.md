@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.7.1
+- `scrubpii scan` now tells "checked and found nothing" apart from "couldn't check". A target that doesn't
+  exist (or a bucket it can't list) exits with status 2; with `--fail`/`--fail-on`, so does a scan that checked
+  no text files or skipped files over `--max-bytes` (`--allow-skipped` to accept that). Reports gain
+  `files_skipped`, `files_ignored`, `errors` and `complete`, and say plainly when a scan is incomplete.
+- New rules (also in the browser tools, checked by shared test fixtures): passwords, tokens and secrets written
+  as `key=value` or JSON, bearer tokens, JWTs, passwords inside connection strings, PEM private keys, more API
+  key formats (Anthropic, GitHub fine-grained, GitLab, npm, Hugging Face, Shopify, SendGrid, AWS STS), MAC
+  addresses, social profile links, and `user=` / `name=` hints in logs.
+- Fewer false alarms: `password = input.value`, version numbers like `v1.2.3.4`, and 2147483647 are left alone;
+  `user:password@host` is no longer read as an email.
+- Adjacent address parts are joined, and secrets lose a `key=` prefix the model included.
+
 ## 0.7.0
 - `scrubpii proxy`: a local privacy proxy for LLM APIs. Point `OPENAI_BASE_URL` or `ANTHROPIC_BASE_URL` at it;
   prompts are tokenized before they leave your machine and answers come back with the real values, streaming

@@ -111,6 +111,34 @@ def test_scan_include_exclude_and_cli_fail(tmp_path, capsys):
     assert "item(s) of personal data" in capsys.readouterr().out
 
 
+def test_scan_says_when_it_could_not_check(tmp_path, capsys):
+    # "Checked and nothing found" must never look like "couldn't check".
+    missing = str(tmp_path / "nope")
+    rep = scan([missing], fast=True)
+    assert rep["errors"] and rep["errors"][0]["target"] == missing and rep["complete"] is False
+    assert scan_main([missing, "--fast", "--fail"]) == 2
+    assert scan_main([missing, "--fast"]) == 2
+    assert "couldn't scan" in capsys.readouterr().err
+
+    big = tmp_path / "big"
+    big.mkdir()
+    (big / "a.txt").write_text("nothing personal here " * 100)
+    rep = scan([str(big)], fast=True, max_bytes=10)
+    assert rep["files_scanned"] == 0 and rep["files_skipped"] == 1 and rep["complete"] is False
+    assert "incomplete" in report_markdown(rep) and "incomplete" in report_html(rep)
+    assert scan_main([str(big), "--fast", "--fail", "--max-bytes", "10"]) == 2
+    assert scan_main([str(big), "--fast", "--fail", "--max-bytes", "10", "--allow-skipped"]) == 2   # still nothing checked
+    (big / "b.txt").write_text("all clear")
+    assert scan_main([str(big), "--fast", "--fail", "--max-bytes", "100"]) == 2                     # one file not checked
+    assert scan_main([str(big), "--fast", "--fail", "--max-bytes", "100", "--allow-skipped"]) == 0
+    assert scan_main([str(big), "--fast", "--fail"]) == 0                                           # everything checked, clean
+
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    assert scan_main([str(empty), "--fast", "--fail"]) == 2
+    assert "no text files were checked" in capsys.readouterr().err
+
+
 def test_scan_s3_and_gcs(monkeypatch):
     objects = {"logs/a.txt": b"reach me at jo@acme.com", "logs/b.bin": b"\x00\x00", "logs/": b""}
 

@@ -28,7 +28,7 @@ __all__ = ["Entity", "find", "find_many", "redact", "redact_many", "tokenize", "
            "redact_json", "redact_csv", "redact_dataframe", "Guard",
            "add_rule", "add_words", "allow", "teach", "understand", "clear_rules", "load_rules", "rules", "audit", "audit_markdown",
            "ScrubFilter", "scrub_logs"]
-__version__ = "0.7.0"
+__version__ = "0.7.1"
 
 # The model to use: a Hugging Face repo or a local folder. SCRUBPII_MODEL overrides it.
 MODEL_ID = os.environ.get("SCRUBPII_MODEL") or "ChadTollison/pii-distilbert-v5"
@@ -69,8 +69,31 @@ AREA_CODES = frozenset((Path(__file__).parent / "area_codes.txt").read_text().sp
 PHONE_RE = re.compile(r"(?:\+?1[\s.-]?)?(?:\(\d{3}\)|\b\d{3})[\s.-]?\d{3}[\s.-]?\d{4}\b")
 IBAN_RE = re.compile(r"\b[A-Z]{2}\d{2}(?: ?[A-Z0-9]{4}){2,7}(?: ?[A-Z0-9]{1,4})?\b")
 API_KEY_RE = re.compile(
-    r"\b(?:(?:sk|pk|rk)_(?:live|test)_[A-Za-z0-9]{16,}|sk-(?:proj-)?[A-Za-z0-9_-]{32,}|AKIA[0-9A-Z]{16}"
-    r"|gh[pousr]_[A-Za-z0-9]{30,}|xox[abprs]-[A-Za-z0-9-]{20,}|AIza[0-9A-Za-z_-]{35})")
+    r"\b(?:(?:sk|pk|rk)_(?:live|test)_[A-Za-z0-9]{16,}|sk-ant-[A-Za-z0-9_-]{32,}|sk-(?:proj-)?[A-Za-z0-9_-]{32,}"
+    r"|(?:AKIA|ASIA)[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{40,}|glpat-[A-Za-z0-9_-]{20,}"
+    r"|npm_[A-Za-z0-9]{36}|hf_[A-Za-z0-9]{30,}|shp(?:at|ss|ca)_[a-fA-F0-9]{32}|xox[abprs]-[A-Za-z0-9-]{20,}"
+    r"|AIza[0-9A-Za-z_-]{35}|SG\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}"
+    r"|eyJ[A-Za-z0-9_-]{8,}\.eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,})")
+# Secrets written as key=value or "key": "value" (passwords, tokens, client secrets).
+SECRET_KV_RE = re.compile(
+    r"(?i)\b(?:pass(?:word|wd|phrase)?|pwd|secret|client_?secret|api_?key|apikey|access_?key|secret_?key|access_?token"
+    r"|auth_?token|refresh_?token|private_?key|token)[\"']?\s*[:=]\s*[\"']?"
+    r"(?P<v>(?![\[<{*•]|\$\{|null\b|none\b|true\b|false\b|undefined\b|redacted\b|xxx)[^\s\"',;&<>]{4,})")
+BEARER_RE = re.compile(r"\b(?:Bearer|Basic|Token)\s+(?P<v>[A-Za-z0-9._~+/-]{16,}=*)")
+URL_PASS_RE = re.compile(r"(?i)\b[a-z][a-z0-9+.-]{1,20}://[^\s:@/]{1,64}:(?P<v>[^\s@/]{3,128})@")
+PEM_RE = re.compile(r"-----BEGIN (?:[A-Z]+ )*PRIVATE KEY-----[\s\S]+?-----END (?:[A-Z]+ )*PRIVATE KEY-----")
+# Key hints in logs and JSON: user=jalvarez, "name": "Priya Raman".
+USER_KV_RE = re.compile(r"\b(?:user(?:_?name)?|login|uid|owner|assignee|author|handle)[\"']?\s*[:=]\s*[\"']?"
+                        r"(?P<v>[A-Za-z][A-Za-z0-9._-]{2,31})(?![A-Za-z0-9._-]*@)(?=[\"'\s,;&)}\]]|$)")
+_UP, _LO = r"[A-ZÀ-ÖØ-Þ]", r"[^\W\d_'’-]"
+_WORD = _UP + r"(?:[^\W\d_]|['’-])+"
+NAME_KV_RE = re.compile(
+    r"\b(?:(?:full|first|last|given|family|display|customer|contact|patient|employee)_?name)[\"']?\s*[:=]\s*[\"']?"
+    r"(?P<v>" + _WORD + r"(?: " + _WORD + r"){0,3})(?=[\"'\s,;&)}\]]|$)"
+    r"|\bname[\"']?\s*[:=]\s*[\"']?(?P<v2>" + _WORD + r"(?: " + _WORD + r"){1,3})(?=[\"'\s,;&)}\]]|$)")
+PROFILE_RE = re.compile(r"(?i)(?:https?://)?(?:www\.)?(?:linkedin\.com/in|facebook\.com|instagram\.com|twitter\.com|x\.com"
+                        r"|tiktok\.com/@|threads\.net/@)/?[A-Za-z0-9_.-]{1,60}[A-Za-z0-9_-]")
+MAC_RE = re.compile(r"\b[0-9A-Fa-f]{2}(?:[:-][0-9A-Fa-f]{2}){5}\b")
 CARD_RE = re.compile(r"\b[2-6]\d{3}(?:[ -]?\d){9,15}\b")
 SSN_RE = re.compile(r"(?<![\w.])\d{3}([-. ])\d{2}\1\d{4}(?!\w|\.\d)")
 SSN_BARE_RE = re.compile(r"(?i)(?:ssn|social security(?: number| no\.?)?)\W{0,12}(\d{9})\b")
@@ -94,6 +117,18 @@ def dea_ok(s: str) -> bool:
     """DEA registration number: (d1+d3+d5) + 2*(d2+d4+d6) ends in d7."""
     d = [int(c) for c in s[2:]]
     return len(d) == 7 and (d[0] + d[2] + d[4] + 2 * (d[1] + d[3] + d[5])) % 10 == d[6]
+
+
+_NOT_USERS = {"id", "null", "none", "anonymous", "guest", "system", "root", "admin", "unknown", "true", "false"}
+
+
+def secret_ok(s: str) -> bool:
+    """A real-looking secret value, not code ("input.value", "getToken()") or a number."""
+    if re.fullmatch(r"\d{1,6}", s) or re.search(r"[()]|^\$", s):
+        return False
+    if re.match(r"(?i)(?:process|os|env|config|settings|self|this|input|req|request|args|params|form)\.", s):
+        return False
+    return not re.fullmatch(r"[A-Za-z_]\w*\.[A-Za-z_][\w.]*", s)
 
 
 def ip_ok(s: str) -> bool:
@@ -164,6 +199,8 @@ def us_phone_ok(s: str) -> bool:
     d = re.sub(r"\D", "", s)
     if len(d) == 11 and d[0] == "1":
         d = d[1:]
+    if d in ("2147483647", "4294967295"):       # the largest 32-bit numbers, everywhere in code
+        return False
     return len(d) == 10 and d[:3] in AREA_CODES and d[3] in "23456789"
 
 
@@ -461,29 +498,54 @@ def _rules(ents: List[Entity], text: str) -> List[Entity]:
               ("PHONE", PHONE_RE, "context", "phone-shaped number after 'phone', 'call' or 'contact'"),
               ("IBAN", IBAN_RE, iban_ok, "IBAN checksum"),
               ("API_KEY", API_KEY_RE, lambda s: True, "known API key format"),
+              ("PRIVATE_KEY", PEM_RE, lambda s: True, "a private key block"),
+              ("PASSWORD", SECRET_KV_RE, secret_ok, "a value after 'password', 'secret' or 'token'"),
+              ("API_KEY", BEARER_RE, lambda s: bool(re.search(r"\d", s) and re.search(r"[A-Za-z]", s)), "a bearer token"),
+              ("PASSWORD", URL_PASS_RE, lambda s: True, "a password inside a link"),
               ("CREDIT_CARD", CARD_RE, luhn_ok, "card number with valid Luhn checksum"),
               ("SSN", SSN_RE, ssn_ok, "valid SSN format"),
               ("SSN", SSN_BARE_RE, ssn_ok, "9 digits right after 'SSN'"),
-              ("EMAIL", SHAPES["EMAIL"], lambda s: True, "email address format"),
-              ("IP_ADDRESS", SHAPES["IP_ADDRESS"], ip_ok, "valid IP address"),
+              ("EMAIL", SHAPES["EMAIL"], "email", "email address format"),
+              ("IP_ADDRESS", SHAPES["IP_ADDRESS"], "ipv4", "valid IP address"),
               ("IP_ADDRESS", IPV6_RE, ip_ok, "valid IPv6 address"),
+              ("MAC_ADDRESS", MAC_RE, lambda s: True, "MAC address format"),
+              ("PROFILE_URL", PROFILE_RE, lambda s: not re.search(r"(?i)/(?:home|login|share|intent|search|explore|hashtag)/?$", s),
+               "a social media profile link"),
               ("DATE_OF_BIRTH", DOB_RE, lambda s: True, "a date right after 'born' or 'DOB'"),
               ("ID_NUMBER", NPI_RE, npi_ok, "NPI (provider number) with a valid check digit"),
               ("ID_NUMBER", MBI_RE, lambda s: True, "Medicare Beneficiary Identifier format"),
-              ("ID_NUMBER", DEA_RE, dea_ok, "DEA registration number with a valid check digit")]
+              ("ID_NUMBER", DEA_RE, dea_ok, "DEA registration number with a valid check digit"),
+              ("USERNAME", USER_KV_RE, lambda s: s.lower() not in _NOT_USERS, "a value after 'user='"),
+              ("PERSON", NAME_KV_RE, lambda s: s not in ("Null", "None", "Unknown", "Test", "Default"), "a value after 'name='")]
+    soft = (USER_KV_RE, NAME_KV_RE)          # key hints never override what the model or a stronger rule found
+    exact = (URL_PASS_RE,)                   # only the password, not the whole link the model may have marked
     for typ, rx, ok, why in checks:
         for m in rx.finditer(text):
             g = 1 if rx in (SSN_BARE_RE, DOB_RE, NPI_RE) else 0
+            if "v" in rx.groupindex:
+                g = "v" if m.group("v") is not None else "v2"
             ms, me = m.start(g), m.end(g)
             if ok == "context":
                 if not phone_context(text, ms):
+                    continue
+            elif ok == "email":
+                if re.search(r"://[^\s@/]*$", text[max(0, ms - 80):ms]):    # user:password@host is not an email
+                    continue
+            elif ok == "ipv4":
+                if not ip_ok(m.group(g)) or re.search(r"(?i)\b(?:v|ver|version)\.?\s?$", text[max(0, ms - 9):ms]) \
+                        or text[me:me + 2][:1] == "." and text[me + 1:me + 2].isdigit():
                     continue
             elif not ok(m.group(g)):
                 continue
             hits = [e for e in ents if e.start < me and e.end > ms]
             if not hits:
                 ents.append(Entity(typ, m.group(g), ms, me, 1.0, why, "rule"))
+                continue
+            if rx in soft:
+                continue
             for e in hits:
+                if e.source == "rule":     # an earlier, more specific rule already settled this one
+                    continue
                 # Phone, card and SSN rules only relabel the model's find when
                 # its own label fails its check (e.g. "card number" that fails Luhn).
                 if typ in ("PHONE", "CREDIT_CARD", "SSN", "EMAIL", "IP_ADDRESS") and e.type != typ and _valid(e):
@@ -492,7 +554,10 @@ def _rules(ents: List[Entity], text: str) -> List[Entity]:
                     continue
                 e.type, e.rule, e.score = typ, why, 1.0
                 e.source = "model+rule" if e.source == "model" else e.source
-                e.start, e.end = min(e.start, ms), max(e.end, me)
+                if rx in exact:
+                    e.start, e.end = ms, me
+                else:
+                    e.start, e.end = min(e.start, ms), max(e.end, me)
                 e.text = text[e.start:e.end]
     ents.sort(key=lambda e: (e.start, -e.end))
     kept: List[Entity] = []
@@ -505,7 +570,25 @@ def _rules(ents: List[Entity], text: str) -> List[Entity]:
                 k.end, k.text = e.end, text[k.start:e.end]
             continue
         kept.append(e)
-    return kept
+    # "1600 Pennsylvania Ave NW, Washington" + "DC 20500" is one address.
+    i = len(kept) - 1
+    while i > 0:
+        a, b = kept[i - 1], kept[i]
+        if a.type == b.type == "ADDRESS" and re.fullmatch(r"[ ,]{1,3}", text[a.end:b.start]):
+            a.end, a.text, a.score = b.end, text[a.start:b.end], min(a.score, b.score)
+            del kept[i]
+        i -= 1
+    for e in kept:
+        # A secret or username grown over its key ("password=hunter2") keeps only the value.
+        kv = re.match(r"[A-Za-z_][\w.-]{0,40}[\"']?\s*[:=](?!//)\s*[\"']?(?=\S)", e.text)
+        if kv and re.search(r"PASSWORD|SECRET|API|USER|TOKEN", e.type) and len(e.text) > kv.end() + 2:
+            e.start += kv.end()
+        while e.end > e.start and text[e.end - 1] in "\"'`" and text[e.start] not in "\"'`":
+            e.end -= 1
+        e.text = text[e.start:e.end]
+    # Model guesses too short to be personal data ("Q3", "B", "12").
+    return [e for e in kept if not (e.source == "model" and e.type == "ADDRESS"
+                                    and (len(e.text) <= 3 or re.fullmatch(r"(?i)Q[1-4]|[A-Z]?\d{1,3}[A-Z]?", e.text)))]
 
 
 def find(text: str, min_score: float = 0.5, model: str = MODEL_ID, fast: bool = False) -> List[Entity]:

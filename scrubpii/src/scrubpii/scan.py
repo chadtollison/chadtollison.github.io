@@ -31,7 +31,7 @@ SKIP_EXT = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".pdf", ".zip", ".
             ".mp3", ".mp4", ".mov", ".pyc", ".class", ".jar", ".db", ".sqlite"}
 # Types that are a risk wherever they show up. Names and similar model finds
 # are reported too, but these decide the "high" risk band.
-HIGH = {"SSN", "CREDIT_CARD", "IBAN", "API_KEY", "PASSWORD", "PASSPORT", "DRIVER_LICENSE", "ID_NUMBER"}
+HIGH = {"SSN", "CREDIT_CARD", "IBAN", "API_KEY", "PASSWORD", "PRIVATE_KEY", "PASSPORT", "DRIVER_LICENSE", "ID_NUMBER"}
 
 
 @dataclass
@@ -151,16 +151,21 @@ def _gcs(url: str, include, exclude) -> Iterator[Tuple[str, int, callable]]:
         yield f"gs://{bucket}/{blob.name}", blob.size or 0, blob.download_as_bytes
 
 
+def _source(t: str, include, exclude):
+    if t.startswith("s3://"):
+        return _s3(t, include, exclude)
+    if t.startswith("gs://"):
+        return _gcs(t, include, exclude)
+    if not Path(t).exists():
+        raise FileNotFoundError(f"{t} does not exist")
+    return _local(t, include, exclude)
+
+
 def sources(targets: Iterable[str], include: Optional[List[str]] = None, exclude: Optional[List[str]] = None):
     """Every (name, size, read) for the given folders, files, s3:// and gs:// URLs."""
     exclude = list(exclude or [])
     for t in targets:
-        if t.startswith("s3://"):
-            yield from _s3(t, include, exclude)
-        elif t.startswith("gs://"):
-            yield from _gcs(t, include, exclude)
-        else:
-            yield from _local(t, include, exclude)
+        yield from _source(t, include, exclude)
 
 
 def scan(targets: Iterable[str], fast: bool = False, min_score: float = 0.5, model: str = MODEL_ID,
@@ -172,11 +177,23 @@ def scan(targets: Iterable[str], fast: bool = False, min_score: float = 0.5, mod
     addresses). include/exclude are glob patterns like "*.csv" or "logs/*".
     """
     targets = list(targets)
+    exclude = list(exclude or [])
     started = datetime.datetime.now(datetime.timezone.utc)
     files: List[FileResult] = []
-    for name, size, read in sources(targets, include, exclude):
+    errors: List[dict] = []          # targets that could not be scanned at all
+    ignored = 0                      # images, archives and other binary files (not text, not checked)
+
+    def every():
+        for t in targets:
+            try:
+                yield from _source(t, include, exclude)
+            except Exception as e:  # missing folder, bucket we can't list, missing boto3...
+                errors.append({"target": t, "error": str(e) or e.__class__.__name__})
+
+    for name, size, read in every():
         ext = os.path.splitext(name)[1].lower()
         if ext in SKIP_EXT:
+            ignored += 1
             continue
         if size > max_bytes:
             files.append(FileResult(name, size, skipped=f"larger than {max_bytes:,} bytes"))
@@ -187,6 +204,7 @@ def scan(targets: Iterable[str], fast: bool = False, min_score: float = 0.5, mod
             files.append(FileResult(name, size, skipped=f"could not read: {e.__class__.__name__}"))
             continue
         if _looks_binary(data):
+            ignored += 1
             continue
         text = data.decode("utf-8", errors="replace")
         files.append(_scan_text(name, size, text, fast, min_score, model, max_samples))
@@ -202,6 +220,11 @@ def scan(targets: Iterable[str], fast: bool = False, min_score: float = 0.5, mod
         "scrubpii": __version__, "created": started.isoformat(timespec="seconds"),
         "targets": targets, "mode": "rules only" if fast else "model + rules",
         "files_scanned": sum(1 for f in files if not f.skipped),
+        "files_skipped": sum(1 for f in files if f.skipped),
+        "files_ignored": ignored,
+        "errors": errors,
+        # True only when every target was reached and every text file was read.
+        "complete": not errors and not any(f.skipped for f in files),
         "files_with_pii": sum(1 for f in files if f.total),
         "total": sum(counts.values()), "counts": dict(sorted(counts.items(), key=lambda kv: -kv[1])),
         "files": [f.as_dict() for f in files],
@@ -226,7 +249,11 @@ def report_markdown(rep: dict, limit: int = 200) -> str:
             out.append(f"\n...and {len(hits) - limit} more file(s).")
     skipped = [f for f in rep["files"] if f.get("skipped")]
     if skipped:
-        out += ["", f"Skipped {len(skipped)} file(s): " + "; ".join(f"`{f['path']}` ({f['skipped']})" for f in skipped[:20])]
+        out += ["", f"**Not checked: {len(skipped)} file(s)** " + "; ".join(f"`{f['path']}` ({f['skipped']})" for f in skipped[:20])]
+    for err in rep.get("errors", []):
+        out += ["", f"**Couldn't scan `{err['target']}`:** {err['error']}"]
+    if not rep.get("complete", True) or not rep["files_scanned"]:
+        out += ["", "> This scan is incomplete, so \"no personal data found\" does not cover what wasn't checked."]
     return "\n".join(out) + "\n"
 
 
@@ -242,6 +269,12 @@ def report_html(rep: dict) -> str:
         rows.append(f'<tr class="{f["risk"]}"><td><i>{f["risk"]}</i></td><td><code>{e(f["path"])}</code>'
                     f'<ul>{samples}</ul></td><td>{f["total"]}</td><td>{chips}</td></tr>')
     totals = "".join(f'<span class="c">{e(t)} <b>{n}</b></span>' for t, n in rep["counts"].items())
+    gaps = [f"<li>Couldn't scan <code>{e(x['target'])}</code>: {e(x['error'])}</li>" for x in rep.get("errors", [])]
+    gaps += [f"<li>Not checked: <code>{e(f['path'])}</code> ({e(f['skipped'])})</li>" for f in rep["files"] if f.get("skipped")][:50]
+    warn = (f'<div class="warn"><b>This scan is incomplete.</b> "No personal data found" does not cover these:<ul>{"".join(gaps)}</ul></div>'
+            if gaps or not rep["files_scanned"] else "")
+    if not rep["files_scanned"] and not gaps:
+        warn = '<div class="warn"><b>No text files were checked.</b></div>'
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PII scan report</title><style>
 body{{font:15px/1.55 system-ui,sans-serif;margin:0;background:#f6f8fa;color:#14202b}}main{{max-width:1000px;margin:auto;padding:32px 18px}}
@@ -252,10 +285,11 @@ th,td{{text-align:left;padding:10px 12px;border-bottom:1px solid #eef1f4;vertica
 td ul{{margin:6px 0 0;padding-left:18px;color:#5a6b7b;font-size:.85rem}}.c{{display:inline-block;border:1px solid #dde3e9;border-radius:99px;padding:1px 9px;margin:2px;font-size:.8rem}}
 tr.high td:first-child i{{background:#ffe1e1;color:#a40000}}tr.medium td:first-child i{{background:#fff1d6;color:#8a5a00}}tr.low td:first-child i{{background:#e6f6ef;color:#0b6b48}}
 td:first-child i{{font-style:normal;font-weight:700;font-size:.75rem;border-radius:6px;padding:2px 8px}}code{{word-break:break-all}}
+.warn{{background:#fff4e0;border:1px solid #f0c36b;border-radius:10px;padding:12px 16px;margin:0 0 18px}}.warn ul{{margin:6px 0 0}}
 </style></head><body><main><h1>PII scan report</h1>
 <p class="meta">{e(rep['created'])} · {e(', '.join(rep['targets']))} · {e(rep['mode'])} · scrubpii {e(rep['scrubpii'])}. Values are shown only as short previews.</p>
-<div class="big"><div><b>{rep['total']}</b>items found</div><div><b>{rep['files_with_pii']}</b>files with personal data</div><div><b>{rep['files_scanned']}</b>files scanned</div></div>
-<p>{totals}</p><table><thead><tr><th>Risk</th><th>File</th><th>Items</th><th>Types</th></tr></thead><tbody>{''.join(rows) or '<tr><td colspan="4">No personal data found.</td></tr>'}</tbody></table>
+{warn}<div class="big"><div><b>{rep['total']}</b>items found</div><div><b>{rep['files_with_pii']}</b>files with personal data</div><div><b>{rep['files_scanned']}</b>files scanned</div></div>
+<p>{totals}</p><table><thead><tr><th>Risk</th><th>File</th><th>Items</th><th>Types</th></tr></thead><tbody>{''.join(rows) or '<tr><td colspan="4">No personal data found in the files checked.</td></tr>'}</tbody></table>
 </main></body></html>
 """
 
@@ -274,6 +308,8 @@ def main(argv: List[str]) -> int:
     ap.add_argument("--format", choices=("text", "md", "json"), default="text", help="what to print (default: text)")
     ap.add_argument("--fail", action="store_true", help="exit with status 1 if anything is found (for CI)")
     ap.add_argument("--fail-on", help="only fail for these types, comma separated (e.g. SSN,CREDIT_CARD,API_KEY)")
+    ap.add_argument("--allow-skipped", action="store_true",
+                    help="with --fail: don't fail because some files were too big or unreadable")
     a = ap.parse_args(argv)
     rep = scan(a.targets, a.fast, a.min_score, include=a.include, exclude=a.exclude, max_bytes=a.max_bytes)
     if a.report:
@@ -290,8 +326,21 @@ def main(argv: List[str]) -> int:
                 types = ", ".join(f"{t} {n}" for t, n in f["counts"].items())
                 print(f"{f['risk']:>6}  {f['path']}  ({types})")
         print(f"{rep['total']} item(s) of personal data in {rep['files_with_pii']} of {rep['files_scanned']} file(s).")
+    # "Checked and found nothing" is not the same as "couldn't check": say so, and fail CI for it.
+    for e in rep["errors"]:
+        print(f"scrubpii scan: couldn't scan {e['target']}: {e['error']}", file=sys.stderr)
+    if rep["files_skipped"]:
+        print(f"scrubpii scan: {rep['files_skipped']} file(s) were not checked (too big or unreadable); "
+              f"see the report, or raise --max-bytes.", file=sys.stderr)
+    if not rep["errors"] and not rep["files_scanned"]:
+        print("scrubpii scan: no text files were checked.", file=sys.stderr)
+    if rep["errors"]:
+        return 2
     if a.fail or a.fail_on:
         bad = set(t.strip().upper() for t in a.fail_on.split(",")) if a.fail_on else None
         hit = any(t in bad for t in rep["counts"]) if bad else rep["total"] > 0
-        return 1 if hit else 0
+        if hit:
+            return 1
+        if not rep["files_scanned"] or (rep["files_skipped"] and not a.allow_skipped):
+            return 2
     return 0
