@@ -26,8 +26,9 @@ from typing import Callable, Dict, Iterable, List, Optional, Tuple
 
 __all__ = ["Entity", "find", "find_many", "redact", "redact_many", "tokenize", "restore", "fake_for", "MODEL_ID",
            "redact_json", "redact_csv", "redact_dataframe", "Guard",
-           "add_rule", "add_words", "allow", "teach", "understand", "clear_rules", "load_rules", "rules", "audit", "audit_markdown"]
-__version__ = "0.6.0"
+           "add_rule", "add_words", "allow", "teach", "understand", "clear_rules", "load_rules", "rules", "audit", "audit_markdown",
+           "ScrubFilter", "scrub_logs"]
+__version__ = "0.7.0"
 
 # The model to use: a Hugging Face repo or a local folder. SCRUBPII_MODEL overrides it.
 MODEL_ID = os.environ.get("SCRUBPII_MODEL") or "ChadTollison/pii-distilbert-v5"
@@ -507,17 +508,21 @@ def _rules(ents: List[Entity], text: str) -> List[Entity]:
     return kept
 
 
-def find(text: str, min_score: float = 0.5, model: str = MODEL_ID) -> List[Entity]:
+def find(text: str, min_score: float = 0.5, model: str = MODEL_ID, fast: bool = False) -> List[Entity]:
     """Return the personal data found in `text`, in order.
 
     Items the rules found or confirmed are always returned. Others need a model
     confidence of at least `min_score`, and must pass their type's check
     (Luhn for cards, checksum for IBANs, format for SSNs...) unless the model
     is at least 95% sure.
+
+    fast=True skips the model and runs only the rules (emails, phones, SSNs,
+    cards, IBANs, IPs, API keys, your own rules). It takes microseconds, which
+    suits log lines and big scans, but it does not find names or addresses.
     """
     if not text.strip():
         return []
-    return _finish(text, _model_entities(text, model), min_score)
+    return _finish(text, [] if fast else _model_entities(text, model), min_score)
 
 
 def _finish(text: str, ents: List[Entity], min_score: float, dropped: Optional[List[Entity]] = None) -> List[Entity]:
@@ -645,13 +650,14 @@ def _apply(text: str, ents: List[Entity], mode: str, key: Optional[Dict[str, str
     return "".join(out), key
 
 
-def redact(text: str, mode: str = "label", min_score: float = 0.5, model: str = MODEL_ID) -> str:
+def redact(text: str, mode: str = "label", min_score: float = 0.5, model: str = MODEL_ID, fast: bool = False) -> str:
     """Return `text` with personal data replaced.
 
     mode="label" -> [PHONE]   mode="mask" -> ████   mode="fake" -> (202) 555-0142
     mode="token" -> <PHONE_1> (use tokenize() to also get the key back)
+    fast=True runs only the rules, no model (see find()).
     """
-    return _apply(text, find(text, min_score, model), mode)[0]
+    return _apply(text, find(text, min_score, model, fast), mode)[0]
 
 
 def redact_many(texts: List[str], mode: str = "label", min_score: float = 0.5, model: str = MODEL_ID) -> List[str]:
@@ -753,3 +759,4 @@ def restore(text: str, key: Dict[str, str]) -> str:
 
 from .structured import redact_csv, redact_dataframe, redact_json  # noqa: E402
 from .guard import Guard  # noqa: E402
+from .logs import ScrubFilter, scrub_logs  # noqa: E402

@@ -12,10 +12,10 @@ The site will publish at `https://chadtollison.github.io`.
 ## Important
 Professional case studies are intentionally sanitized. Do not publish employer source code, customer information, credentials, internal screenshots, or confidential schemas.
 
-## Live PII demo (`/pii/`)
-`pii/index.html`, `redact.css` and `redact.js` are a live demo of the PII Detector. The model runs in the visitor's browser with [transformers.js](https://huggingface.co/docs/transformers.js), so there is no server and nothing to pay for. The model files in `models/pii-distilbert-v5/` are an 8-bit ONNX copy of [ChadTollison/pii-distilbert-v5](https://huggingface.co/ChadTollison/pii-distilbert-v5).
+## Privacy tools (moved)
+The live PII demo and the scrubpii docs now live on their own site, [chadtollison.github.io/privacy-tools](https://chadtollison.github.io/privacy-tools/) (repo [chadtollison/privacy-tools](https://github.com/chadtollison/privacy-tools)). `pii/`, `redact.html`, `scrubpii/index.html` and `chad-pii/` here are redirects so old links keep working.
 
-If you retrain the model on Hugging Face, open **Actions → Build in-browser PII model → Run workflow**. It rebuilds the files and commits them for you.
+The scrubpii package source (`scrubpii/`), the model files in `models/` and the training and benchmark workflows stay in this repo. After a new model is shipped to `models/pii-distilbert-v5/`, copy that folder to the privacy-tools repo too so the demo uses it.
 
 ## SAML & SCIM debugger (`/sso/`)
 `sso/index.html`, `sso.css` and the rest of the `sso/` folder are a free debugger for SAML sign-in and SCIM provisioning. Everything runs in the visitor's browser (no libraries, no server); a Content-Security-Policy stops the page from sending pasted data anywhere.
@@ -28,4 +28,4 @@ If you retrain the model on Hugging Face, open **Actions → Build in-browser PI
 - `sso/report.js`: redacted reports (rule-based, using what each field means).
 - `sso/samples.js`: examples. SAML examples are signed live with a **public demo key** that no real system should trust.
 
-`redact.html` and `sso-debugger.html` are redirects to the new addresses, so old links keep working.
+`sso-debugger.html` is a redirect to the new address, so old links keep working.

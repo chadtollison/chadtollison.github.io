@@ -62,7 +62,24 @@ It runs on ONNX Runtime, so there is no PyTorch to install. The 8-bit model
 under a second and works offline. Nothing is sent anywhere. If you already
 use PyTorch, `pip install "scrubpii[torch]"` and set `SCRUBPII_BACKEND=torch`.
 
-Try it in your browser first: [chadtollison.github.io/pii/](https://chadtollison.github.io/pii/)
+Try it in your browser first: [chadtollison.github.io/privacy-tools/pii/](https://chadtollison.github.io/privacy-tools/pii/)
+
+
+## Privacy tools built on scrubpii
+
+Five free tools use scrubpii: [chadtollison.github.io/privacy-tools](https://chadtollison.github.io/privacy-tools/).
+
+```bash
+scrubpii proxy --upstream https://api.openai.com      # then OPENAI_BASE_URL=http://127.0.0.1:8787/v1
+scrubpii scan ./exports s3://bucket/logs --report pii-report.html
+tail -f app.log | scrubpii --fast                      # rules only, streams line by line
+```
+
+```python
+import logging, scrubpii
+logging.basicConfig(level=logging.INFO)
+scrubpii.scrub_logs()          # every log line is scrubbed before it is written
+```
 
 ## Ways to redact
 
@@ -140,7 +157,7 @@ scrubpii.understand("redact any ###-#####-##-RC as an RC code")
 ```
 
 On the command line: `scrubpii --rule "redact any ###-#####-##-RC as an RC code" --file notes.txt`.
-The [online demo](https://chadtollison.github.io/pii/) takes the same rules.
+The [online demo](https://chadtollison.github.io/privacy-tools/pii/) takes the same rules.
 
 ### Rules with regular expressions
 

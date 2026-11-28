@@ -9,6 +9,9 @@
   scrubpii --rules my_rules.json "..."            -> add your own patterns (see scrubpii.load_rules)
   scrubpii --rule "redact any ###-#####-##-RC as an RC code" "..."   -> a rule in plain English
   scrubpii serve --port 8000                      -> local HTTP API (needs scrubpii[server])
+  scrubpii proxy --upstream https://api.openai.com -> privacy proxy for LLM APIs (see scrubpii.proxy)
+  scrubpii scan ./data s3://bucket --report r.html -> where personal data lives (see scrubpii.scan)
+  scrubpii --fast "..."                           -> rules only, no model (fast; no names)
 """
 import argparse
 import json
@@ -18,7 +21,7 @@ from pathlib import Path
 from . import MODES, __version__, audit, teach, understand, audit_markdown, find, load_rules, redact, redact_csv, redact_json, tokenize
 
 
-def _file(path, mode, min_score, columns):
+def _file(path, mode, min_score, columns, fast=False):
     p = Path(path)
     text = p.read_text(encoding="utf-8")
     ext = p.suffix.lower()
@@ -29,7 +32,7 @@ def _file(path, mode, min_score, columns):
     if ext == ".jsonl":
         lines = [json.loads(l) for l in text.splitlines() if l.strip()]
         return "".join(json.dumps(x, ensure_ascii=False) + "\n" for x in redact_json(lines, mode, columns, min_score))
-    return redact(text, mode, min_score)
+    return redact(text, mode, min_score, fast=fast)
 
 
 def main(argv=None):
@@ -41,6 +44,12 @@ def main(argv=None):
         s = sp.parse_args(argv[1:])
         from .server import run
         return run(s.host, s.port)
+    if argv[:1] == ["proxy"]:
+        from .proxy import main as proxy_main
+        return proxy_main(argv[1:])
+    if argv[:1] == ["scan"]:
+        from .scan import main as scan_main
+        sys.exit(scan_main(argv[1:]))
     ap = argparse.ArgumentParser(prog="scrubpii", description="Find and redact personal data in text.")
     ap.add_argument("text", nargs="?", help="text to redact (default: read standard input)")
     ap.add_argument("--file", help="redact a .csv, .json, .jsonl or text file")
@@ -48,6 +57,7 @@ def main(argv=None):
     ap.add_argument("--columns", help="CSV columns / JSON fields to redact, comma separated (default: all)")
     ap.add_argument("--mode", choices=MODES, default="label", help="how to replace what it finds (default: label)")
     ap.add_argument("--min-score", type=float, default=0.5, help="model confidence needed (default: 0.5)")
+    ap.add_argument("--fast", action="store_true", help="rules only, no model: very fast, but names and addresses are not found")
     ap.add_argument("--find", action="store_true", help="print what it found as JSON instead of redacting")
     ap.add_argument("--audit", action="store_true", help="print a report: redacted text and why each item was flagged")
     ap.add_argument("--audit-format", choices=("json", "md"), default="json", help="audit report format (default: json)")
@@ -72,17 +82,23 @@ def main(argv=None):
         rep = audit(text, a.mode if a.mode != "token" else "label", a.min_score, include_values=a.show_values)
         out = audit_markdown(rep) + "\n" if a.audit_format == "md" else json.dumps(rep, indent=2, ensure_ascii=False) + "\n"
     elif a.file:
-        out = _file(a.file, a.mode, a.min_score, cols)
+        out = _file(a.file, a.mode, a.min_score, cols, a.fast)
+    elif a.text is None and not a.find and a.mode != "token" and not a.output:
+        # Standard input, line by line, so it works on a live stream: tail -f app.log | scrubpii --fast
+        for line in sys.stdin:
+            sys.stdout.write(redact(line, a.mode, a.min_score, fast=a.fast))
+            sys.stdout.flush()
+        return
     else:
         text = a.text if a.text is not None else sys.stdin.read()
         if a.find:
-            out = json.dumps([e.as_dict() for e in find(text, a.min_score)], indent=2, ensure_ascii=False) + "\n"
+            out = json.dumps([e.as_dict() for e in find(text, a.min_score, fast=a.fast)], indent=2, ensure_ascii=False) + "\n"
         elif a.mode == "token":
             out, key = tokenize(text, a.min_score)
             out += "\n"
             print(json.dumps(key, indent=2, ensure_ascii=False), file=sys.stderr)
         else:
-            out = redact(text, a.mode, a.min_score) + "\n"
+            out = redact(text, a.mode, a.min_score, fast=a.fast) + "\n"
     if a.output:
         Path(a.output).write_text(out, encoding="utf-8")
     else:

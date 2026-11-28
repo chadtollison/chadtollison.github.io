@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.0
+- `scrubpii proxy`: a local privacy proxy for LLM APIs. Point `OPENAI_BASE_URL` or `ANTHROPIC_BASE_URL` at it;
+  prompts are tokenized before they leave your machine and answers come back with the real values, streaming
+  included (tokens split across chunks are handled). Standard library only.
+- `scrubpii.scrub_logs()` / `ScrubFilter`: a logging filter that redacts messages, their arguments and tracebacks.
+- `scrubpii scan`: find personal data in folders, files, `s3://` and `gs://` buckets, with HTML, Markdown or JSON
+  reports that never contain the values; `--fail` / `--fail-on` for CI. Also as `scrubpii.scan.scan()`.
+- `fast=True` (`--fast` on the command line) runs the rules only, no model: microseconds per line.
+- Reading standard input now works line by line, so `tail -f app.log | scrubpii --fast` streams.
+
 ## 0.6.0
 - New model, pii-distilbert-v5: trained on more data (NVIDIA Nemotron-PII; French, German and Italian from
   ai4privacy). It now reads five languages and catches far more lone first names and health ID numbers:

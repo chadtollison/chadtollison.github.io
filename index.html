@@ -16,7 +16,7 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="styles.css?v=2026-11-28b">
+  <link rel="stylesheet" href="styles.css?v=2026-11-28c">
 </head>
 <body>
   <div id="scroll-progress" aria-hidden="true"></div>
@@ -58,7 +58,7 @@
           </figure>
         </div>
       </div>
-      <a class="redact-teaser reactive" href="pii/" aria-label="Open the live PII redaction demo">
+      <a class="redact-teaser reactive" href="https://chadtollison.github.io/privacy-tools/pii/" aria-label="Open the live PII redaction demo">
         <small><i class="live-dot" aria-hidden="true"></i>LIVE DEMO · RUNS IN YOUR BROWSER</small>
         <p aria-hidden="true">Hi, I'm <span class="t-pii" data-tag="NAME">Jane Doe</span>. Email me at <span class="t-pii" data-tag="EMAIL">jane@mail.com</span> or call <span class="t-pii" data-tag="PHONE">555-0142</span>.</p>
         <b>Paste your own text <span>→</span></b>
@@ -72,7 +72,7 @@
       <a class="path-card reactive" data-glow href="#projects">
         <small>BUILT BY ME · OPEN SOURCE</small>
         <strong>Things you can use right now</strong>
-        <p>A Python package that beats Microsoft Presidio, a live PII redaction demo and a SAML &amp; SCIM debugger. Click, paste, try.</p>
+        <p>Five privacy tools built on a PII redactor that beats Microsoft Presidio, plus a SAML &amp; SCIM debugger. Click, paste, try.</p>
         <b>See my projects <span>↓</span></b>
       </a>
       <a class="path-card reactive" data-glow href="#work">
@@ -89,10 +89,16 @@
 
       <article class="card flagship reactive" data-glow>
         <div class="flag-copy">
-          <small>FLAGSHIP · PYTHON PACKAGE ON PYPI · MIT</small>
-          <h3>scrubpii</h3>
-          <p class="headline">Finds and redacts personal data with one line of Python, and beats Microsoft Presidio on all 7 benchmark sets.</p>
-          <p>Names, addresses, emails, phones, SSNs, cards, IBANs, passports, licenses, dates of birth, passwords, IPs and API keys, in English, Spanish, French, German and Italian. A DistilBERT model I fine-tuned does the finding and checksum rules double-check it, so a card number must pass Luhn and an IBAN its bank checksum. Teams can add their own rules in plain English, and an audit report shows what was found and why. It runs offline, with no PyTorch to install.</p>
+          <small>FLAGSHIP · FREE PRIVACY TOOLS · OPEN SOURCE</small>
+          <h3>Privacy tools</h3>
+          <p class="headline">Five free tools that hide personal data on your own device, built on scrubpii, my PII redactor that beats Microsoft Presidio on all 7 benchmark sets.</p>
+          <ul class="tool-list">
+            <li><b>Prompt Shield</b> hides names and numbers from ChatGPT and Claude, then restores them in the answer.</li>
+            <li><b>Log Scrubber</b> cleans logs, with a Python logging filter and a GitHub Action.</li>
+            <li><b>Leak Scanner</b> finds personal data in folders, S3 and GCS buckets.</li>
+            <li><b>Fake Data</b> turns real exports into realistic test data.</li>
+            <li><b>Paste Guard</b> is a browser extension that warns before you paste PII.</li>
+          </ul>
           <div class="code-line"><span>$</span> pip install scrubpii</div>
           <div class="flag-stats">
             <div><strong>0.99</strong><span>F1 vs Presidio's 0.81 on ai4privacy English</span></div>
@@ -100,10 +106,9 @@
             <div><strong>0.6 s</strong><span>cold start, vs 1.5 s</span></div>
           </div>
           <div class="links">
-            <a class="projectlink live" href="scrubpii/">Read the docs <span>→</span></a>
+            <a class="projectlink live" href="https://chadtollison.github.io/privacy-tools/">See all the tools <span>→</span></a>
+            <a class="projectlink" href="https://chadtollison.github.io/privacy-tools/pii/">Try the live demo <span>→</span></a>
             <a class="projectlink" href="https://pypi.org/project/scrubpii/" target="_blank" rel="noreferrer">PyPI <span>↗</span></a>
-            <a class="projectlink" href="https://github.com/chadtollison/chadtollison.github.io/blob/main/benchmarks/compare.md" target="_blank" rel="noreferrer">Full benchmark <span>↗</span></a>
-            <a class="projectlink" href="https://huggingface.co/ChadTollison/pii-distilbert-v5" target="_blank" rel="noreferrer">Model <span>↗</span></a>
           </div>
         </div>
         <figure class="bench" data-chart aria-labelledby="bench-cap">
@@ -121,20 +126,7 @@
         </figure>
       </article>
 
-      <div class="grid built-grid">
-        <article class="card reactive" data-glow data-tilt>
-          <small>LIVE DEMO · RUNS IN YOUR BROWSER</small>
-          <h3>Redact me</h3>
-          <p class="headline">Paste any text, PDF or CSV and watch personal data disappear, without anything leaving your device.</p>
-          <p>The same model behind scrubpii, shrunk to an 8-bit, 63 MB file that runs in the page. Switch between tags, masks and realistic fake values, and teach it new rules in plain English. Hosted free on GitHub Pages with no server.</p>
-          <div class="flow">Your text → DistilBERT in the browser → Checksum rules → Redacted output</div>
-          <div class="tags"><span>Transformers.js</span><span>ONNX</span><span>JavaScript</span><span>Fine-tuning</span></div>
-          <div class="links">
-            <a class="projectlink live" href="pii/">Try the live demo <span>→</span></a>
-            <a class="projectlink" href="https://github.com/chadtollison/PII-Detector" target="_blank" rel="noreferrer">Training code <span>↗</span></a>
-          </div>
-        </article>
-
+      <div class="built-grid">
         <article class="card reactive" data-glow data-tilt>
           <small>FREE TOOL · RUNS IN YOUR BROWSER</small>
           <h3>SAML &amp; SCIM Debugger</h3>
