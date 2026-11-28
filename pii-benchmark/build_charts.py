@@ -12,7 +12,10 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-ME, THEM = "scrubpii", "Microsoft Presidio"
+ME = "scrubpii"
+# Newest results name Presidio by setup; older ones just "Microsoft Presidio".
+THEM_CHOICES = ["Microsoft Presidio (each language's own setup)", "Microsoft Presidio (English setup)", "Microsoft Presidio"]
+THEM = None
 
 # dataset key in compare.json -> (label, note shown beside the label)
 SETS = [
@@ -73,8 +76,16 @@ def put(path, name, body):
 
 
 def main():
+    global THEM
     data = json.loads(Path(sys.argv[1]).read_text())
     res = data["results"]
+    systems = next(iter(res.values())).keys()
+    THEM = next(n for n in THEM_CHOICES if n in systems)
+    if THEM != "Microsoft Presidio (English setup)" and THEM != "Microsoft Presidio":
+        for i, (k, label, note) in enumerate(SETS):  # each language got its own Presidio setup
+            if note == "Presidio in English mode":
+                SETS[i] = (k, label, "")
+    print(f"comparing {ME} with {THEM}")
     put(HERE / "index.html", "score", sets_rows(res, None, " " * 10))
     put(HERE / "index.html", "types", type_rows(res, " " * 10))
 
