@@ -173,7 +173,17 @@
         </article>
         
         <article class="card reactive" data-glow data-tilt>
-          <small>CASE STUDY · 03</small>
+          <small>PUBLIC PROJECT · 03</small>
+          <h3>SAML &amp; SCIM Debugger</h3>
+          <p>A free tool for the two problems I debugged most while building SSO for 300+ customer organizations. Paste a SAML response and it decodes it, verifies the XML signature, and flags expired assertions, audience and ACS mismatches, missing attributes, and signature wrapping attacks. Paste a SCIM payload and it checks it against RFC 7643/7644 and the quirks of Entra ID and Okta. The signature check is written from the W3C specs and runs entirely in the browser.</p>
+          <div class="flow">Paste → Decode → Verify signature → Check → Plain-English fixes</div>
+          <div class="tags"><span>SAML 2.0</span><span>SCIM 2.0</span><span>XML Signature</span><span>WebCrypto</span><span>JavaScript</span></div>
+          <a class="projectlink live" href="sso-debugger.html">Try the debugger <span>→</span></a>
+          <a class="projectlink" href="https://github.com/chadtollison/chadtollison.github.io/tree/main/sso" target="_blank" rel="noreferrer">View the code <span>↗</span></a>
+        </article>
+
+        <article class="card reactive" data-glow data-tilt>
+          <small>CASE STUDY · 04</small>
           <h3>Enterprise Data Platform</h3>
           <p>Architected a centralized 440+ GB reporting platform and end-to-end pipelines across SQL Server, PostgreSQL, MySQL, Elasticsearch, product analytics, and internal APIs.</p>
           <div class="flow">Multi-source data → C# + Python ETL → SQL Server → BI & Analytics</div>
@@ -181,28 +191,29 @@
         </article>
 
         <article class="card reactive" data-glow data-tilt>
-          <small>CASE STUDY · 04</small>
+          <small>CASE STUDY · 05</small>
           <h3>Customer Health Intelligence</h3>
           <p>Designed a pipeline that analyzes six months of product usage, calculates growth and decline trends, and combines product signals with Salesforce data to surface retention risk and upsell opportunities.</p>
           <div class="tags"><span>Data Pipelines</span><span>Salesforce</span><span>Analytics</span></div>
         </article>
 
         <article class="card reactive" data-glow data-tilt>
-          <small>CASE STUDY · 05</small>
+          <small>CASE STUDY · 06</small>
           <h3>Cloud Observability & SLA Monitoring</h3>
           <p>Built AWS monitoring with custom CloudWatch metrics, run-status tracking, dashboards, and 15+ automated alarms, alongside Sentry and Splunk. Added a daily runner that collects per-endpoint API metrics and GitHub Actions deployment-drift reporting that flags stale or missed releases across dev, test, and prod.</p>
           <div class="tags"><span>CloudWatch</span><span>Sentry</span><span>Splunk</span><span>AWS</span></div>
         </article>
 
         <article class="card reactive" data-glow data-tilt>
-          <small>CASE STUDY · 06</small>
+          <small>CASE STUDY · 07</small>
           <h3>Enterprise Identity & User Platform</h3>
           <p>Own C#/.NET microservices for organizations, users, groups, permissions, quotas, and password workflows, plus a SAML 2.0/JWT SSO framework used by 300+ customer organizations and Entra ID/SCIM provisioning that eliminates hours of manual developer work per onboarding request. Built a C# privacy microservice automating 50+ PII removal requests daily, replacing a workflow that required about 2 hours of manual processing per request. Automated daily Salesforce-to-AlloyDB privacy opt-out reconciliation in Python, eliminating 5–6 hours per day of manual work by a developer and a legal representative.</p>
           <div class="tags"><span>C#/.NET</span><span>Python</span><span>Microservices</span><span>NUnit</span><span>SAML</span><span>SCIM</span><span>Salesforce</span></div>
+          <a class="projectlink live" href="sso-debugger.html">Try my SAML &amp; SCIM debugger <span>→</span></a>
         </article>
 
         <article class="card reactive" data-glow data-tilt>
-          <small>CASE STUDY · 07</small>
+          <small>CASE STUDY · 08</small>
           <h3>AWS ETL & Infrastructure as Code</h3>
           <p>Engineered idempotent Python/.NET workloads on ECS and infrastructure-as-code for scheduling, logging, IAM, and delivery. Also built a containerized .NET 8 service to track customer API usage through AWS API Gateway, giving CX visibility beyond billing. Exposure to Apache Spark and Airflow.</p>
           <div class="flow">EventBridge → ECS → .NET / Python → SQL Server / S3</div>
@@ -210,7 +221,7 @@
         </article>
 
         <article class="card reactive" data-glow data-tilt>
-          <small>CASE STUDY · 08</small>
+          <small>CASE STUDY · 09</small>
           <h3>AI Engineering & Automation</h3>
           <p>Developed AI-assisted reporting and engineering workflows using Python, FastAPI, Vertex AI, and LLMs to summarize data, identify anomalies, assist troubleshooting, and accelerate investigation.</p>
           <div class="tags"><span>Vertex AI</span><span>LLMs</span><span>FastAPI</span><span>Python</span></div>
