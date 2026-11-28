@@ -31,9 +31,9 @@ Caught, by type:
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| scrubpii | 99% | 99% | 100% | **0.994** | 5 |
+| scrubpii | 99% | 99% | 100% | **0.994** | 8 |
 | Microsoft Presidio | 61% | 52% | 65% | 0.629 | 6 |
-| Presidio + scrubpii plug-in | 100% | 100% | 92% | 0.956 | 12 |
+| Presidio + scrubpii plug-in | 100% | 100% | 92% | 0.956 | 16 |
 | spaCy (en_core_web_lg) | 41% | 34% | 52% | 0.461 | 5 |
 
 Caught, by type:
@@ -54,9 +54,9 @@ Caught, by type:
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| scrubpii | 99% | 98% | 100% | **0.992** | 8 |
+| scrubpii | 99% | 98% | 100% | **0.992** | 6 |
 | Microsoft Presidio | 66% | 58% | 72% | 0.690 | 6 |
-| Presidio + scrubpii plug-in | 100% | 99% | 94% | 0.964 | 17 |
+| Presidio + scrubpii plug-in | 100% | 99% | 94% | 0.964 | 14 |
 | spaCy (en_core_web_lg) | 38% | 33% | 58% | 0.457 | 5 |
 
 Caught, by type:
@@ -77,9 +77,9 @@ Caught, by type:
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| scrubpii | 98% | 97% | 98% | **0.983** | 5 |
+| scrubpii | 98% | 97% | 98% | **0.983** | 6 |
 | Microsoft Presidio | 75% | 65% | 50% | 0.602 | 6 |
-| Presidio + scrubpii plug-in | 98% | 97% | 93% | 0.954 | 12 |
+| Presidio + scrubpii plug-in | 98% | 97% | 93% | 0.954 | 13 |
 | spaCy (en_core_web_lg) | 47% | 42% | 32% | 0.381 | 5 |
 
 Caught, by type:
@@ -101,7 +101,7 @@ Caught, by type:
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
 | scrubpii | 99% | 98% | 99% | **0.991** | 5 |
-| Microsoft Presidio | 68% | 58% | 60% | 0.638 | 5 |
+| Microsoft Presidio | 68% | 58% | 60% | 0.638 | 6 |
 | Presidio + scrubpii plug-in | 99% | 98% | 90% | 0.947 | 12 |
 | spaCy (en_core_web_lg) | 42% | 35% | 45% | 0.434 | 5 |
 
@@ -123,9 +123,9 @@ Caught, by type:
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| scrubpii | 99% | 99% | 99% | **0.990** | 9 |
-| Microsoft Presidio | 87% | 75% | 83% | 0.852 | 12 |
-| Presidio + scrubpii plug-in | 100% | 99% | 89% | 0.940 | 29 |
+| scrubpii | 99% | 99% | 99% | **0.990** | 13 |
+| Microsoft Presidio | 87% | 75% | 83% | 0.852 | 11 |
+| Presidio + scrubpii plug-in | 100% | 99% | 89% | 0.940 | 21 |
 | spaCy (en_core_web_lg) | 22% | 14% | 85% | 0.356 | 9 |
 
 Caught, by type:
@@ -149,10 +149,10 @@ Caught, by type:
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| scrubpii | 86% | 78% | 84% | **0.845** | 52 |
-| Microsoft Presidio | 81% | 56% | 38% | 0.521 | 53 |
-| Presidio + scrubpii plug-in | 88% | 79% | 36% | 0.511 | 107 |
-| spaCy (en_core_web_lg) | 55% | 34% | 61% | 0.580 | 45 |
+| scrubpii | 86% | 78% | 84% | **0.845** | 49 |
+| Microsoft Presidio | 81% | 56% | 38% | 0.521 | 49 |
+| Presidio + scrubpii plug-in | 88% | 79% | 36% | 0.511 | 99 |
+| spaCy (en_core_web_lg) | 55% | 34% | 61% | 0.580 | 40 |
 
 Caught, by type:
 
@@ -177,10 +177,10 @@ Caught, by type:
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| scrubpii | 98% | 98% | 99% | **0.989** | 26 |
-| Microsoft Presidio | 88% | 78% | 76% | 0.816 | 30 |
-| Presidio + scrubpii plug-in | 99% | 98% | 80% | 0.886 | 64 |
-| spaCy (en_core_web_lg) | 32% | 30% | 94% | 0.474 | 26 |
+| scrubpii | 98% | 98% | 99% | **0.989** | 25 |
+| Microsoft Presidio | 88% | 78% | 76% | 0.816 | 28 |
+| Presidio + scrubpii plug-in | 99% | 98% | 80% | 0.886 | 54 |
+| spaCy (en_core_web_lg) | 32% | 30% | 94% | 0.474 | 23 |
 
 Caught, by type:
 
@@ -203,10 +203,10 @@ Caught, by type:
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| scrubpii | 98% | 98% | 100% | **0.987** | 32 |
-| Microsoft Presidio | 82% | 76% | 75% | 0.783 | 36 |
-| Presidio + scrubpii plug-in | 98% | 98% | 78% | 0.869 | 69 |
-| spaCy (en_core_web_lg) | 40% | 39% | 97% | 0.568 | 32 |
+| scrubpii | 98% | 98% | 100% | **0.987** | 48 |
+| Microsoft Presidio | 82% | 76% | 75% | 0.783 | 32 |
+| Presidio + scrubpii plug-in | 98% | 98% | 78% | 0.869 | 63 |
+| spaCy (en_core_web_lg) | 40% | 39% | 97% | 0.568 | 27 |
 
 Caught, by type:
 
@@ -229,10 +229,10 @@ Caught, by type:
 
 | System | Caught | Fully hidden | Was personal | F1 | ms/text |
 |---|---:|---:|---:|---:|---:|
-| scrubpii | 96% | 96% | 97% | **0.968** | 38 |
-| Microsoft Presidio | 70% | 60% | 74% | 0.717 | 32 |
-| Presidio + scrubpii plug-in | 98% | 97% | 78% | 0.869 | 72 |
-| spaCy (en_core_web_lg) | 19% | 18% | 88% | 0.313 | 28 |
+| scrubpii | 96% | 96% | 97% | **0.968** | 35 |
+| Microsoft Presidio | 70% | 60% | 74% | 0.717 | 30 |
+| Presidio + scrubpii plug-in | 98% | 97% | 78% | 0.869 | 65 |
+| spaCy (en_core_web_lg) | 19% | 18% | 88% | 0.313 | 24 |
 
 Caught, by type:
 

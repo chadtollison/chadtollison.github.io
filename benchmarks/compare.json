@@ -17,7 +17,7 @@
         "fully_hidden": 0.995,
         "was_personal": 0.994,
         "f1": 0.996,
-        "ms_per_text": 3.9,
+        "ms_per_text": 4.0,
         "by_type": {
           "ADDRESS": {
             "items": 319,
@@ -72,7 +72,7 @@
         "fully_hidden": 0.668,
         "was_personal": 0.905,
         "f1": 0.814,
-        "ms_per_text": 6.1,
+        "ms_per_text": 6.2,
         "by_type": {
           "ADDRESS": {
             "items": 319,
@@ -127,7 +127,7 @@
         "fully_hidden": 0.997,
         "was_personal": 0.948,
         "f1": 0.973,
-        "ms_per_text": 14.1,
+        "ms_per_text": 14.5,
         "by_type": {
           "ADDRESS": {
             "items": 319,
@@ -182,7 +182,7 @@
         "fully_hidden": 0.462,
         "was_personal": 0.978,
         "f1": 0.676,
-        "ms_per_text": 4.8,
+        "ms_per_text": 5.1,
         "by_type": {
           "ADDRESS": {
             "items": 319,
@@ -239,7 +239,7 @@
         "fully_hidden": 0.99,
         "was_personal": 0.996,
         "f1": 0.994,
-        "ms_per_text": 5.0,
+        "ms_per_text": 7.5,
         "by_type": {
           "ADDRESS": {
             "items": 169,
@@ -294,7 +294,7 @@
         "fully_hidden": 0.515,
         "was_personal": 0.653,
         "f1": 0.629,
-        "ms_per_text": 5.6,
+        "ms_per_text": 6.0,
         "by_type": {
           "ADDRESS": {
             "items": 169,
@@ -349,7 +349,7 @@
         "fully_hidden": 0.995,
         "was_personal": 0.918,
         "f1": 0.956,
-        "ms_per_text": 11.6,
+        "ms_per_text": 16.5,
         "by_type": {
           "ADDRESS": {
             "items": 169,
@@ -404,7 +404,7 @@
         "fully_hidden": 0.341,
         "was_personal": 0.522,
         "f1": 0.461,
-        "ms_per_text": 4.8,
+        "ms_per_text": 5.1,
         "by_type": {
           "ADDRESS": {
             "items": 169,
@@ -461,7 +461,7 @@
         "fully_hidden": 0.983,
         "was_personal": 0.996,
         "f1": 0.992,
-        "ms_per_text": 8.3,
+        "ms_per_text": 5.7,
         "by_type": {
           "ADDRESS": {
             "items": 111,
@@ -516,7 +516,7 @@
         "fully_hidden": 0.577,
         "was_personal": 0.725,
         "f1": 0.69,
-        "ms_per_text": 6.1,
+        "ms_per_text": 6.3,
         "by_type": {
           "ADDRESS": {
             "items": 111,
@@ -571,7 +571,7 @@
         "fully_hidden": 0.992,
         "was_personal": 0.935,
         "f1": 0.964,
-        "ms_per_text": 17.0,
+        "ms_per_text": 13.7,
         "by_type": {
           "ADDRESS": {
             "items": 111,
@@ -626,7 +626,7 @@
         "fully_hidden": 0.334,
         "was_personal": 0.576,
         "f1": 0.457,
-        "ms_per_text": 5.2,
+        "ms_per_text": 5.3,
         "by_type": {
           "ADDRESS": {
             "items": 111,
@@ -683,7 +683,7 @@
         "fully_hidden": 0.972,
         "was_personal": 0.985,
         "f1": 0.983,
-        "ms_per_text": 5.2,
+        "ms_per_text": 5.5,
         "by_type": {
           "ADDRESS": {
             "items": 129,
@@ -738,7 +738,7 @@
         "fully_hidden": 0.652,
         "was_personal": 0.503,
         "f1": 0.602,
-        "ms_per_text": 5.7,
+        "ms_per_text": 5.9,
         "by_type": {
           "ADDRESS": {
             "items": 129,
@@ -793,7 +793,7 @@
         "fully_hidden": 0.974,
         "was_personal": 0.927,
         "f1": 0.954,
-        "ms_per_text": 12.0,
+        "ms_per_text": 12.7,
         "by_type": {
           "ADDRESS": {
             "items": 129,
@@ -848,7 +848,7 @@
         "fully_hidden": 0.417,
         "was_personal": 0.319,
         "f1": 0.381,
-        "ms_per_text": 4.6,
+        "ms_per_text": 4.8,
         "by_type": {
           "ADDRESS": {
             "items": 129,
@@ -905,7 +905,7 @@
         "fully_hidden": 0.984,
         "was_personal": 0.991,
         "f1": 0.991,
-        "ms_per_text": 4.9,
+        "ms_per_text": 5.2,
         "by_type": {
           "ADDRESS": {
             "items": 160,
@@ -960,7 +960,7 @@
         "fully_hidden": 0.58,
         "was_personal": 0.6,
         "f1": 0.638,
-        "ms_per_text": 5.3,
+        "ms_per_text": 5.7,
         "by_type": {
           "ADDRESS": {
             "items": 160,
@@ -1015,7 +1015,7 @@
         "fully_hidden": 0.985,
         "was_personal": 0.905,
         "f1": 0.947,
-        "ms_per_text": 11.6,
+        "ms_per_text": 12.3,
         "by_type": {
           "ADDRESS": {
             "items": 160,
@@ -1070,7 +1070,7 @@
         "fully_hidden": 0.352,
         "was_personal": 0.45,
         "f1": 0.434,
-        "ms_per_text": 4.7,
+        "ms_per_text": 4.8,
         "by_type": {
           "ADDRESS": {
             "items": 160,
@@ -1127,7 +1127,7 @@
         "fully_hidden": 0.992,
         "was_personal": 0.986,
         "f1": 0.99,
-        "ms_per_text": 8.6,
+        "ms_per_text": 12.9,
         "by_type": {
           "ADDRESS": {
             "items": 312,
@@ -1197,7 +1197,7 @@
         "fully_hidden": 0.75,
         "was_personal": 0.832,
         "f1": 0.852,
-        "ms_per_text": 11.6,
+        "ms_per_text": 11.4,
         "by_type": {
           "ADDRESS": {
             "items": 312,
@@ -1267,7 +1267,7 @@
         "fully_hidden": 0.994,
         "was_personal": 0.889,
         "f1": 0.94,
-        "ms_per_text": 29.1,
+        "ms_per_text": 21.3,
         "by_type": {
           "ADDRESS": {
             "items": 312,
@@ -1337,7 +1337,7 @@
         "fully_hidden": 0.142,
         "was_personal": 0.846,
         "f1": 0.356,
-        "ms_per_text": 9.3,
+        "ms_per_text": 9.1,
         "by_type": {
           "ADDRESS": {
             "items": 312,
@@ -1409,7 +1409,7 @@
         "fully_hidden": 0.776,
         "was_personal": 0.836,
         "f1": 0.845,
-        "ms_per_text": 51.5,
+        "ms_per_text": 48.7,
         "by_type": {
           "ADDRESS": {
             "items": 801,
@@ -1489,7 +1489,7 @@
         "fully_hidden": 0.564,
         "was_personal": 0.384,
         "f1": 0.521,
-        "ms_per_text": 52.6,
+        "ms_per_text": 49.3,
         "by_type": {
           "ADDRESS": {
             "items": 801,
@@ -1569,7 +1569,7 @@
         "fully_hidden": 0.793,
         "was_personal": 0.361,
         "f1": 0.511,
-        "ms_per_text": 107.0,
+        "ms_per_text": 99.0,
         "by_type": {
           "ADDRESS": {
             "items": 801,
@@ -1649,7 +1649,7 @@
         "fully_hidden": 0.34,
         "was_personal": 0.61,
         "f1": 0.58,
-        "ms_per_text": 44.7,
+        "ms_per_text": 40.3,
         "by_type": {
           "ADDRESS": {
             "items": 801,
@@ -1731,7 +1731,7 @@
         "fully_hidden": 0.982,
         "was_personal": 0.994,
         "f1": 0.989,
-        "ms_per_text": 26.1,
+        "ms_per_text": 25.4,
         "by_type": {
           "ADDRESS": {
             "items": 248,
@@ -1801,7 +1801,7 @@
         "fully_hidden": 0.781,
         "was_personal": 0.764,
         "f1": 0.816,
-        "ms_per_text": 29.5,
+        "ms_per_text": 27.5,
         "by_type": {
           "ADDRESS": {
             "items": 248,
@@ -1871,7 +1871,7 @@
         "fully_hidden": 0.985,
         "was_personal": 0.804,
         "f1": 0.886,
-        "ms_per_text": 63.5,
+        "ms_per_text": 54.1,
         "by_type": {
           "ADDRESS": {
             "items": 248,
@@ -1941,7 +1941,7 @@
         "fully_hidden": 0.301,
         "was_personal": 0.937,
         "f1": 0.474,
-        "ms_per_text": 26.3,
+        "ms_per_text": 23.1,
         "by_type": {
           "ADDRESS": {
             "items": 248,
@@ -2013,7 +2013,7 @@
         "fully_hidden": 0.976,
         "was_personal": 0.995,
         "f1": 0.987,
-        "ms_per_text": 31.7,
+        "ms_per_text": 48.3,
         "by_type": {
           "ADDRESS": {
             "items": 188,
@@ -2083,7 +2083,7 @@
         "fully_hidden": 0.762,
         "was_personal": 0.746,
         "f1": 0.783,
-        "ms_per_text": 36.3,
+        "ms_per_text": 31.7,
         "by_type": {
           "ADDRESS": {
             "items": 188,
@@ -2153,7 +2153,7 @@
         "fully_hidden": 0.976,
         "was_personal": 0.782,
         "f1": 0.869,
-        "ms_per_text": 69.3,
+        "ms_per_text": 62.8,
         "by_type": {
           "ADDRESS": {
             "items": 188,
@@ -2223,7 +2223,7 @@
         "fully_hidden": 0.39,
         "was_personal": 0.97,
         "f1": 0.568,
-        "ms_per_text": 31.8,
+        "ms_per_text": 27.3,
         "by_type": {
           "ADDRESS": {
             "items": 188,
@@ -2295,7 +2295,7 @@
         "fully_hidden": 0.955,
         "was_personal": 0.971,
         "f1": 0.968,
-        "ms_per_text": 38.0,
+        "ms_per_text": 35.1,
         "by_type": {
           "ADDRESS": {
             "items": 114,
@@ -2365,7 +2365,7 @@
         "fully_hidden": 0.596,
         "was_personal": 0.735,
         "f1": 0.717,
-        "ms_per_text": 32.4,
+        "ms_per_text": 29.5,
         "by_type": {
           "ADDRESS": {
             "items": 114,
@@ -2435,7 +2435,7 @@
         "fully_hidden": 0.97,
         "was_personal": 0.781,
         "f1": 0.869,
-        "ms_per_text": 72.0,
+        "ms_per_text": 65.4,
         "by_type": {
           "ADDRESS": {
             "items": 114,
@@ -2505,7 +2505,7 @@
         "fully_hidden": 0.182,
         "was_personal": 0.878,
         "f1": 0.313,
-        "ms_per_text": 28.1,
+        "ms_per_text": 23.8,
         "by_type": {
           "ADDRESS": {
             "items": 114,
