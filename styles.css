@@ -319,3 +319,18 @@ footer{display:flex;justify-content:space-between;border-top:1px solid var(--lin
   .side-project{padding:22px}
 }
 @media(pointer:coarse){.path-card:hover{transform:none}}
+
+/* v4.1 phone hero: small photo beside the role line so the headline shows on the first screen */
+@media(max-width:560px){
+  .hero{padding-top:28px}
+  .hero-grid{display:grid;grid-template-columns:76px minmax(0,1fr);gap:0 16px;align-items:center}
+  .hero-copy,.hero-side{display:contents}
+  .hero-side .portrait{grid-column:1;grid-row:1;order:0;width:76px;height:76px;padding:3px;margin:0}
+  .hero-side .portrait:after{inset:-6px}
+  .hero-side .portrait img{border-width:3px}
+  .hero-copy .kicker{grid-column:2;grid-row:1;margin:0;font-size:.66rem;letter-spacing:.14em;line-height:1.7}
+  .hero-copy h1,.hero-copy .lead,.hero-copy .buttons{grid-column:1/-1}
+  .hero-copy h1{margin:22px 0 16px}
+  .hero-copy .lead{margin:0;font-size:1.05rem}
+  .hero-copy .buttons{margin-top:24px}
+}
