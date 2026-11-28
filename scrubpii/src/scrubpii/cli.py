@@ -7,6 +7,7 @@
   scrubpii --audit "..."                          -> redacted text plus why each item was flagged (JSON)
   scrubpii --audit --audit-format md --file x.txt -> the same as a Markdown report
   scrubpii --rules my_rules.json "..."            -> add your own patterns (see scrubpii.load_rules)
+  scrubpii --rule "redact any ###-#####-##-RC as an RC code" "..."   -> a rule in plain English
   scrubpii serve --port 8000                      -> local HTTP API (needs scrubpii[server])
 """
 import argparse
@@ -14,7 +15,7 @@ import json
 import sys
 from pathlib import Path
 
-from . import MODES, __version__, audit, audit_markdown, find, load_rules, redact, redact_csv, redact_json, tokenize
+from . import MODES, __version__, audit, teach, understand, audit_markdown, find, load_rules, redact, redact_csv, redact_json, tokenize
 
 
 def _file(path, mode, min_score, columns):
@@ -52,11 +53,20 @@ def main(argv=None):
     ap.add_argument("--audit-format", choices=("json", "md"), default="json", help="audit report format (default: json)")
     ap.add_argument("--show-values", action="store_true", help="put the real values in the audit report (off by default)")
     ap.add_argument("--rules", action="append", default=[], help="JSON file of your own rules; can repeat")
+    ap.add_argument("--rule", action="append", default=[], metavar="ENGLISH",
+                    help='a rule in plain English, e.g. "redact any ###-#####-##-RC as an RC code" '
+                         "(# = digit, @ = letter); can repeat")
     ap.add_argument("--version", action="version", version=f"scrubpii {__version__}")
     a = ap.parse_args(argv)
     cols = a.columns.split(",") if a.columns else None
     for path in a.rules:
         load_rules(path)
+    for sentence in a.rule:
+        try:
+            teach(sentence)
+        except ValueError as e:
+            ap.error(f'rule "{sentence}": {e}')
+        print(f"rule: {understand(sentence)}", file=sys.stderr)
     if a.audit:
         text = Path(a.file).read_text(encoding="utf-8") if a.file else a.text if a.text is not None else sys.stdin.read()
         rep = audit(text, a.mode if a.mode != "token" else "label", a.min_score, include_values=a.show_values)

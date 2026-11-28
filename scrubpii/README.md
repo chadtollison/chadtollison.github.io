@@ -106,8 +106,41 @@ confirmed by a rule are always returned. Every item says how it was found
 
 ## Your own rules
 
-Add patterns for data only you have, like employee or member IDs, without
-retraining anything:
+Say it in plain English. No regex, no retraining, no AI service: scrubpii
+reads the sentence itself, offline.
+
+```python
+import scrubpii
+
+scrubpii.teach("redact any ###-#####-##-RC as an RC code")
+scrubpii.redact("Ref 123-45678-90-RC is late")
+# "Ref [RC_CODE] is late"
+```
+
+In a shape, `#` is a digit, `@` a letter, `?` a letter or digit and `*` any
+letters or digits. Everything else is matched as written, in any case. More
+things it understands:
+
+```python
+scrubpii.teach(
+    "hide codes like AB-1234 as order number",              # an example: digits vary, the rest stays
+    'redact 8 digit numbers after "member" as member id',   # only right after these words
+    "redact 6 to 8 digit numbers near account or acct as account",
+    "redact anything starting with EMP- as employee id",
+    "redact Globex, Initech and Umbrella as client",        # exact words or names
+    "never redact support@acme.com",                        # keep these visible
+    "never redact emails at acme.com",
+)
+scrubpii.understand("redact any ###-#####-##-RC as an RC code")
+# 'Redact 3 digits, then "-", then 5 digits, then "-", then 2 digits, then "-RC", labeled [RC_CODE]'
+```
+
+On the command line: `scrubpii --rule "redact any ###-#####-##-RC as an RC code" --file notes.txt`.
+The [online demo](https://chadtollison.github.io/redact.html) takes the same rules.
+
+### Rules with regular expressions
+
+If you know regular expressions, add patterns directly:
 
 ```python
 import scrubpii
@@ -131,7 +164,8 @@ or `scrubpii --rules rules.json`:
 {"rules": [{"type": "EMPLOYEE_ID", "pattern": "\\bEMP-\\d{6}\\b"},
            {"type": "MEMBER_ID", "pattern": "\\b\\d{8}\\b", "context": ["member"]}],
  "words": {"CLIENT": ["Globex", "Initech"]},
- "allow": ["support@acme.com"]}
+ "allow": ["support@acme.com"],
+ "say": ["redact any ###-#####-##-RC as an RC code"]}
 ```
 
 ## Audit report

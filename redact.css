@@ -152,3 +152,13 @@ mark.pii.swap{color:var(--c);background:color-mix(in srgb,var(--c) 14%,transpare
 .bench-note{color:var(--muted);font-size:.85rem;max-width:760px;margin-top:12px}
 .bench-table td:first-child{white-space:normal}
 @media (max-width:600px){.bench-table th,.bench-table td{padding:9px 8px;font-size:.85rem}.bench-table th{font-size:.7rem}}
+
+.my-rules{margin:6px 0 10px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);padding:0 14px}
+.my-rules summary{cursor:pointer;padding:12px 0;font-size:.9rem;color:var(--text)}
+.my-rules-help{margin:0 0 10px;font-size:.82rem;color:var(--muted)}
+.my-rules-help code{color:var(--accent)}
+.my-rules textarea{min-height:0;flex:none;width:100%;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:.88rem;line-height:1.6;resize:vertical;box-sizing:border-box}
+.rules-read{list-style:none;margin:8px 0 12px;padding:0;font-size:.82rem;color:var(--muted);display:grid;gap:4px}
+.rules-read li.ok:before{content:"✓ ";color:var(--accent)}
+.rules-read li.bad{color:#ff9c9c}
+.rules-read li.bad:before{content:"✗ "}

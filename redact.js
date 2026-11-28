@@ -4,6 +4,8 @@
 // in .github/workflows/build-pii-model.yml).
 import { AutoTokenizer, AutoModelForTokenClassification, Tensor, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1';
 
+import { parseRule, ruleSpans, isAllowed } from './english-rules.js?v=2026-11-28a';
+
 env.allowRemoteModels = false;
 env.allowLocalModels = true;
 env.localModelPath = new URL('models/', location.href).href;
@@ -242,6 +244,13 @@ function mergeSpans(text, labeled) {
         s.type = type; s.rule = 'confirmed'; s.why = why; s.scores = [1]; s.start = Math.min(s.start, a); s.end = Math.max(s.end, b); }
     }
   }
+  // Your own rules win where they overlap what the model or the rules found.
+  for (const c of ruleSpans(text, userRules)) {
+    const hits = spans.filter((s) => s.start < c.end && s.end > c.start);
+    if (hits.some((h) => h.custom)) continue;            // an earlier rule of yours already has it
+    for (const h of hits) { c.start = Math.min(c.start, h.start); c.end = Math.max(c.end, h.end); spans.splice(spans.indexOf(h), 1); }
+    spans.push({ type: c.type, start: c.start, end: c.end, scores: [1], rule: 'found', why: c.why, custom: true });
+  }
   // Drop entities swallowed by a grown one, then build the results.
   const kept = [];
   for (const s of spans.sort((a, b) => a.start - b.start)) {
@@ -255,7 +264,7 @@ function mergeSpans(text, labeled) {
       : s.rule === 'found' ? { ok: true, msg: `✓ Caught by the area code rule (${s.area} is a real area code)` }
       : s.rule === 'confirmed' ? { ok: true, msg: `✓ ${s.area} is a real area code` } : validate(span);
     return span;
-  });
+  }).filter((sp) => !isAllowed(sp.text, userRules));
 }
 
 // ---------- rendering ----------
@@ -550,6 +559,23 @@ const drop = document.querySelector('.panes');
 drop.addEventListener('dragover', (e) => { if ([...e.dataTransfer.types].includes('Files')) { e.preventDefault(); drop.classList.add('dropping'); } });
 drop.addEventListener('dragleave', () => drop.classList.remove('dropping'));
 drop.addEventListener('drop', (e) => { const f = e.dataTransfer.files[0]; drop.classList.remove('dropping'); if (f) { e.preventDefault(); handleFile(f); } });
+// ---------- your own rules, in plain English ----------
+let userRules = [];
+const rulesInput = $('rules-input');
+function readRules() {
+  const lines = rulesInput.value.split('\n').map((l) => l.trim()).filter(Boolean);
+  userRules = []; const items = [];
+  for (const line of lines) {
+    try { const r = parseRule(line); userRules.push(r); items.push(`<li class="ok">${esc(r.explain)}</li>`); }
+    catch (e) { items.push(`<li class="bad">"${esc(line)}": ${esc(e.message)}</li>`); }
+  }
+  $('rules-read').innerHTML = items.join('');
+  try { localStorage.setItem('scrubpii-rules', rulesInput.value); } catch (e) { /* storage off */ }
+}
+try { const saved = localStorage.getItem('scrubpii-rules'); if (saved) { rulesInput.value = saved; $('my-rules').open = true; } } catch (e) { /* storage off */ }
+readRules();
+rulesInput.addEventListener('input', () => { readRules(); schedule(); });
+
 input.addEventListener('input', () => { $('count').textContent = `${input.value.length} / 5000`; schedule(); });
 document.querySelectorAll('[data-sample]').forEach((b) => b.addEventListener('click', () => { input.value = SAMPLES[+b.dataset.sample]; schedule(0); }));
 $('clear').addEventListener('click', () => { input.value = ''; input.focus(); schedule(0); });

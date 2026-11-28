@@ -26,8 +26,8 @@ from typing import Callable, Dict, Iterable, List, Optional, Tuple
 
 __all__ = ["Entity", "find", "find_many", "redact", "redact_many", "tokenize", "restore", "fake_for", "MODEL_ID",
            "redact_json", "redact_csv", "redact_dataframe", "Guard",
-           "add_rule", "add_words", "allow", "clear_rules", "load_rules", "rules", "audit", "audit_markdown"]
-__version__ = "0.4.0"
+           "add_rule", "add_words", "allow", "teach", "understand", "clear_rules", "load_rules", "rules", "audit", "audit_markdown"]
+__version__ = "0.5.0"
 
 MODEL_ID = "ChadTollison/pii-distilbert-v3"
 MODES = ("label", "mask", "fake", "token")
@@ -179,10 +179,15 @@ class Rule:
     context: Tuple[str, ...] = ()
     window: int = 40
     why: str = ""
+    explain: str = ""               # how a plain-English rule was understood
+    near: bool = False              # context word must come right before (at most 2 short words between)
 
     def as_dict(self) -> dict:
-        return {"type": self.type, "pattern": self.pattern.pattern, "group": self.group,
-                "context": list(self.context), "why": self.why, "check": bool(self.check)}
+        d = {"type": self.type, "pattern": self.pattern.pattern, "group": self.group,
+             "context": list(self.context), "why": self.why, "check": bool(self.check)}
+        if self.explain:
+            d["explain"] = self.explain
+        return d
 
 
 _custom: List[Rule] = []
@@ -196,7 +201,7 @@ def _type_name(t: str) -> str:
     return name
 
 
-def add_rule(type: str, pattern, *, group: int = 0, check: Optional[Callable[[str], bool]] = None,
+def add_rule(type: str, pattern=None, *, group: int = 0, check: Optional[Callable[[str], bool]] = None,
              context: Iterable[str] = (), window: int = 40, why: str = "", ignore_case: bool = False) -> Rule:
     r"""Teach scrubpii a pattern of your own, no retraining needed.
 
@@ -210,7 +215,11 @@ def add_rule(type: str, pattern, *, group: int = 0, check: Optional[Callable[[st
              characters before the match (case-insensitive), e.g. ["member", "acct"].
     Your rules win over the model where they overlap. Rules apply to every
     find/redact call in this process; clear_rules() removes them.
+
+    Or just say it in English: add_rule("redact any ###-#####-##-RC as an RC code").
     """
+    if pattern is None:
+        return teach(type)
     rx = pattern if isinstance(pattern, re.Pattern) else re.compile(pattern, re.I if ignore_case else 0)
     if group > rx.groups:
         raise ValueError(f"pattern has {rx.groups} group(s), so group={group} does not exist")
@@ -218,6 +227,52 @@ def add_rule(type: str, pattern, *, group: int = 0, check: Optional[Callable[[st
              why or f"your rule {_type_name(type)}")
     _custom.append(r)
     return r
+
+
+def understand(sentence: str) -> str:
+    """How scrubpii reads a plain-English rule, without adding it."""
+    from ._english import parse
+    return parse(sentence).explain
+
+
+def teach(*sentences: str) -> Optional[Rule]:
+    r"""Add rules written in plain English. No regex, no AI model, works offline.
+
+        >>> teach("redact any ###-#####-##-RC as an RC code")
+        >>> redact("Ref 123-45678-90-RC is late")
+        'Ref [RC_CODE] is late'
+
+    In a shape, # is a digit, @ a letter, ? a letter or digit, * any letters or
+    digits; everything else is matched as written, in any case. More examples:
+
+        teach("hide codes like AB-1234 as order number")        # an example works too
+        teach('redact 8 digit numbers after "member" as member id')
+        teach("redact anything starting with EMP- as employee id")
+        teach("redact Globex, Initech and Umbrella as client")
+        teach("never redact support@acme.com")
+        teach("never redact emails at acme.com")
+
+    Raises ValueError with a hint when it can't read a rule. understand(rule)
+    shows how a rule is read; the returned Rule's .explain says it too.
+    """
+    from ._english import parse
+    last = None
+    for sentence in sentences:
+        p = parse(sentence)
+        why = f'your rule: "{sentence.strip()}"'
+        if p.action == "allow":
+            if p.words:
+                allow(*p.words)
+            else:
+                allow(pattern=p.pattern)
+            continue
+        if p.words:
+            last = add_words(p.type, p.words, why=why)
+            last.context, last.explain, last.near = tuple(p.context), p.explain, True
+        else:
+            last = add_rule(p.type, re.compile(p.pattern, re.I), context=p.context, why=why)
+            last.explain, last.near = p.explain, True
+    return last
 
 
 def add_words(type: str, words: Iterable[str], *, ignore_case: bool = True, why: str = "") -> Rule:
@@ -258,7 +313,8 @@ def load_rules(path: str) -> int:
         {"rules": [{"type": "EMPLOYEE_ID", "pattern": "\\bEMP-\\d{6}\\b"},
                    {"type": "MEMBER_ID", "pattern": "\\b\\d{8}\\b", "context": ["member"]}],
          "words": {"CLIENT": ["Globex", "Initech"]},
-         "allow": ["support@acme.com"]}
+         "allow": ["support@acme.com"],
+         "say": ["redact any ###-#####-##-RC as an RC code"]}
     """
     import json
     cfg = json.loads(Path(path).read_text(encoding="utf-8"))
@@ -266,6 +322,9 @@ def load_rules(path: str) -> int:
     for r in cfg.get("rules", []):
         add_rule(r["type"], r["pattern"], group=int(r.get("group", 0)), context=r.get("context", ()),
                  window=int(r.get("window", 40)), why=r.get("why", ""), ignore_case=bool(r.get("ignore_case")))
+        n += 1
+    for sentence in cfg.get("say", []):
+        teach(sentence)
         n += 1
     for typ, words in (cfg.get("words") or {}).items():
         add_words(typ, words)
@@ -278,6 +337,13 @@ def load_rules(path: str) -> int:
     return n + len(allowed)
 
 
+def _context_ok(r: Rule, low: str, start: int) -> bool:
+    before = low[max(0, start - r.window):start]
+    if not r.near:
+        return any(c in before for c in r.context)
+    return any(re.search(re.escape(c) + r"[\s:#.\-]*(?:[a-z.]{1,6}[\s:#.\-]+){0,2}$", before) for c in r.context)
+
+
 def _custom_entities(text: str) -> List[Entity]:
     out = []
     low = text.lower()
@@ -286,7 +352,7 @@ def _custom_entities(text: str) -> List[Entity]:
             s, e = m.span(r.group)
             if s < 0 or e <= s:
                 continue
-            if r.context and not any(c in low[max(0, s - r.window):s] for c in r.context):
+            if r.context and not _context_ok(r, low, s):
                 continue
             if r.check and not r.check(m.group(r.group)):
                 continue
