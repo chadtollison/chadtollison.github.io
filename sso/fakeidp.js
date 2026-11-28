@@ -26,19 +26,24 @@ const SHA256_RSA = seq(oid('1.2.840.113549.1.1.11'), NULL);
 const name = (cn, o) => seq(set(seq(oid('2.5.4.3'), utf8(cn))), set(seq(oid('2.5.4.10'), utf8(o))));
 
 const ALG = { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' };
-async function makeIdp() {
+/** A fresh RSA key and self-signed certificate. Dates are Date objects. */
+export async function makeKeyAndCert({ cn, org, notBefore, notAfter }) {
   const pair = await crypto.subtle.generateKey({ ...ALG, modulusLength: 2048, publicExponent: Uint8Array.of(1, 0, 1) }, true, ['sign', 'verify']);
   const spki = new Uint8Array(await crypto.subtle.exportKey('spki', pair.publicKey));
   const serial = crypto.getRandomValues(new Uint8Array(16)); serial[0] &= 0x7f;
-  const tag = [...crypto.getRandomValues(new Uint8Array(4))].map((b) => b.toString(16).padStart(2, '0')).join('');
-  const subject = name(`test-idp-${tag}`, 'SSO Debugger test IdP (not for production)');
-  const now = new Date();
-  const tbs = seq(tlv(0xa0, int(Uint8Array.of(2))), int(serial), SHA256_RSA, subject,
-    seq(time(new Date(now.getTime() - 86400000)), time(new Date(now.getTime() + 3 * 365 * 86400000))), subject, spki);
+  const subject = name(cn, org);
+  const tbs = seq(tlv(0xa0, int(Uint8Array.of(2))), int(serial), SHA256_RSA, subject, seq(time(notBefore), time(notAfter)), subject, spki);
   const sig = new Uint8Array(await crypto.subtle.sign(ALG, pair.privateKey, tbs));
   const cert = seq(tbs, SHA256_RSA, tlv(0x03, cat(Uint8Array.of(0), sig)));
   const pkcs8 = new Uint8Array(await crypto.subtle.exportKey('pkcs8', pair.privateKey));
-  return { pkcs8: bytesToB64(pkcs8), cert: bytesToB64(cert), entityId: `https://chadtollison.github.io/sso/test-idp/${tag}`, created: now.toISOString() };
+  return { pkcs8: bytesToB64(pkcs8), cert: bytesToB64(cert), key: pair.privateKey };
+}
+
+async function makeIdp() {
+  const tag = [...crypto.getRandomValues(new Uint8Array(4))].map((b) => b.toString(16).padStart(2, '0')).join('');
+  const now = new Date();
+  const { pkcs8, cert } = await makeKeyAndCert({ cn: `test-idp-${tag}`, org: 'SSO Debugger test IdP (not for production)', notBefore: new Date(now.getTime() - 86400000), notAfter: new Date(now.getTime() + 3 * 365 * 86400000) });
+  return { pkcs8, cert, entityId: `https://chadtollison.github.io/sso/test-idp/${tag}`, created: now.toISOString() };
 }
 
 const STORE = 'sso-debugger-test-idp';
@@ -84,10 +89,11 @@ export function parseAttrLines(text) {
 
 /**
  * Build and sign a SAML response.
- * o: { spEntityId, acsUrl, nameId, nameIdFormat, attrs (Map), minutes, sign: 'assertion'|'response'|'both'|'none', inResponseTo }
+ * o: { spEntityId, acsUrl, nameId, nameIdFormat, attrs (Map), minutes, sign: 'assertion'|'response'|'both'|'none', inResponseTo,
+ *      recipient (defaults to acsUrl), idp ({ entityId, key, cert }; defaults to this browser's test IdP) }
  */
 export async function buildResponse(o) {
-  const idp = await getIdp();
+  const idp = o.idp || await getIdp();
   const now = new Date();
   const t = (min) => iso(new Date(now.getTime() + min * 60000));
   const aId = rid(), rId = rid();
@@ -97,7 +103,7 @@ export async function buildResponse(o) {
     + `<saml:Issuer>${esc(idp.entityId)}</saml:Issuer><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></samlp:Status>`
     + `<saml:Assertion ID="${aId}" Version="2.0" IssueInstant="${t(0)}"><saml:Issuer>${esc(idp.entityId)}</saml:Issuer>`
     + `<saml:Subject><saml:NameID Format="${esc(o.nameIdFormat || NAMEID.email)}">${esc(o.nameId)}</saml:NameID>`
-    + `<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer"><saml:SubjectConfirmationData NotOnOrAfter="${t(Math.min(5, o.minutes || 5))}" Recipient="${esc(o.acsUrl)}"${irt}/></saml:SubjectConfirmation></saml:Subject>`
+    + `<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer"><saml:SubjectConfirmationData NotOnOrAfter="${t(Math.min(5, o.minutes || 5))}" Recipient="${esc(o.recipient || o.acsUrl)}"${irt}/></saml:SubjectConfirmation></saml:Subject>`
     + `<saml:Conditions NotBefore="${t(-1)}" NotOnOrAfter="${t(o.minutes || 5)}"><saml:AudienceRestriction><saml:Audience>${esc(o.spEntityId)}</saml:Audience></saml:AudienceRestriction></saml:Conditions>`
     + `<saml:AuthnStatement AuthnInstant="${t(0)}" SessionIndex="${aId}"><saml:AuthnContext><saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></saml:AuthnContext></saml:AuthnStatement>`
     + (attrs ? `<saml:AttributeStatement>${attrs}</saml:AttributeStatement>` : '')

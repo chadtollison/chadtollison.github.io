@@ -41,7 +41,7 @@ function stepsForRequest(r) {
 const levelOf = (checks) => (checks.some((c) => c.level === 'error') ? 'bad' : checks.some((c) => c.level === 'warn') ? 'warn' : 'ok');
 
 /** Build the flow element for a SAML analysis result. Returns null for messages it cannot draw. */
-export function renderFlow(r, el) {
+export function renderFlow(r, el, opts = {}) {
   const isResponse = r.kind === 'Response' || r.kind === 'Assertion' || (r.assertion && r.kind !== 'AuthnRequest');
   const isRequest = /Request$/.test(r.kind) && !r.assertion;
   if (!isResponse && !isRequest) return null;
@@ -54,34 +54,49 @@ export function renderFlow(r, el) {
     if (s.final && s.state === 'bad') s.label = 'User is not signed in';
     if (s.state === 'bad' && broken === -1 && !s.final) broken = i;
   });
+  for (const s of steps) {
+    const counts = s.checks.filter((c) => c.level === 'error' || c.level === 'warn');
+    const first = s.checks.find((c) => c.level === 'error') || s.checks.find((c) => c.level === 'warn');
+    s.detail = first ? first.title + (counts.length > 1 ? ` (+${counts.length - 1} more)` : '') : null;
+  }
+  return drawSequence(el, {
+    lanes: LANES, cols: COL, steps, broken, onReplay: opts.onReplay, title: opts.title || 'Where sign-in breaks',
+    summary: broken === -1 ? (isRequest ? 'The request looks fine so far.' : 'Every step passes, so the user gets in.') : `Sign-in stops at step ${broken + 1}: \u201c${steps[broken].label}\u201d.`,
+  });
+}
 
+/**
+ * Draw a sequence diagram. Each step: { from, to } (an arrow between lanes) or { at } (an action in one lane),
+ * label, via, note, state ('ok' | 'warn' | 'bad' | 'pending'), detail (shown under the label), inspect (a Node shown on demand).
+ * Steps after `broken` are drawn as not reached, except a final step.
+ */
+export function drawSequence(el, { lanes, cols, steps, broken = -1, title, summary, onReplay, replayLabel = 'Replay' }) {
   const wrap = el('div', { class: 'flow-wrap' });
+  wrap.dataset.broken = String(broken);
+  const replay = () => { wrap.classList.remove('play'); void wrap.offsetWidth; wrap.classList.add('play'); };
   const head = el('div', { class: 'flow-head' },
-    el('div', {},
-      el('h2', { text: 'Where sign-in breaks' }),
-      el('p', { text: broken === -1 ? (isRequest ? 'The request looks fine so far.' : 'Every step passes, so the user gets in.') : `Sign-in stops at step ${broken + 1}: \u201c${steps[broken].label}\u201d.` })),
-    el('button', { type: 'button', class: 'mini-btn', text: 'Replay', onclick: () => { wrap.classList.remove('play'); void wrap.offsetWidth; wrap.classList.add('play'); } }));
-  const grid = el('ol', { class: 'seq', 'aria-label': 'Sign-in steps' });
-  grid.append(...LANES.map((l, i) => el('li', { class: 'lane-head', 'aria-hidden': 'true', 'data-col': i + 1 }, el('span', { text: l }))));
+    el('div', {}, el('h2', { text: title }), el('p', { text: summary })),
+    el('button', { type: 'button', class: 'mini-btn', text: replayLabel, onclick: onReplay || replay }));
+  const grid = el('ol', { class: 'seq', 'aria-label': `${title}: steps` });
+  grid.append(...lanes.map((l, i) => el('li', { class: 'lane-head', 'aria-hidden': 'true', 'data-col': i + 1 }, el('span', { text: l }))));
   steps.forEach((s, i) => {
     const reached = broken === -1 || i <= broken || s.final;
     const state = reached ? s.state : 'skipped';
-    const counts = s.checks.filter((c) => c.level === 'error' || c.level === 'warn');
-    const first = s.checks.find((c) => c.level === 'error') || s.checks.find((c) => c.level === 'warn');
-    const icon = { ok: '✓', warn: '!', bad: '✕', pending: '…', skipped: '' }[state];
+    const icon = { ok: '\u2713', warn: '!', bad: '\u2715', pending: '\u2026', skipped: '' }[state];
     const srState = { ok: 'passed', warn: 'passed with warnings', bad: 'failed', pending: 'waiting', skipped: 'not reached' }[state];
     const row = el('li', { class: `step ${state}${s.at ? ` at-${s.at}` : ''}` });
     row.style.setProperty('--i', i);
     let a, b;
-    if (s.at) { a = b = COL[s.at]; } else { a = Math.min(COL[s.from], COL[s.to]); b = Math.max(COL[s.from], COL[s.to]); }
+    if (s.at) { a = b = cols[s.at]; } else { a = Math.min(cols[s.from], cols[s.to]); b = Math.max(cols[s.from], cols[s.to]); }
     row.style.setProperty('--a', a);
     row.style.setProperty('--b', b + 1);
-    const body = el('div', { class: `step-body ${s.at ? 'action' : COL[s.from] < COL[s.to] ? 'arrow right' : 'arrow left'}` },
+    const body = el('div', { class: `step-body ${s.at ? 'action' : cols[s.from] < cols[s.to] ? 'arrow right' : 'arrow left'}` },
       el('span', { class: 'step-ico', 'aria-hidden': 'true', text: icon }),
       el('span', { class: 'step-text' },
         el('strong', {}, el('span', { class: 'sr-only', text: `Step ${i + 1}, ${srState}: ` }), s.label, s.via ? el('em', { text: ` (${s.via})` }) : null),
-        first && reached ? el('small', { text: first.title + (counts.length > 1 ? ` (+${counts.length - 1} more)` : '') }) : s.note ? el('small', { text: s.note }) : null,
-        !reached && counts.length ? el('small', { text: `Not reached. Would also fail: ${first.title}` }) : null),
+        s.detail && reached ? el('small', { text: s.detail }) : s.note ? el('small', { text: s.note }) : null,
+        !reached && s.detail ? el('small', { text: `Not reached. Would also fail: ${s.detail}` }) : null,
+        s.inspect && reached ? el('details', { class: 'inspect' }, el('summary', { text: s.inspectLabel || 'Show the message' }), s.inspect) : null),
       s.at ? null : el('i', { class: 'packet', 'aria-hidden': 'true' }));
     row.append(body);
     grid.append(row);
