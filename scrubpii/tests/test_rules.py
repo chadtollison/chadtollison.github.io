@@ -89,3 +89,11 @@ def test_health_ids(monkeypatch):
     assert cp.redact("MBI 1EG4TE5MK73") == "MBI [ID_NUMBER]"
     assert cp.redact("DEA AB1234563 ok") == "DEA [ID_NUMBER] ok"
     assert cp.redact("DEA AB1234567 ok") == "DEA AB1234567 ok"
+
+
+def test_ssn_with_dots():
+    from scrubpii import SSN_RE, ssn_ok
+    assert SSN_RE.search("Il numero 456.78.9012 è stato verificato.")
+    assert ssn_ok("456.78.9012")
+    assert not SSN_RE.search("version 1.123.45.6789.2")
+    assert not SSN_RE.search("ip 10.123.45.6789")
