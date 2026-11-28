@@ -38,7 +38,7 @@ async function makeIdp() {
   const sig = new Uint8Array(await crypto.subtle.sign(ALG, pair.privateKey, tbs));
   const cert = seq(tbs, SHA256_RSA, tlv(0x03, cat(Uint8Array.of(0), sig)));
   const pkcs8 = new Uint8Array(await crypto.subtle.exportKey('pkcs8', pair.privateKey));
-  return { pkcs8: bytesToB64(pkcs8), cert: bytesToB64(cert), entityId: `https://chadtollison.github.io/sso-debugger/test-idp/${tag}`, created: now.toISOString() };
+  return { pkcs8: bytesToB64(pkcs8), cert: bytesToB64(cert), entityId: `https://chadtollison.github.io/sso/test-idp/${tag}`, created: now.toISOString() };
 }
 
 const STORE = 'sso-debugger-test-idp';

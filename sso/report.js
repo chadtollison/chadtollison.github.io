@@ -1,9 +1,8 @@
 // Shareable report: the findings plus the message, with personal data swapped for
 // placeholders like <EMAIL_1> before anything is copied or downloaded.
 import { SAML } from './saml.js';
-import { findPii } from './scrub.js';
 
-const PAGE = 'https://chadtollison.github.io/sso-debugger.html';
+const PAGE = 'https://chadtollison.github.io/sso/';
 const isEmail = (s) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s);
 const KEEP_ATTR = /groups|role|tenantid|identityprovider|authnmethods|wids|entitlement|affiliation/i;
 const NAME_ATTR = /givenname|surname|firstname|lastname|displayname|\/name$|^name$|fullname|cn$|2\.5\.4\.(42|4|3)$|113730\.3\.1\.241$/i;
@@ -65,27 +64,11 @@ function scimValues(r) {
   for (const m of (r.http?.path || '').matchAll(/"([^"]+)"/g)) found.push([isEmail(m[1]) ? 'EMAIL' : 'VALUE', m[1]]);
   return found;
 }
-function freeTexts(tool, r) {
-  if (tool === 'saml') {
-    const out = [];
-    const walker = r.doc.createTreeWalker(r.doc, NodeFilter.SHOW_TEXT);
-    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
-      const t = n.data.trim();
-      if (t.length > 2 && !/^[A-Za-z0-9+/=\s]{60,}$/.test(t) && !/^(urn:|https?:\/\/|_)/.test(t)) out.push(t);
-    }
-    return out;
-  }
-  const out = [];
-  const walk = (v) => { if (Array.isArray(v)) v.forEach(walk); else if (v && typeof v === 'object') Object.values(v).forEach(walk); else if (typeof v === 'string' && v.length > 2 && !/^(urn:|https?:)/.test(v)) out.push(v); };
-  walk(r.json);
-  return out;
-}
-
 /**
  * Build a redacted Markdown report.
- * opts: { tool: 'saml'|'scim', result, raw, deep, onProgress, fixes: check => text }
+ * opts: { tool: 'saml'|'scim', result, raw, fixFor: check => text }
  */
-export async function buildReport({ tool, result: r, raw, deep = false, onProgress, fixFor }) {
+export async function buildReport({ tool, result: r, raw, fixFor }) {
   const lines = [];
   const errors = r.checks.filter((c) => c.level === 'error').length;
   const warns = r.checks.filter((c) => c.level === 'warn').length;
@@ -125,16 +108,6 @@ export async function buildReport({ tool, result: r, raw, deep = false, onProgre
 
   // ---------- redact ----------
   const values = tool === 'saml' ? samlValues(r) : scimValues(r);
-  if (deep) {
-    const texts = [...new Set(freeTexts(tool, r))];
-    if (texts.length) {
-      const joined = texts.join('\n');
-      for (const s of await findPii(joined, onProgress)) {
-        const t = /PERSON|NAME/i.test(s.type) ? 'NAME' : /EMAIL/i.test(s.type) ? 'EMAIL' : /PHONE/i.test(s.type) ? 'PHONE' : /ADDRESS|LOC/i.test(s.type) ? 'ADDRESS' : /IP/i.test(s.type) ? 'IP' : /USER/i.test(s.type) ? 'USER' : /PASS|KEY/i.test(s.type) ? 'SECRET' : 'VALUE';
-        values.push([t, s.text.trim()]);
-      }
-    }
-  }
   for (const m of text.matchAll(/[\p{L}\p{N}._%+-]+@[\p{L}\p{N}.-]+\.[\p{L}]{2,}/gu)) values.push(['EMAIL', m[0]]);
   for (const m of text.matchAll(/\b(?:\d{1,3}\.){3}\d{1,3}\b/g)) if (m[0].split('.').every((p) => +p <= 255)) values.push(['IP', m[0]]);
 

@@ -441,22 +441,18 @@ async function makeReport() {
   const src = reportFor === 'saml' ? lastSaml : lastScim;
   if (!src) return;
   const status = $('#report-status');
-  const deep = $('#report-deep').checked;
-  status.textContent = deep ? 'Loading the scrubpii model…' : 'Redacting…';
+  status.textContent = 'Redacting…';
   try {
-    const { text, hidden, total } = await buildReport({ tool: reportFor, result: src.r, raw: src.raw, deep, fixFor: fixText, onProgress: (p) => { status.textContent = `Loading the scrubpii model… ${Math.round(p)}%`; } });
+    const { text, hidden, total } = await buildReport({ tool: reportFor, result: src.r, raw: src.raw, fixFor: fixText });
     $('#report-text').value = text;
     status.textContent = total ? `Hidden ${total} personal value${total === 1 ? '' : 's'}: ${Object.entries(hidden).map(([k, n]) => `${n} ${k.toLowerCase()}`).join(', ')}. Read it over before you share it.` : 'No personal data found. Read it over before you share it.';
   } catch (e) {
-    status.textContent = `The deep scan failed (${e.message}). The report below still has the structured redaction.`;
-    $('#report-deep').checked = false;
-    if (deep) makeReport();
+    status.textContent = `The report could not be made: ${e.message}`;
   }
 }
 for (const which of ['saml', 'scim']) {
   $(`#${which}-report`).addEventListener('click', () => { reportFor = which; $('#report-text').value = ''; dlg.showModal(); makeReport(); });
 }
-$('#report-deep').addEventListener('change', makeReport);
 $('#report-close').addEventListener('click', () => dlg.close());
 dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
 $('#report-copy').addEventListener('click', async () => {

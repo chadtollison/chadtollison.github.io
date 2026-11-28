@@ -24,7 +24,7 @@ from scrubpii import redact
 redact("Email sarah.j@example.com or call 415-555-0198")   # 'Email [EMAIL] or call [PHONE]'
 ```
 
-Try it in the browser (nothing leaves the page): https://chadtollison.github.io/redact.html
+Try it in the browser (nothing leaves the page): https://chadtollison.github.io/pii/
 
 ## Head-to-head (F1, scrubpii package with this model)
 
