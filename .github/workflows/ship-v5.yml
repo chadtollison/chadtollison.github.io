@@ -1,0 +1,60 @@
+# Ship the v5 model from the "scrubpii v5" run.
+#   push (this file changes): commit the 8-bit copy to models/pii-distilbert-v5 for the browser demo
+#   Run workflow with "publish" ticked: upload the model, the 8-bit copy and the card to Hugging Face
+#   as ChadTollison/pii-distilbert-v5 (needs the HF_TOKEN secret)
+name: Ship v5
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Run of the 'scrubpii v5' workflow to ship"
+        default: "46091695189"
+      publish:
+        description: "Upload to Hugging Face"
+        type: boolean
+        default: false
+  push:
+    branches: ["claude/**"]
+    paths: [".github/workflows/ship-v5.yml"]
+permissions:
+  contents: write
+  actions: read
+jobs:
+  ship:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - uses: actions/download-artifact@v4
+        with: { name: v5-8bit, path: build/v5-8bit, run-id: "${{ inputs.run_id || '46091695189' }}", github-token: "${{ github.token }}" }
+      - uses: actions/download-artifact@v4
+        if: ${{ inputs.publish }}
+        with: { name: v5-model, path: build/v5, run-id: "${{ inputs.run_id || '46091695189' }}", github-token: "${{ github.token }}" }
+      - name: Commit the browser copy
+        if: ${{ !inputs.publish }}
+        run: |
+          mkdir -p models/pii-distilbert-v5
+          cp -r build/v5-8bit/. models/pii-distilbert-v5/
+          git config user.name "github-actions[bot]"
+          git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
+          git add models/pii-distilbert-v5
+          git commit -m "pii-distilbert-v5: 8-bit copy for the browser demo" || exit 0
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+      - name: Upload to Hugging Face
+        if: ${{ inputs.publish }}
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          if [ -z "$HF_TOKEN" ]; then echo "::error::Add an HF_TOKEN secret first."; exit 1; fi
+          pip install -q "huggingface_hub<1"
+          cp training/model_card/README_v5.md build/v5/README.md
+          mkdir -p build/v5/onnx && cp build/v5-8bit/onnx/model_quantized.onnx build/v5/onnx/
+          python - <<'PY'
+          from huggingface_hub import HfApi
+          api = HfApi()
+          api.create_repo("ChadTollison/pii-distilbert-v5", exist_ok=True)
+          api.upload_folder(repo_id="ChadTollison/pii-distilbert-v5", folder_path="build/v5",
+                            commit_message="pii-distilbert-v5: 5 languages, Nemotron-PII, 15 types")
+          print("https://huggingface.co/ChadTollison/pii-distilbert-v5")
+          PY

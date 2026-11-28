@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.6.0
+- New model, pii-distilbert-v5: trained on more data (NVIDIA Nemotron-PII; French, German and Italian from
+  ai4privacy). It now reads five languages and catches far more lone first names and health ID numbers:
+  F1 on unseen finance documents 0.80 -> 0.85, German 0.79 -> 0.98, medical records 0.91 -> 0.99.
+- `SCRUBPII_MODEL` picks the model (a Hugging Face repo or a local folder).
+- SSNs written with dots (123.45.6789) are now caught by the SSN rule too, as Presidio does.
+- Presidio plug-in: `scrubpii.presidio.add_to(AnalyzerEngine())` adds scrubpii as a Presidio recognizer, with
+  Presidio's entity names (`pip install "scrubpii[presidio]"`). `replace_ner=True` drops Presidio's spaCy names.
+- US health identifiers found by rule: NPI numbers (after "NPI", with a valid check digit), Medicare
+  Beneficiary Identifiers (MBI format) and DEA registration numbers (with a valid check digit), as ID_NUMBER.
+
 ## 0.5.0
 - Rules in plain English: `teach("redact any ###-#####-##-RC as an RC code")`. Shapes (`#` digit, `@` letter,
   `?` letter or digit, `*` a run), examples ("codes like AB-1234"), "N digit numbers", "starting with",

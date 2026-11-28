@@ -1,0 +1,33 @@
+{
+  "base": "ChadTollison/pii-distilbert-v3",
+  "texts": 113907,
+  "joined_share": 0.15,
+  "max_len": 256,
+  "steps": 6526,
+  "minutes": 320.0,
+  "types": [
+    "PERSON",
+    "EMAIL",
+    "PHONE",
+    "SSN",
+    "CREDIT_CARD",
+    "IP_ADDRESS",
+    "PASSPORT",
+    "DRIVER_LICENSE",
+    "API_KEY",
+    "IBAN",
+    "ADDRESS",
+    "ID_NUMBER",
+    "DATE_OF_BIRTH",
+    "USERNAME",
+    "PASSWORD"
+  ],
+  "langs": "en,es,fr,de,it",
+  "nemotron": 25000,
+  "data": [
+    "ai4privacy/open-pii-masking-500k-ai4privacy (CC BY 4.0)",
+    "gretelai/gretel-pii-masking-en-v1 (Apache 2.0)",
+    "nvidia/Nemotron-PII (CC BY 4.0)",
+    "generated sentences (training/retrain_pii.py)"
+  ]
+}

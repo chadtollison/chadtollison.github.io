@@ -5,7 +5,8 @@ import pytest
 
 import scrubpii
 
-MODEL = Path(__file__).resolve().parents[2] / "models" / "pii-distilbert-v3"
+MODELS = Path(__file__).resolve().parents[2] / "models"
+MODEL = MODELS / "pii-distilbert-v5" if (MODELS / "pii-distilbert-v5").exists() else MODELS / "pii-distilbert-v3"
 pytestmark = pytest.mark.skipif(not (MODEL / "onnx" / "model_quantized.onnx").exists(), reason="no local model")
 
 

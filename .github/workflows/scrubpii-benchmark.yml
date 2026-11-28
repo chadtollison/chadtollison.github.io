@@ -27,14 +27,17 @@ jobs:
       - name: scrubpii vs Presidio vs spaCy
         run: |
           cd training
+          export SCRUBPII_MODEL=../models/pii-distilbert-v5
           python compare.py --rows 1000 --out compare \
-            --system "scrubpii@onnx:ChadTollison/pii-distilbert-v3=scrubpii 0.4" --system presidio --system spacy
+            --system "scrubpii@onnx:../models/pii-distilbert-v5=scrubpii" --system presidio --system presidio+scrubpii --system spacy
           cat ../benchmarks/compare.md >> "$GITHUB_STEP_SUMMARY"
       - name: Commit results
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
+          cp benchmarks/compare.* /tmp/
+          git fetch origin "${GITHUB_REF_NAME}" && git reset -q --hard FETCH_HEAD
+          cp /tmp/compare.* benchmarks/
           git add benchmarks/compare.*
-          git commit -m "scrubpii 0.4: benchmark vs Presidio and spaCy on seven test sets" || exit 0
-          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git commit -m "scrubpii: benchmark vs Presidio and spaCy" || exit 0
           git push origin "HEAD:${GITHUB_REF_NAME}"

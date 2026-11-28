@@ -4,7 +4,7 @@
     >>> redact("Hi, I'm Sarah Johnson. Call 662-634-1142.")
     "Hi, I'm [PERSON]. Call [PHONE]."
 
-A fine-tuned DistilBERT model (ChadTollison/pii-distilbert-v3) finds the
+A fine-tuned DistilBERT model (ChadTollison/pii-distilbert-v5) finds the
 items, and checksum and format rules double-check them: card numbers must
 pass Luhn, IBANs their bank checksum, SSNs the SSA format. The rules also
 catch 10-digit US phone numbers with a real area code, valid IBANs and
@@ -27,9 +27,10 @@ from typing import Callable, Dict, Iterable, List, Optional, Tuple
 __all__ = ["Entity", "find", "find_many", "redact", "redact_many", "tokenize", "restore", "fake_for", "MODEL_ID",
            "redact_json", "redact_csv", "redact_dataframe", "Guard",
            "add_rule", "add_words", "allow", "teach", "understand", "clear_rules", "load_rules", "rules", "audit", "audit_markdown"]
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
-MODEL_ID = "ChadTollison/pii-distilbert-v3"
+# The model to use: a Hugging Face repo or a local folder. SCRUBPII_MODEL overrides it.
+MODEL_ID = os.environ.get("SCRUBPII_MODEL") or "ChadTollison/pii-distilbert-v5"
 MODES = ("label", "mask", "fake", "token")
 SURE = 0.95     # model confidence that overrides a failed format/checksum check
 # Long text is read in windows of this many tokens. The model learned on short
@@ -70,10 +71,28 @@ API_KEY_RE = re.compile(
     r"\b(?:(?:sk|pk|rk)_(?:live|test)_[A-Za-z0-9]{16,}|sk-(?:proj-)?[A-Za-z0-9_-]{32,}|AKIA[0-9A-Z]{16}"
     r"|gh[pousr]_[A-Za-z0-9]{30,}|xox[abprs]-[A-Za-z0-9-]{20,}|AIza[0-9A-Za-z_-]{35})")
 CARD_RE = re.compile(r"\b[2-6]\d{3}(?:[ -]?\d){9,15}\b")
-SSN_RE = re.compile(r"\b\d{3}([- ])\d{2}\1\d{4}\b")
+SSN_RE = re.compile(r"(?<![\w.])\d{3}([-. ])\d{2}\1\d{4}(?!\w|\.\d)")
 SSN_BARE_RE = re.compile(r"(?i)(?:ssn|social security(?: number| no\.?)?)\W{0,12}(\d{9})\b")
 DOB_RE = re.compile(r"(?i)\b(?:born(?: on)?|d\.?o\.?b\.?|date of birth|birth ?date|birthday|fecha de nacimiento|nacid[oa] el)\W{0,4}(\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}|\d{4}[/.-]\d{1,2}[/.-]\d{1,2}|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.? \d{1,2}(?:st|nd|rd|th)?,? \d{4}|\d{1,2}(?:st|nd|rd|th)? (?:of )?(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?,? \d{4}|\d{1,2} de [a-záéíóú]+ de \d{4})")
 IPV6_RE = re.compile(r"(?<![\w:])(?=[0-9A-Fa-f:]*:[0-9A-Fa-f]*:)[0-9A-Fa-f:]{2,39}(?![\w:])")
+
+
+# US health identifiers, each checked the way the issuer checks it.
+NPI_RE = re.compile(r"(?i)\bNPI(?:\s*(?:number|no\.?|#))?\W{0,6}(\d{10})\b")
+MBI_RE = re.compile(r"(?i)(?<![A-Z0-9])[1-9][AC-HJKMNP-RT-Y][AC-HJKMNP-RT-Y0-9]\d-?[AC-HJKMNP-RT-Y][AC-HJKMNP-RT-Y0-9]\d-?"
+                    r"[AC-HJKMNP-RT-Y]{2}\d{2}(?![A-Z0-9])")
+DEA_RE = re.compile(r"(?<![A-Za-z0-9])[ABCDEFGHJKLMPRSTUX][A-Z9]\d{7}(?![A-Za-z0-9])")
+
+
+def npi_ok(s: str) -> bool:
+    """National Provider Identifier: Luhn over '80840' + the 10 digits."""
+    return len(s) == 10 and luhn_ok("80840" + s)
+
+
+def dea_ok(s: str) -> bool:
+    """DEA registration number: (d1+d3+d5) + 2*(d2+d4+d6) ends in d7."""
+    d = [int(c) for c in s[2:]]
+    return len(d) == 7 and (d[0] + d[2] + d[4] + 2 * (d[1] + d[3] + d[5])) % 10 == d[6]
 
 
 def ip_ok(s: str) -> bool:
@@ -117,7 +136,7 @@ def iban_ok(s: str) -> bool:
 
 
 def ssn_ok(s: str) -> bool:
-    m = re.fullmatch(r"(\d{3})[- ]?(\d{2})[- ]?(\d{4})", s.strip())
+    m = re.fullmatch(r"(\d{3})[-. ]?(\d{2})[-. ]?(\d{4})", s.strip())
     return bool(m) and m[1] not in ("000", "666") and m[1][0] != "9" and m[2] != "00" and m[3] != "0000"
 
 
@@ -447,10 +466,13 @@ def _rules(ents: List[Entity], text: str) -> List[Entity]:
               ("EMAIL", SHAPES["EMAIL"], lambda s: True, "email address format"),
               ("IP_ADDRESS", SHAPES["IP_ADDRESS"], ip_ok, "valid IP address"),
               ("IP_ADDRESS", IPV6_RE, ip_ok, "valid IPv6 address"),
-              ("DATE_OF_BIRTH", DOB_RE, lambda s: True, "a date right after 'born' or 'DOB'")]
+              ("DATE_OF_BIRTH", DOB_RE, lambda s: True, "a date right after 'born' or 'DOB'"),
+              ("ID_NUMBER", NPI_RE, npi_ok, "NPI (provider number) with a valid check digit"),
+              ("ID_NUMBER", MBI_RE, lambda s: True, "Medicare Beneficiary Identifier format"),
+              ("ID_NUMBER", DEA_RE, dea_ok, "DEA registration number with a valid check digit")]
     for typ, rx, ok, why in checks:
         for m in rx.finditer(text):
-            g = 1 if rx in (SSN_BARE_RE, DOB_RE) else 0
+            g = 1 if rx in (SSN_BARE_RE, DOB_RE, NPI_RE) else 0
             ms, me = m.start(g), m.end(g)
             if ok == "context":
                 if not phone_context(text, ms):

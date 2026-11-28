@@ -1,6 +1,6 @@
 // Live "Redact me" demo. Runs the fine-tuned DistilBERT PII model in the
 // visitor's browser with transformers.js, so no server (and no cost) is needed.
-// The model files live in models/pii-distilbert-v3 (built by the GitHub Action
+// The model files live in models/pii-distilbert-v5 (built by the GitHub Action
 // in .github/workflows/build-pii-model.yml).
 import { AutoTokenizer, AutoModelForTokenClassification, Tensor, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1';
 
@@ -9,7 +9,7 @@ import { parseRule, ruleSpans, isAllowed } from './english-rules.js?v=2026-11-28
 env.allowRemoteModels = false;
 env.allowLocalModels = true;
 env.localModelPath = new URL('models/', import.meta.url).href;
-const MODEL_ID = 'pii-distilbert-v3';
+const MODEL_ID = 'pii-distilbert-v5';
 // The model learned on short texts and finds much more in long ones when it
 // reads them in short windows (see benchmarks/compare.md), so pack about 126 pieces.
 const MAX_TOKENS = 126;
@@ -664,7 +664,7 @@ render();
       const r = data.results[ds], best = Math.max(...systems.map((n) => r[n]?.f1 ?? 0));
       return `<tr><td>${esc(ds)}</td>${systems.map((n) => r[n] ? `<td>${r[n].f1 === best ? '<strong>' : ''}${r[n].f1.toFixed(2)}${r[n].f1 === best ? '</strong>' : ''}</td>` : '<td class="na">–</td>').join('')}</tr>`;
     }).join('');
-    $('bench-lead').innerHTML = `Scored on up to ${data.meta.rows.toLocaleString()} texts from each of ${sets.length} public datasets, against <a href="https://microsoft.github.io/presidio/" target="_blank" rel="noreferrer">Microsoft Presidio</a> and <a href="https://spacy.io/" target="_blank" rel="noreferrer">spaCy</a>. None of these texts were used in training. Four sets (finance, medical records, support tickets and emails, logs and config files) come from datasets the model never saw any part of.`;
+    $('bench-lead').innerHTML = `Scored on up to ${data.meta.rows.toLocaleString()} texts from each of ${sets.length} public datasets, against <a href="https://microsoft.github.io/presidio/" target="_blank" rel="noreferrer">Microsoft Presidio</a> and <a href="https://spacy.io/" target="_blank" rel="noreferrer">spaCy</a>. None of these texts were used in training. The finance set comes from a dataset the model never saw any part of; the medical, ticket and log sets are the separate test split of NVIDIA's Nemotron-PII.`;
     $('bench').hidden = false;
   } catch (e) { /* no results yet */ }
 })();

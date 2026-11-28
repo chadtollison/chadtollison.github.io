@@ -77,3 +77,23 @@ def test_phone_formats(monkeypatch):
         assert "[PHONE]" in cp.redact(t), t
     for t in ["Order 123-456-7890 shipped", "Version 1.2.3, build 20231127", "Score went +12 points"]:
         assert cp.redact(t) == t, t
+
+
+def test_health_ids(monkeypatch):
+    monkeypatch.setattr(cp, "_model_entities", fake_model([]))
+    assert cp.npi_ok("1234567893") and not cp.npi_ok("1234567890")
+    assert cp.dea_ok("AB1234563") and not cp.dea_ok("AB1234567")
+    assert cp.redact("Provider NPI: 1234567893.") == "Provider NPI: [ID_NUMBER]."
+    assert cp.redact("Provider NPI: 1234567890.") == "Provider NPI: 1234567890."
+    assert cp.redact("Medicare ID 1EG4-TE5-MK73 on file") == "Medicare ID [ID_NUMBER] on file"
+    assert cp.redact("MBI 1EG4TE5MK73") == "MBI [ID_NUMBER]"
+    assert cp.redact("DEA AB1234563 ok") == "DEA [ID_NUMBER] ok"
+    assert cp.redact("DEA AB1234567 ok") == "DEA AB1234567 ok"
+
+
+def test_ssn_with_dots():
+    from scrubpii import SSN_RE, ssn_ok
+    assert SSN_RE.search("Il numero 456.78.9012 è stato verificato.")
+    assert ssn_ok("456.78.9012")
+    assert not SSN_RE.search("version 1.123.45.6789.2")
+    assert not SSN_RE.search("ip 10.123.45.6789")

@@ -11,7 +11,7 @@ redaction?", so the main scores ignore what *name* each system gives an item:
   ms/text        average time per text on the same CPU
 
 Per-type "Caught" is reported too. Datasets:
-  * ai4privacy open-pii-masking-500k, validation split, English and Spanish
+  * ai4privacy open-pii-masking-500k, validation split, English, Spanish, French, German and Italian
   * gretel-pii-masking-en-v1, test split
   * gretel synthetic_pii_finance_multilingual, English test split: scrubpii
     never trains on this one, so it is the fairest outside test.
@@ -58,6 +58,16 @@ def make_system(spec):
         eng = AnalyzerEngine()
         return "Microsoft Presidio", lambda t: [(r.start, r.end, PRESIDIO_MAP.get(r.entity_type, r.entity_type))
                                                 for r in eng.analyze(t, language="en")]
+    if spec == "presidio+scrubpii":
+        from presidio_analyzer import AnalyzerEngine
+        from scrubpii.presidio import add_to
+        eng = add_to(AnalyzerEngine(), replace_ner=True)
+        to_ours = {v: k for k, v in __import__("scrubpii.presidio", fromlist=["x"]).TO_PRESIDIO.items()}
+        to_ours["DATE_TIME"] = "DATE_OF_BIRTH"
+        fn = lambda t: [(r.start, r.end, to_ours.get(r.entity_type, PRESIDIO_MAP.get(r.entity_type, r.entity_type)))
+                        for r in eng.analyze(t, language="en")]
+        fn("warm up")
+        return "Presidio + scrubpii plug-in", fn
     if spec == "spacy":
         import spacy
         nlp = spacy.load("en_core_web_lg")
@@ -103,12 +113,15 @@ def score(fn, rows):
 DATASETS = {
     "ai4privacy (English)": lambda n: pii_data.openpii("validation", langs=("en",), n=n, seed=7),
     "ai4privacy (Spanish)": lambda n: pii_data.openpii("validation", langs=("es",), n=n // 2, seed=7),
+    "ai4privacy (French)": lambda n: pii_data.openpii("validation", langs=("fr",), n=n // 2, seed=7),
+    "ai4privacy (German)": lambda n: pii_data.openpii("validation", langs=("de",), n=n // 2, seed=7),
+    "ai4privacy (Italian)": lambda n: pii_data.openpii("validation", langs=("it",), n=n // 2, seed=7),
     "Gretel PII (English)": lambda n: pii_data.gretel_en("test", n=n, seed=7),
     "Gretel finance (English, never trained on)": lambda n: pii_data.gretel_finance("test", n=n, seed=7),
-    "Medical records (Nemotron-PII, never trained on)": lambda n: pii_data.nemotron("medical", n=n, seed=7),
-    "Support tickets, emails, transcripts (Nemotron-PII, never trained on)":
+    "Medical records (Nemotron-PII test split)": lambda n: pii_data.nemotron("medical", n=n, seed=7),
+    "Support tickets, emails, transcripts (Nemotron-PII test split)":
         lambda n: pii_data.nemotron("conversation", n=n, seed=7),
-    "Logs and config files (Nemotron-PII, never trained on)": lambda n: pii_data.nemotron("logs_config", n=n, seed=7),
+    "Logs and config files (Nemotron-PII test split)": lambda n: pii_data.nemotron("logs_config", n=n, seed=7),
 }
 
 
