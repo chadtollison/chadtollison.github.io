@@ -12,16 +12,16 @@
     "ai4privacy (English)": {
       "scrubpii v5": {
         "items": 1637,
-        "caught": 0.998,
-        "fully_hidden": 0.995,
-        "was_personal": 0.995,
-        "f1": 0.996,
-        "ms_per_text": 3.4,
+        "caught": 0.995,
+        "fully_hidden": 0.994,
+        "was_personal": 0.994,
+        "f1": 0.995,
+        "ms_per_text": 11.5,
         "by_type": {
           "ADDRESS": {
             "items": 319,
-            "caught": 0.997,
-            "fully_hidden": 0.991
+            "caught": 0.994,
+            "fully_hidden": 0.987
           },
           "CREDIT_CARD": {
             "items": 13,
@@ -40,18 +40,18 @@
           },
           "ID_NUMBER": {
             "items": 109,
-            "caught": 0.991,
-            "fully_hidden": 0.991
+            "caught": 0.972,
+            "fully_hidden": 0.972
           },
           "PASSPORT": {
             "items": 24,
-            "caught": 0.958,
-            "fully_hidden": 0.958
+            "caught": 0.917,
+            "fully_hidden": 0.917
           },
           "PERSON": {
             "items": 848,
             "caught": 1.0,
-            "fully_hidden": 0.998
+            "fully_hidden": 1.0
           },
           "PHONE": {
             "items": 171,
@@ -71,7 +71,7 @@
         "fully_hidden": 0.99,
         "was_personal": 0.994,
         "f1": 0.993,
-        "ms_per_text": 3.5,
+        "ms_per_text": 11.3,
         "by_type": {
           "ADDRESS": {
             "items": 319,
@@ -126,7 +126,7 @@
         "fully_hidden": 0.668,
         "was_personal": 0.905,
         "f1": 0.814,
-        "ms_per_text": 5.7,
+        "ms_per_text": 9.0,
         "by_type": {
           "ADDRESS": {
             "items": 319,
@@ -179,21 +179,21 @@
     "ai4privacy (Spanish)": {
       "scrubpii v5": {
         "items": 790,
-        "caught": 0.991,
-        "fully_hidden": 0.989,
-        "was_personal": 0.996,
-        "f1": 0.994,
-        "ms_per_text": 5.1,
+        "caught": 0.99,
+        "fully_hidden": 0.984,
+        "was_personal": 0.995,
+        "f1": 0.993,
+        "ms_per_text": 16.4,
         "by_type": {
           "ADDRESS": {
             "items": 169,
-            "caught": 0.982,
-            "fully_hidden": 0.982
+            "caught": 0.988,
+            "fully_hidden": 0.97
           },
           "CREDIT_CARD": {
             "items": 14,
-            "caught": 1.0,
-            "fully_hidden": 1.0
+            "caught": 0.857,
+            "fully_hidden": 0.857
           },
           "DRIVER_LICENSE": {
             "items": 11,
@@ -238,7 +238,7 @@
         "fully_hidden": 0.984,
         "was_personal": 0.994,
         "f1": 0.991,
-        "ms_per_text": 4.9,
+        "ms_per_text": 16.4,
         "by_type": {
           "ADDRESS": {
             "items": 169,
@@ -293,7 +293,7 @@
         "fully_hidden": 0.515,
         "was_personal": 0.653,
         "f1": 0.629,
-        "ms_per_text": 5.4,
+        "ms_per_text": 9.0,
         "by_type": {
           "ADDRESS": {
             "items": 169,
@@ -346,16 +346,16 @@
     "ai4privacy (French)": {
       "scrubpii v5": {
         "items": 766,
-        "caught": 0.99,
-        "fully_hidden": 0.987,
-        "was_personal": 0.996,
-        "f1": 0.993,
-        "ms_per_text": 5.1,
+        "caught": 0.988,
+        "fully_hidden": 0.984,
+        "was_personal": 0.993,
+        "f1": 0.99,
+        "ms_per_text": 17.7,
         "by_type": {
           "ADDRESS": {
             "items": 111,
             "caught": 0.991,
-            "fully_hidden": 0.982
+            "fully_hidden": 0.973
           },
           "CREDIT_CARD": {
             "items": 18,
@@ -394,8 +394,8 @@
           },
           "SSN": {
             "items": 12,
-            "caught": 0.667,
-            "fully_hidden": 0.667
+            "caught": 0.583,
+            "fully_hidden": 0.583
           }
         }
       },
@@ -405,7 +405,7 @@
         "fully_hidden": 0.957,
         "was_personal": 0.936,
         "f1": 0.956,
-        "ms_per_text": 5.2,
+        "ms_per_text": 18.0,
         "by_type": {
           "ADDRESS": {
             "items": 111,
@@ -460,7 +460,7 @@
         "fully_hidden": 0.577,
         "was_personal": 0.725,
         "f1": 0.69,
-        "ms_per_text": 5.8,
+        "ms_per_text": 9.6,
         "by_type": {
           "ADDRESS": {
             "items": 111,
@@ -513,16 +513,16 @@
     "ai4privacy (German)": {
       "scrubpii v5": {
         "items": 797,
-        "caught": 0.98,
-        "fully_hidden": 0.971,
-        "was_personal": 0.988,
+        "caught": 0.987,
+        "fully_hidden": 0.982,
+        "was_personal": 0.981,
         "f1": 0.984,
-        "ms_per_text": 5.1,
+        "ms_per_text": 16.8,
         "by_type": {
           "ADDRESS": {
             "items": 129,
-            "caught": 0.961,
-            "fully_hidden": 0.946
+            "caught": 0.969,
+            "fully_hidden": 0.961
           },
           "CREDIT_CARD": {
             "items": 13,
@@ -541,8 +541,8 @@
           },
           "ID_NUMBER": {
             "items": 73,
-            "caught": 0.986,
-            "fully_hidden": 0.986
+            "caught": 1.0,
+            "fully_hidden": 1.0
           },
           "PASSPORT": {
             "items": 27,
@@ -551,8 +551,8 @@
           },
           "PERSON": {
             "items": 384,
-            "caught": 0.977,
-            "fully_hidden": 0.964
+            "caught": 0.987,
+            "fully_hidden": 0.979
           },
           "PHONE": {
             "items": 83,
@@ -571,8 +571,8 @@
         "caught": 0.97,
         "fully_hidden": 0.944,
         "was_personal": 0.664,
-        "f1": 0.788,
-        "ms_per_text": 5.2,
+        "f1": 0.789,
+        "ms_per_text": 16.9,
         "by_type": {
           "ADDRESS": {
             "items": 129,
@@ -627,7 +627,7 @@
         "fully_hidden": 0.652,
         "was_personal": 0.503,
         "f1": 0.602,
-        "ms_per_text": 5.9,
+        "ms_per_text": 9.0,
         "by_type": {
           "ADDRESS": {
             "items": 129,
@@ -680,16 +680,16 @@
     "ai4privacy (Italian)": {
       "scrubpii v5": {
         "items": 753,
-        "caught": 0.992,
-        "fully_hidden": 0.988,
-        "was_personal": 0.991,
+        "caught": 0.996,
+        "fully_hidden": 0.989,
+        "was_personal": 0.989,
         "f1": 0.992,
-        "ms_per_text": 7.4,
+        "ms_per_text": 16.0,
         "by_type": {
           "ADDRESS": {
             "items": 160,
-            "caught": 0.988,
-            "fully_hidden": 0.988
+            "caught": 0.994,
+            "fully_hidden": 0.981
           },
           "CREDIT_CARD": {
             "items": 8,
@@ -718,32 +718,32 @@
           },
           "PERSON": {
             "items": 361,
-            "caught": 0.992,
-            "fully_hidden": 0.983
+            "caught": 0.997,
+            "fully_hidden": 0.989
           },
           "PHONE": {
             "items": 83,
-            "caught": 0.988,
-            "fully_hidden": 0.988
+            "caught": 1.0,
+            "fully_hidden": 1.0
           },
           "SSN": {
             "items": 4,
-            "caught": 1.0,
-            "fully_hidden": 1.0
+            "caught": 0.75,
+            "fully_hidden": 0.75
           }
         }
       },
       "scrubpii v3 (0.5)": {
         "items": 753,
-        "caught": 0.991,
+        "caught": 0.992,
         "fully_hidden": 0.969,
         "was_personal": 0.938,
         "f1": 0.964,
-        "ms_per_text": 4.7,
+        "ms_per_text": 18.3,
         "by_type": {
           "ADDRESS": {
             "items": 160,
-            "caught": 0.969,
+            "caught": 0.975,
             "fully_hidden": 0.9
           },
           "CREDIT_CARD": {
@@ -794,7 +794,7 @@
         "fully_hidden": 0.58,
         "was_personal": 0.6,
         "f1": 0.638,
-        "ms_per_text": 5.3,
+        "ms_per_text": 8.9,
         "by_type": {
           "ADDRESS": {
             "items": 160,
@@ -848,15 +848,15 @@
       "scrubpii v5": {
         "items": 2933,
         "caught": 0.995,
-        "fully_hidden": 0.991,
-        "was_personal": 0.986,
-        "f1": 0.991,
-        "ms_per_text": 8.2,
+        "fully_hidden": 0.994,
+        "was_personal": 0.979,
+        "f1": 0.987,
+        "ms_per_text": 28.8,
         "by_type": {
           "ADDRESS": {
             "items": 312,
-            "caught": 0.994,
-            "fully_hidden": 0.99
+            "caught": 0.997,
+            "fully_hidden": 0.994
           },
           "API_KEY": {
             "items": 7,
@@ -871,7 +871,7 @@
           "DATE_OF_BIRTH": {
             "items": 477,
             "caught": 0.996,
-            "fully_hidden": 0.994
+            "fully_hidden": 0.996
           },
           "EMAIL": {
             "items": 222,
@@ -880,12 +880,12 @@
           },
           "ID_NUMBER": {
             "items": 547,
-            "caught": 0.996,
-            "fully_hidden": 0.995
+            "caught": 0.998,
+            "fully_hidden": 0.998
           },
           "IP_ADDRESS": {
             "items": 166,
-            "caught": 1.0,
+            "caught": 0.988,
             "fully_hidden": 0.988
           },
           "PASSWORD": {
@@ -895,13 +895,13 @@
           },
           "PERSON": {
             "items": 421,
-            "caught": 0.988,
-            "fully_hidden": 0.979
+            "caught": 0.993,
+            "fully_hidden": 0.988
           },
           "PHONE": {
             "items": 211,
-            "caught": 1.0,
-            "fully_hidden": 1.0
+            "caught": 0.995,
+            "fully_hidden": 0.995
           },
           "SSN": {
             "items": 349,
@@ -921,7 +921,7 @@
         "fully_hidden": 0.992,
         "was_personal": 0.988,
         "f1": 0.992,
-        "ms_per_text": 8.3,
+        "ms_per_text": 29.9,
         "by_type": {
           "ADDRESS": {
             "items": 312,
@@ -991,7 +991,7 @@
         "fully_hidden": 0.75,
         "was_personal": 0.832,
         "f1": 0.852,
-        "ms_per_text": 11.2,
+        "ms_per_text": 17.0,
         "by_type": {
           "ADDRESS": {
             "items": 312,
@@ -1059,21 +1059,21 @@
     "Gretel finance (English, never trained on)": {
       "scrubpii v5": {
         "items": 3136,
-        "caught": 0.856,
-        "fully_hidden": 0.777,
-        "was_personal": 0.835,
-        "f1": 0.845,
-        "ms_per_text": 70.7,
+        "caught": 0.873,
+        "fully_hidden": 0.798,
+        "was_personal": 0.799,
+        "f1": 0.835,
+        "ms_per_text": 190.9,
         "by_type": {
           "ADDRESS": {
             "items": 801,
-            "caught": 0.908,
-            "fully_hidden": 0.718
+            "caught": 0.926,
+            "fully_hidden": 0.728
           },
           "API_KEY": {
             "items": 19,
-            "caught": 0.789,
-            "fully_hidden": 0.789
+            "caught": 0.842,
+            "fully_hidden": 0.842
           },
           "CREDIT_CARD": {
             "items": 26,
@@ -1087,7 +1087,7 @@
           },
           "DRIVER_LICENSE": {
             "items": 30,
-            "caught": 0.833,
+            "caught": 0.867,
             "fully_hidden": 0.8
           },
           "EMAIL": {
@@ -1097,8 +1097,8 @@
           },
           "IBAN": {
             "items": 57,
-            "caught": 0.684,
-            "fully_hidden": 0.649
+            "caught": 0.632,
+            "fully_hidden": 0.596
           },
           "IP_ADDRESS": {
             "items": 73,
@@ -1107,18 +1107,18 @@
           },
           "PASSPORT": {
             "items": 24,
-            "caught": 0.958,
-            "fully_hidden": 0.958
+            "caught": 0.917,
+            "fully_hidden": 0.917
           },
           "PASSWORD": {
             "items": 33,
-            "caught": 0.879,
-            "fully_hidden": 0.879
+            "caught": 0.909,
+            "fully_hidden": 0.909
           },
           "PERSON": {
             "items": 1503,
-            "caught": 0.798,
-            "fully_hidden": 0.739
+            "caught": 0.825,
+            "fully_hidden": 0.777
           },
           "PHONE": {
             "items": 183,
@@ -1127,7 +1127,7 @@
           },
           "SSN": {
             "items": 32,
-            "caught": 0.844,
+            "caught": 0.875,
             "fully_hidden": 0.844
           },
           "USERNAME": {
@@ -1139,16 +1139,16 @@
       },
       "scrubpii v3 (0.5)": {
         "items": 3136,
-        "caught": 0.743,
-        "fully_hidden": 0.668,
-        "was_personal": 0.857,
-        "f1": 0.796,
-        "ms_per_text": 50.7,
+        "caught": 0.744,
+        "fully_hidden": 0.669,
+        "was_personal": 0.859,
+        "f1": 0.797,
+        "ms_per_text": 191.0,
         "by_type": {
           "ADDRESS": {
             "items": 801,
-            "caught": 0.81,
-            "fully_hidden": 0.68
+            "caught": 0.809,
+            "fully_hidden": 0.678
           },
           "API_KEY": {
             "items": 19,
@@ -1177,8 +1177,8 @@
           },
           "IBAN": {
             "items": 57,
-            "caught": 0.596,
-            "fully_hidden": 0.561
+            "caught": 0.579,
+            "fully_hidden": 0.544
           },
           "IP_ADDRESS": {
             "items": 73,
@@ -1197,8 +1197,8 @@
           },
           "PERSON": {
             "items": 1503,
-            "caught": 0.625,
-            "fully_hidden": 0.546
+            "caught": 0.627,
+            "fully_hidden": 0.549
           },
           "PHONE": {
             "items": 183,
@@ -1207,7 +1207,7 @@
           },
           "SSN": {
             "items": 32,
-            "caught": 0.844,
+            "caught": 0.875,
             "fully_hidden": 0.844
           },
           "USERNAME": {
@@ -1223,7 +1223,7 @@
         "fully_hidden": 0.564,
         "was_personal": 0.384,
         "f1": 0.521,
-        "ms_per_text": 49.9,
+        "ms_per_text": 72.6,
         "by_type": {
           "ADDRESS": {
             "items": 801,
@@ -1301,16 +1301,16 @@
     "Medical records (Nemotron-PII test split)": {
       "scrubpii v5": {
         "items": 3909,
-        "caught": 0.985,
-        "fully_hidden": 0.983,
-        "was_personal": 0.993,
-        "f1": 0.989,
-        "ms_per_text": 26.9,
+        "caught": 0.99,
+        "fully_hidden": 0.988,
+        "was_personal": 0.992,
+        "f1": 0.991,
+        "ms_per_text": 97.5,
         "by_type": {
           "ADDRESS": {
             "items": 248,
-            "caught": 0.984,
-            "fully_hidden": 0.98
+            "caught": 0.992,
+            "fully_hidden": 0.984
           },
           "API_KEY": {
             "items": 2,
@@ -1320,7 +1320,7 @@
           "CREDIT_CARD": {
             "items": 28,
             "caught": 1.0,
-            "fully_hidden": 1.0
+            "fully_hidden": 0.964
           },
           "DATE_OF_BIRTH": {
             "items": 519,
@@ -1335,7 +1335,7 @@
           "ID_NUMBER": {
             "items": 918,
             "caught": 0.993,
-            "fully_hidden": 0.991
+            "fully_hidden": 0.993
           },
           "IP_ADDRESS": {
             "items": 5,
@@ -1349,8 +1349,8 @@
           },
           "PERSON": {
             "items": 1274,
-            "caught": 0.97,
-            "fully_hidden": 0.965
+            "caught": 0.983,
+            "fully_hidden": 0.98
           },
           "PHONE": {
             "items": 365,
@@ -1372,15 +1372,15 @@
       "scrubpii v3 (0.5)": {
         "items": 3909,
         "caught": 0.846,
-        "fully_hidden": 0.794,
+        "fully_hidden": 0.795,
         "was_personal": 0.992,
         "f1": 0.913,
-        "ms_per_text": 25.9,
+        "ms_per_text": 98.7,
         "by_type": {
           "ADDRESS": {
             "items": 248,
-            "caught": 0.863,
-            "fully_hidden": 0.819
+            "caught": 0.867,
+            "fully_hidden": 0.81
           },
           "API_KEY": {
             "items": 2,
@@ -1404,7 +1404,7 @@
           },
           "ID_NUMBER": {
             "items": 918,
-            "caught": 0.818,
+            "caught": 0.815,
             "fully_hidden": 0.686
           },
           "IP_ADDRESS": {
@@ -1414,13 +1414,13 @@
           },
           "PASSWORD": {
             "items": 85,
-            "caught": 0.529,
-            "fully_hidden": 0.518
+            "caught": 0.553,
+            "fully_hidden": 0.541
           },
           "PERSON": {
             "items": 1274,
             "caught": 0.724,
-            "fully_hidden": 0.677
+            "fully_hidden": 0.68
           },
           "PHONE": {
             "items": 365,
@@ -1445,7 +1445,7 @@
         "fully_hidden": 0.781,
         "was_personal": 0.764,
         "f1": 0.816,
-        "ms_per_text": 27.0,
+        "ms_per_text": 41.0,
         "by_type": {
           "ADDRESS": {
             "items": 248,
@@ -1513,16 +1513,16 @@
     "Support tickets, emails, transcripts (Nemotron-PII test split)": {
       "scrubpii v5": {
         "items": 3995,
-        "caught": 0.98,
-        "fully_hidden": 0.976,
-        "was_personal": 0.995,
-        "f1": 0.987,
-        "ms_per_text": 30.0,
+        "caught": 0.984,
+        "fully_hidden": 0.98,
+        "was_personal": 0.993,
+        "f1": 0.989,
+        "ms_per_text": 113.9,
         "by_type": {
           "ADDRESS": {
             "items": 188,
-            "caught": 0.904,
-            "fully_hidden": 0.883
+            "caught": 0.936,
+            "fully_hidden": 0.92
           },
           "API_KEY": {
             "items": 5,
@@ -1561,8 +1561,8 @@
           },
           "PERSON": {
             "items": 1723,
-            "caught": 0.98,
-            "fully_hidden": 0.973
+            "caught": 0.985,
+            "fully_hidden": 0.979
           },
           "PHONE": {
             "items": 315,
@@ -1577,22 +1577,22 @@
           "USERNAME": {
             "items": 352,
             "caught": 0.986,
-            "fully_hidden": 0.983
+            "fully_hidden": 0.98
           }
         }
       },
       "scrubpii v3 (0.5)": {
         "items": 3995,
-        "caught": 0.777,
-        "fully_hidden": 0.735,
+        "caught": 0.776,
+        "fully_hidden": 0.734,
         "was_personal": 0.99,
-        "f1": 0.871,
-        "ms_per_text": 29.6,
+        "f1": 0.87,
+        "ms_per_text": 114.9,
         "by_type": {
           "ADDRESS": {
             "items": 188,
             "caught": 0.707,
-            "fully_hidden": 0.681
+            "fully_hidden": 0.686
           },
           "API_KEY": {
             "items": 5,
@@ -1617,7 +1617,7 @@
           "ID_NUMBER": {
             "items": 65,
             "caught": 0.8,
-            "fully_hidden": 0.615
+            "fully_hidden": 0.6
           },
           "IP_ADDRESS": {
             "items": 67,
@@ -1626,13 +1626,13 @@
           },
           "PASSWORD": {
             "items": 204,
-            "caught": 0.627,
-            "fully_hidden": 0.613
+            "caught": 0.618,
+            "fully_hidden": 0.603
           },
           "PERSON": {
             "items": 1723,
-            "caught": 0.64,
-            "fully_hidden": 0.574
+            "caught": 0.639,
+            "fully_hidden": 0.572
           },
           "PHONE": {
             "items": 315,
@@ -1646,8 +1646,8 @@
           },
           "USERNAME": {
             "items": 352,
-            "caught": 0.659,
-            "fully_hidden": 0.582
+            "caught": 0.665,
+            "fully_hidden": 0.58
           }
         }
       },
@@ -1657,7 +1657,7 @@
         "fully_hidden": 0.762,
         "was_personal": 0.746,
         "f1": 0.783,
-        "ms_per_text": 32.5,
+        "ms_per_text": 48.0,
         "by_type": {
           "ADDRESS": {
             "items": 188,
@@ -1725,21 +1725,21 @@
     "Logs and config files (Nemotron-PII test split)": {
       "scrubpii v5": {
         "items": 3723,
-        "caught": 0.965,
-        "fully_hidden": 0.956,
-        "was_personal": 0.973,
-        "f1": 0.969,
-        "ms_per_text": 36.2,
+        "caught": 0.975,
+        "fully_hidden": 0.965,
+        "was_personal": 0.964,
+        "f1": 0.97,
+        "ms_per_text": 135.2,
         "by_type": {
           "ADDRESS": {
             "items": 114,
-            "caught": 0.956,
-            "fully_hidden": 0.947
+            "caught": 0.965,
+            "fully_hidden": 0.956
           },
           "API_KEY": {
             "items": 533,
-            "caught": 0.987,
-            "fully_hidden": 0.979
+            "caught": 0.994,
+            "fully_hidden": 0.992
           },
           "CREDIT_CARD": {
             "items": 58,
@@ -1759,7 +1759,7 @@
           "ID_NUMBER": {
             "items": 102,
             "caught": 0.961,
-            "fully_hidden": 0.961
+            "fully_hidden": 0.951
           },
           "IP_ADDRESS": {
             "items": 786,
@@ -1768,13 +1768,13 @@
           },
           "PASSWORD": {
             "items": 252,
-            "caught": 0.972,
-            "fully_hidden": 0.972
+            "caught": 0.98,
+            "fully_hidden": 0.98
           },
           "PERSON": {
             "items": 634,
-            "caught": 0.897,
-            "fully_hidden": 0.88
+            "caught": 0.907,
+            "fully_hidden": 0.894
           },
           "PHONE": {
             "items": 157,
@@ -1788,28 +1788,28 @@
           },
           "USERNAME": {
             "items": 605,
-            "caught": 0.934,
-            "fully_hidden": 0.906
+            "caught": 0.974,
+            "fully_hidden": 0.929
           }
         }
       },
       "scrubpii v3 (0.5)": {
         "items": 3723,
         "caught": 0.812,
-        "fully_hidden": 0.774,
+        "fully_hidden": 0.776,
         "was_personal": 0.97,
         "f1": 0.884,
-        "ms_per_text": 36.2,
+        "ms_per_text": 136.1,
         "by_type": {
           "ADDRESS": {
             "items": 114,
             "caught": 0.693,
-            "fully_hidden": 0.64
+            "fully_hidden": 0.632
           },
           "API_KEY": {
             "items": 533,
-            "caught": 0.961,
-            "fully_hidden": 0.88
+            "caught": 0.959,
+            "fully_hidden": 0.887
           },
           "CREDIT_CARD": {
             "items": 58,
@@ -1828,8 +1828,8 @@
           },
           "ID_NUMBER": {
             "items": 102,
-            "caught": 0.794,
-            "fully_hidden": 0.647
+            "caught": 0.804,
+            "fully_hidden": 0.686
           },
           "IP_ADDRESS": {
             "items": 786,
@@ -1838,13 +1838,13 @@
           },
           "PASSWORD": {
             "items": 252,
-            "caught": 0.639,
+            "caught": 0.635,
             "fully_hidden": 0.615
           },
           "PERSON": {
             "items": 634,
             "caught": 0.53,
-            "fully_hidden": 0.481
+            "fully_hidden": 0.483
           },
           "PHONE": {
             "items": 157,
@@ -1858,8 +1858,8 @@
           },
           "USERNAME": {
             "items": 605,
-            "caught": 0.623,
-            "fully_hidden": 0.565
+            "caught": 0.626,
+            "fully_hidden": 0.569
           }
         }
       },
@@ -1869,7 +1869,7 @@
         "fully_hidden": 0.596,
         "was_personal": 0.735,
         "f1": 0.717,
-        "ms_per_text": 28.6,
+        "ms_per_text": 43.7,
         "by_type": {
           "ADDRESS": {
             "items": 114,
