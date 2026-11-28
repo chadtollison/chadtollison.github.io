@@ -58,7 +58,7 @@ export function renderFlow(r, el) {
   const wrap = el('div', { class: 'flow-wrap' });
   const head = el('div', { class: 'flow-head' },
     el('div', {},
-      el('h3', { text: 'Where sign-in breaks' }),
+      el('h2', { text: 'Where sign-in breaks' }),
       el('p', { text: broken === -1 ? (isRequest ? 'The request looks fine so far.' : 'Every step passes, so the user gets in.') : `Sign-in stops at step ${broken + 1}: \u201c${steps[broken].label}\u201d.` })),
     el('button', { type: 'button', class: 'mini-btn', text: 'Replay', onclick: () => { wrap.classList.remove('play'); void wrap.offsetWidth; wrap.classList.add('play'); } }));
   const grid = el('ol', { class: 'seq', 'aria-label': 'Sign-in steps' });

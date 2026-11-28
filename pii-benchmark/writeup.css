@@ -1,0 +1,81 @@
+/* Write-up page: builds on ../styles.css */
+.skip{position:absolute;left:12px;top:-60px;z-index:100;background:var(--accent);color:#06110d;font-weight:800;padding:10px 14px;border-radius:8px}
+.skip:focus{top:12px}
+.wu-back{color:var(--muted);font-size:.85rem;transition:color .2s ease}.wu-back:hover{color:var(--text)}
+main#article>section{max-width:860px}
+.wu-hero{padding-top:72px;padding-bottom:20px}
+.wu-hero h1{font-size:clamp(2.5rem,6.4vw,4.6rem);line-height:1;letter-spacing:-.055em;margin:16px 0 22px}
+.wu-hero h1 em{font-style:normal;background:linear-gradient(90deg,var(--accent),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent}
+.wu-hero .lead{font-size:1.12rem;line-height:1.7;color:#c3d0dc;max-width:720px;margin:0}
+.wu-hero .lead a,.wu-p a,.lessons a{color:var(--accent);text-decoration:underline;text-decoration-color:rgba(92,219,182,.4);text-underline-offset:3px}
+.wu-stats{display:grid;grid-template-columns:repeat(4,1fr);margin:36px 0 0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:rgba(17,24,33,.55)}
+.wu-stats div{padding:18px 18px 16px;border-right:1px solid var(--line)}.wu-stats div:last-child{border-right:0}
+.wu-stats strong{display:block;font-size:1.7rem;letter-spacing:-.04em;color:var(--accent)}
+.wu-stats span{display:block;margin-top:4px;font-size:.78rem;line-height:1.4;color:var(--muted)}
+.wu-tldr{margin-top:20px;border:1px solid rgba(92,219,182,.35);border-left:3px solid var(--accent);border-radius:12px;padding:18px 22px;background:rgba(92,219,182,.04)}
+.wu-tldr b{font:700 .7rem/1 monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.wu-tldr ul{margin:12px 0 0;padding-left:18px;display:grid;gap:8px}
+.wu-tldr li{line-height:1.55;color:#c3d0dc}.wu-tldr li strong{color:var(--text)}
+main#article>section.wu{padding-top:44px;padding-bottom:20px}
+.wu .title{margin-bottom:18px}.wu .title h2{font-size:1.9rem}
+.wu-p{font-size:1.02rem;line-height:1.75;color:#c3d0dc;margin:0 0 20px}.wu-p strong{color:var(--text)}
+.wu code{font:500 .86em ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#0b1118;border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--text)}
+.wu-chart{margin:8px 0 8px}
+.wu-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:4px 0 22px}
+.wu-metrics div{border:1px solid var(--line);border-radius:12px;padding:14px 14px 12px;background:rgba(17,24,33,.6)}
+.wu-metrics small{font:700 .66rem/1 monospace;letter-spacing:.12em;color:var(--blue)}
+.wu-metrics .f1{border-color:rgba(92,219,182,.4)}.wu-metrics .f1 small{color:var(--accent)}
+.wu-metrics p{margin:8px 0 0;font-size:.84rem;line-height:1.5;color:var(--muted)}
+/* progression chart */
+.wu-steps{margin:8px 0 26px;background:#0b1118;border:1px solid var(--line);border-radius:12px;padding:20px 22px 18px}
+.wu-steps figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;margin-bottom:18px}
+.wu-steps figcaption small{font-size:.68rem;letter-spacing:.12em}
+.wu-steps figcaption span{display:flex;align-items:center;gap:6px;font-size:.76rem;color:var(--muted)}
+.wu-steps figcaption i{display:inline-block;width:10px;height:10px;border-radius:3px}
+.wu-steps .k-line{width:16px!important;height:0!important;border-top:2px dashed #8da0b3;border-radius:0!important;margin-left:8px}
+.steps-plot{position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:12px;--pb:46px;height:230px;padding-bottom:var(--pb);border-bottom:1px solid var(--line)}
+.steps-ref{position:absolute;left:0;right:0;bottom:calc(var(--pb) + (100% - var(--pb)) * .521);border-top:2px dashed #8da0b3;opacity:.8;pointer-events:none}
+.step{position:relative;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.step i{display:block;width:min(56px,70%);height:var(--v);border-radius:6px 6px 0 0;background:linear-gradient(180deg,#8cebd0,var(--accent));opacity:.55;transition:opacity .2s ease}
+.step.best i{opacity:1;box-shadow:0 0 22px rgba(92,219,182,.3)}
+.step.dip i{background:linear-gradient(180deg,#f5c46b,#d9a24a);opacity:.7}
+.step:hover i{opacity:1}
+.step b{font:700 .8rem monospace;color:var(--text);margin-bottom:6px}
+.step span{position:absolute;top:calc(100% + 6px);left:0;right:0;text-align:center;font-size:.78rem;font-weight:700;color:var(--text);line-height:1.25}
+.step span em{display:block;font-style:normal;font-weight:400;font-size:.7rem;color:var(--muted)}
+/* lessons */
+.lessons{list-style:none;counter-reset:l;margin:0;padding:0;display:grid;gap:14px}
+.lessons li{counter-increment:l;position:relative;border:1px solid var(--line);border-radius:14px;padding:20px 22px 18px 64px;background:linear-gradient(180deg,rgba(17,24,33,.95),rgba(13,20,28,.96))}
+.lessons li:before{content:counter(l,decimal-leading-zero);position:absolute;left:20px;top:21px;font:700 .82rem monospace;color:var(--accent)}
+.lessons li.fail{border-color:rgba(245,196,107,.35)}.lessons li.fail:before{color:#f5c46b}
+.lessons h3{margin:0 0 6px;font-size:1.12rem;letter-spacing:-.02em}
+.lessons p{margin:0;line-height:1.7;color:#c3d0dc;font-size:.96rem}.lessons strong{color:var(--text)}
+.wu-mini{margin-top:16px}.wu-mini .brow .them{background:#66798d}
+/* honest section */
+.wu-honest{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.wu-honest div{border:1px solid var(--line);border-radius:12px;padding:16px;background:rgba(17,24,33,.6)}
+.wu-honest b{display:block;margin-bottom:6px}.wu-honest p{margin:0;font-size:.88rem;line-height:1.6;color:var(--muted)}
+.wu-code{margin:0 0 20px;background:#0b1118;border:1px solid var(--line);border-radius:12px;padding:18px 20px;overflow-x:auto;font:500 .9rem/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--text)}
+.wu-code code{background:none;border:0;padding:0}
+.wu-code .c{color:var(--muted)}.wu-code .k{color:var(--violet)}.wu-code .s{color:var(--accent)}
+.wu-try{padding-bottom:70px!important}
+.wu-try .links{display:flex;flex-wrap:wrap;gap:10px 22px}
+footer a{color:var(--muted)}footer a:hover{color:var(--text)}
+@media(max-width:760px){.wu-stats{grid-template-columns:1fr 1fr}.wu-stats div:nth-child(2){border-right:0}.wu-stats div:nth-child(-n+2){border-bottom:1px solid var(--line)}.wu-metrics{grid-template-columns:1fr 1fr}.wu-honest{grid-template-columns:1fr}}
+@media(max-width:560px){.wu-hero{padding-top:40px}.wu-hero .lead{font-size:1rem}.wu-stats strong{font-size:1.4rem}.wu .title h2{font-size:1.55rem}.lessons li{padding:18px 16px 16px 50px}.lessons li:before{left:16px;top:20px}.steps-plot{gap:4px;height:236px;--pb:60px}.step span{font-size:.68rem}.step span em{font-size:.62rem}.wu-steps{padding:16px 12px 14px}.wu-back{display:none}}
+.wu-mini .bench-rows{padding-right:76px}.wu-mini .brow b{right:-70px}.wu-mini .brow b{white-space:nowrap}
+.wu-table{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:rgba(17,24,33,.6);margin:0 0 16px}
+.wu-table table{width:100%;border-collapse:collapse;font-size:.86rem;min-width:560px}
+.wu-table th,.wu-table td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+.wu-table th{font:700 .66rem/1 monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-top:13px}
+.wu-table tr:last-child td{border-bottom:0}
+.wu-table td{color:#c3d0dc}.wu-table td:first-child{color:var(--text);font-weight:600}
+.wu-table td em{font-style:normal;color:var(--accent)}
+.wu-table .n{text-align:right;font-family:ui-monospace,monospace;white-space:nowrap}
+.wu-config{display:grid;grid-template-columns:1fr 1.6fr 1fr;gap:10px}
+.wu-config div{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:rgba(17,24,33,.6)}
+.wu-config b{display:block;margin-bottom:6px}.wu-config p{margin:0;font-size:.86rem;line-height:1.6;color:var(--muted)}
+.wu-warn{margin:0 0 20px;border:1px solid rgba(245,196,107,.4);border-left:3px solid #f5c46b;border-radius:12px;padding:16px 20px;background:rgba(245,196,107,.05)}
+.wu-warn b{display:block;color:#f5c46b;margin-bottom:6px}.wu-warn p{margin:0;line-height:1.65;color:#c3d0dc;font-size:.95rem}
+.wu-honest{grid-template-columns:1fr 1fr}
+@media(max-width:760px){.wu-config{grid-template-columns:1fr}.wu-honest{grid-template-columns:1fr}}

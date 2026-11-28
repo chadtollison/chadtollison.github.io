@@ -255,3 +255,75 @@ if (finePointer && !reduceMotion) {
   });
 }
 
+
+// Hero "x-ray" demo: cycles through three texts with real scrubpii output
+(() => {
+  const box = document.getElementById('xray');
+  if (!box) return;
+  const tabs = [...box.querySelectorAll('[role="tab"]')];
+  const scenes = [...box.querySelectorAll('.xs')];
+  const count = box.querySelector('.xray-count');
+  const DWELL = 3600;
+  let current = 0, timer = null, started = 0, left = DWELL, visible = false, hovered = false;
+
+  function show(n, animate) {
+    current = n;
+    scenes.forEach((s) => s.classList.remove('is-on', 'is-done', 'is-scan'));
+    tabs.forEach((t, i) => {
+      t.setAttribute('aria-selected', String(i === n));
+      t.tabIndex = i === n ? 0 : -1;
+      const bar = t.querySelector('i');           // restart the progress fill
+      if (bar) { bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = ''; }
+    });
+    const on = scenes.filter((s) => s.dataset.n === String(n));
+    const src = on[0];
+    if (count && src) count.innerHTML = `<b>${src.dataset.found}</b> found · <b>${src.dataset.rules}</b> double-checked by checksum and format rules`;
+    on.forEach((s) => s.classList.add('is-on'));
+    if (!animate) { on.forEach((s) => s.classList.add('is-done')); return; }
+    box.classList.remove('scanning');
+    setTimeout(() => {
+      if (current !== n) return;
+      void box.offsetWidth;
+      box.classList.add('scanning');
+      on.forEach((s) => s.classList.add('is-scan'));
+    }, 380);
+  }
+
+  function schedule(ms) {
+    clearTimeout(timer);
+    started = Date.now(); left = ms;
+    timer = setTimeout(() => { show((current + 1) % tabs.length, true); schedule(DWELL); }, ms);
+  }
+  function pause() {
+    if (!box.classList.contains('auto') || box.classList.contains('paused')) return;
+    clearTimeout(timer); left = Math.max(300, left - (Date.now() - started));
+    box.classList.add('paused');
+  }
+  function resume() {
+    if (!box.classList.contains('auto') || hovered || !visible || document.hidden) return;
+    if (box.classList.contains('paused')) { box.classList.remove('paused'); schedule(left); }
+  }
+
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => { show(i, !reduceMotion); if (box.classList.contains('auto')) { box.classList.remove('paused'); schedule(DWELL); } });
+    t.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      const j = (i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length;
+      tabs[j].focus(); tabs[j].click();
+    });
+  });
+
+  if (reduceMotion) { show(0, false); return; }
+  box.style.setProperty('--dwell', `${DWELL}ms`);
+  box.addEventListener('mouseenter', () => { hovered = true; pause(); });
+  box.addEventListener('mouseleave', () => { hovered = false; resume(); });
+  document.addEventListener('visibilitychange', () => (document.hidden ? pause() : resume()));
+  let first = true;
+  const io = new IntersectionObserver(([entry]) => {
+    visible = entry.isIntersecting;
+    if (!visible) { pause(); return; }
+    if (first) { first = false; box.classList.add('auto'); show(0, true); schedule(DWELL); }
+    else resume();
+  }, { threshold: 0.35 });
+  io.observe(box);
+})();

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://chadtollison.github.io/sitemap.xml

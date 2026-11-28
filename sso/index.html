@@ -8,12 +8,22 @@
   <meta name="description" content="Free SAML and SCIM debugger by Michael Chad Tollison. Paste a SAML response or SCIM payload to decode it, verify its signature and find what is breaking your SSO. Runs entirely in your browser.">
   <meta name="theme-color" content="#090d12">
   <title>SAML &amp; SCIM Debugger | Michael Chad Tollison</title>
-  <link rel="stylesheet" href="../styles.css?v=2026-11-27b">
-  <link rel="stylesheet" href="../sso.css?v=2026-11-28c">
+  <link rel="canonical" href="https://chadtollison.github.io/sso/">
+  <link rel="icon" href="../images/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://chadtollison.github.io/sso/">
+  <meta property="og:title" content="SAML &amp; SCIM Debugger: why won't SSO work?">
+  <meta property="og:description" content="Paste a SAML response or SCIM payload to see where sign-in breaks and which setting fixes it. Free, runs in your browser.">
+  <meta property="og:image" content="https://chadtollison.github.io/images/og-sso.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="../styles.css?v=2026-11-28e">
+  <link rel="stylesheet" href="../sso.css?v=2026-11-28d">
 </head>
 <body>
   <header>
-    <a class="logo name-logo" href="../" aria-label="Back to portfolio">Michael Chad Tollison<span>.</span></a>
+    <a class="logo name-logo" href="../" aria-label="Michael Chad Tollison, back to portfolio">Michael Chad Tollison<span>.</span></a>
     <a class="back" href="../#projects">← Back to portfolio</a>
   </header>
 
@@ -33,10 +43,12 @@
     </section>
 
     <section class="tool">
-      <div class="tabs" role="tablist" aria-label="What to debug">
+      <div class="tabs">
+        <div class="tab-group" role="tablist" aria-label="What to debug">
         <button type="button" role="tab" id="tab-saml" data-tab="saml" aria-controls="panel-saml" aria-selected="true">SAML sign-in</button>
         <button type="button" role="tab" id="tab-scim" data-tab="scim" aria-controls="panel-scim" aria-selected="false" tabindex="-1">SCIM provisioning</button>
         <button type="button" role="tab" id="tab-idp" data-tab="idp" aria-controls="panel-idp" aria-selected="false" tabindex="-1">Test IdP</button>
+        </div>
         <label class="idp-pref" id="fixidp">Fixes for
           <select id="idp-pref">
             <option value="all">every IdP</option>
@@ -157,6 +169,7 @@
       <div id="panel-idp" role="tabpanel" aria-labelledby="tab-idp" hidden>
         <div id="idp-incoming" class="verdict good" role="status" hidden></div>
         <p class="idp-lead">A pretend identity provider that runs in this tab. It makes its own signing key and certificate, signs SAML responses with them and generates SCIM users, so you can test your app's SSO and provisioning without an Okta or Entra ID tenant.</p>
+        <h2 class="sr-only">Test identity provider</h2>
         <div class="idp-grid">
           <section class="rcard" aria-labelledby="idp-sign-title">
             <h3 id="idp-sign-title">1. Sign a SAML response</h3>
@@ -243,7 +256,7 @@ groups = SSO-Admins</textarea></label>
   </main>
 
   <footer><span>Michael Chad Tollison</span><span>Software & Data Engineer</span><span><a href="../">Portfolio</a></span></footer>
-  <script type="module" src="app.js?v=2026-11-28c"></script>
+  <script type="module" src="app.js?v=2026-11-28d"></script>
   <script data-goatcounter="https://chadtollison.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>

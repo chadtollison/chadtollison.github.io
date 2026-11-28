@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="How Michael Chad Tollison built and measured scrubpii, an open-source PII redactor: datasets, configurations, scoring method, results and limits.">
+  <meta name="theme-color" content="#090d12">
+  <title>How I built and measured a PII redactor | Michael Chad Tollison</title>
+  <link rel="canonical" href="https://chadtollison.github.io/pii-benchmark/">
+  <link rel="icon" href="../images/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://chadtollison.github.io/pii-benchmark/">
+  <meta property="og:title" content="How I built and measured a PII redactor">
+  <meta property="og:description" content="Datasets, setup and a strict scoring method for scrubpii, an open-source PII redactor, plus what moved the numbers and where it still falls short.">
+  <meta property="og:image" content="https://chadtollison.github.io/images/og-benchmark.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="How I built and measured a PII redactor">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="../styles.css?v=2026-11-28e">
+  <link rel="stylesheet" href="writeup.css?v=2026-11-28e">
+</head>
+<body>
+  <a class="skip" href="#article">Skip to the article</a>
+  <div id="scroll-progress" aria-hidden="true"></div>
+  <header>
+    <a class="logo name-logo" href="../" aria-label="Michael Chad Tollison, back to portfolio">Michael Chad Tollison<span>.</span></a>
+    <a class="wu-back" href="../#projects">← Back to portfolio</a>
+  </header>
+
+  <main id="article">
+    <section class="wu-hero">
+      <p class="kicker">BENCHMARK NOTES · NOVEMBER 2026 · 7 MIN READ</p>
+      <h1>How I built and <em>measured</em> a PII redactor</h1>
+      <p class="lead"><a href="https://pypi.org/project/scrubpii/" target="_blank" rel="noreferrer">scrubpii</a> is my open-source tool for finding and redacting personal data on your own device. This page explains how I test it: which datasets, which configurations, how the scoring works and where the numbers can mislead. It compares against Microsoft Presidio, the most widely used open-source tool for the same job, run in its default setup.</p>
+      <div class="wu-stats">
+        <div><strong>10</strong><span>public test sets, in 5 languages</span></div>
+        <div><strong>22,000+</strong><span>labeled personal-data items scored</span></div>
+        <div><strong>90%</strong><span>of an item must be hidden to count</span></div>
+        <div><strong>Public</strong><span>datasets, scoring code and results</span></div>
+      </div>
+      <aside class="wu-tldr" aria-label="Short version">
+        <b>The short version</b>
+        <ul>
+          <li><strong>The headline metric is strict.</strong> An item only counts as hidden if at least 90% of its characters are redacted, because half a phone number still leaks.</li>
+          <li><strong>F1 is reported but not trusted alone.</strong> In this scorer it counts any overlap, so it can look perfect while data still leaks.</li>
+          <li><strong>Better data beat a bigger model,</strong> and checksums fixed what the model couldn't be sure of.</li>
+          <li><strong>It still has gaps,</strong> listed below, starting with unfamiliar financial paperwork.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section class="wu" aria-labelledby="h-data">
+      <div class="title"><b>01</b><h2 id="h-data">What was measured</h2></div>
+      <p class="wu-p">Ten held-out test sets from public datasets that come with their own answer keys. The model never trained on these texts, and the finance set comes from a source it never saw at all.</p>
+      <div class="wu-table" role="region" aria-label="Test sets" tabindex="0">
+        <table>
+          <thead><tr><th>Test set</th><th>Source</th><th>Language</th><th class="n">Items</th></tr></thead>
+          <tbody>
+            <tr><td>Synthetic emails and messages</td><td>ai4privacy open-pii-masking-500k, validation split (CC BY 4.0)</td><td>English</td><td class="n">1,637</td></tr>
+            <tr><td>Same, four more languages</td><td>ai4privacy, validation split</td><td>Spanish, French, German, Italian</td><td class="n">3,106</td></tr>
+            <tr><td>Mixed business documents</td><td>Gretel PII masking, test split (Apache 2.0)</td><td>English</td><td class="n">2,933</td></tr>
+            <tr><td>Financial documents</td><td>Gretel finance, test split. <em>Source never used in training.</em></td><td>English</td><td class="n">3,136</td></tr>
+            <tr><td>Medical records</td><td>NVIDIA Nemotron-PII, held-out split (CC BY 4.0)</td><td>English</td><td class="n">3,909</td></tr>
+            <tr><td>Support tickets, emails, chats</td><td>NVIDIA Nemotron-PII, held-out split</td><td>English</td><td class="n">3,995</td></tr>
+            <tr><td>Logs and config files</td><td>NVIDIA Nemotron-PII, held-out split</td><td>English</td><td class="n">3,723</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="wu-config">
+        <div><b>scrubpii 0.7</b><p>Default install: the 8-bit ONNX model, checksum rules on, 128-token reading windows, minimum confidence 0.5.</p></div>
+        <div><b>Microsoft Presidio</b><p>Default <code>AnalyzerEngine()</code> with spaCy <code>en_core_web_lg</code> and its built-in recognizers, called with <code>language="en"</code> on every set. Presidio supports other languages once you install and configure their models; this run didn't, so the four non-English results show its out-of-the-box behavior, not its best.</p></div>
+        <div><b>Both</b><p>Same texts, same CPU-only GitHub Actions runner, up to 1,000 texts per set (500 for each non-English set).</p></div>
+      </div>
+    </section>
+
+    <section class="wu" aria-labelledby="h-fair">
+      <div class="title"><b>02</b><h2 id="h-fair">How it's scored</h2></div>
+      <p class="wu-p">The scorer ignores labels and asks one question: would this text be safe to share? If Presidio calls an address a <code>LOCATION</code> and scrubpii calls it an <code>ADDRESS</code>, both get full credit.</p>
+      <div class="wu-metrics">
+        <div class="f1"><small>FULLY HIDDEN</small><p>Share of real personal-data items with at least 90% of their characters redacted. The headline number.</p></div>
+        <div><small>WAS PERSONAL</small><p>Share of finds that landed on real personal data. This catches a tool that redacts everything.</p></div>
+        <div><small>CAUGHT</small><p>Share of items that a find touches at all. Lenient: one character counts.</p></div>
+        <div><small>F1</small><p>Combines caught and was personal. Lenient for the same reason, so it's never the headline.</p></div>
+      </div>
+      <aside class="wu-warn" aria-label="Caveat about F1">
+        <b>Overlap-based F1 doesn't guarantee redaction</b>
+        <p>My first charts led with F1. A review showed why that isn't enough: a deliberately broken detector that marks one character of each email gets a perfect F1 from this scorer, while fully hidden correctly shows zero. So every chart on this page uses fully hidden, and F1 only appears where I describe how a number changed during development.</p>
+      </aside>
+      <p class="wu-p">Anyone can rerun it: <a href="https://github.com/chadtollison/privacy-tools/blob/main/training/compare.py" target="_blank" rel="noreferrer">the scoring code</a> and <a href="https://github.com/chadtollison/privacy-tools/blob/main/benchmarks/compare.md" target="_blank" rel="noreferrer">the full results, with every metric</a> are public.</p>
+    </section>
+
+    <section class="wu" aria-labelledby="h-score">
+      <div class="title"><b>03</b><h2 id="h-score">Results</h2></div>
+      <p class="wu-p">Share of personal data fully hidden, per test set. Read the non-English rows with the configuration note above in mind.</p>
+      <figure class="bench wu-chart in" aria-labelledby="cap-score">
+        <figcaption id="cap-score"><small>PERSONAL DATA FULLY HIDDEN · HIGHER IS BETTER</small><span><i class="k-me"></i>scrubpii 0.7 <i class="k-them"></i>Presidio, default setup</span></figcaption>
+        <div class="bench-rows">
+          <!-- chart:score -->
+          <div class="brow" style="--a:99.5%;--b:66.8%"><span>ai4privacy, English</span><div><i class="me"><b>99.5%</b></i><i class="them"><b>67%</b></i></div></div>
+          <div class="brow" style="--a:99.0%;--b:51.5%"><span>ai4privacy, Spanish <em>Presidio in English mode</em></span><div><i class="me"><b>99%</b></i><i class="them"><b>52%</b></i></div></div>
+          <div class="brow" style="--a:98.3%;--b:57.7%"><span>ai4privacy, French <em>Presidio in English mode</em></span><div><i class="me"><b>98%</b></i><i class="them"><b>58%</b></i></div></div>
+          <div class="brow" style="--a:97.2%;--b:65.2%"><span>ai4privacy, German <em>Presidio in English mode</em></span><div><i class="me"><b>97%</b></i><i class="them"><b>65%</b></i></div></div>
+          <div class="brow" style="--a:98.4%;--b:58.0%"><span>ai4privacy, Italian <em>Presidio in English mode</em></span><div><i class="me"><b>98%</b></i><i class="them"><b>58%</b></i></div></div>
+          <div class="brow" style="--a:99.2%;--b:75.0%"><span>Gretel PII</span><div><i class="me"><b>99%</b></i><i class="them"><b>75%</b></i></div></div>
+          <div class="brow" style="--a:98.2%;--b:78.1%"><span>Medical records</span><div><i class="me"><b>98%</b></i><i class="them"><b>78%</b></i></div></div>
+          <div class="brow" style="--a:97.6%;--b:76.2%"><span>Support tickets, emails, chats</span><div><i class="me"><b>98%</b></i><i class="them"><b>76%</b></i></div></div>
+          <div class="brow" style="--a:95.5%;--b:59.6%"><span>Logs &amp; config files</span><div><i class="me"><b>96%</b></i><i class="them"><b>60%</b></i></div></div>
+          <div class="brow" style="--a:77.6%;--b:56.4%"><span>Finance documents <em>source never seen in training</em></span><div><i class="me"><b>78%</b></i><i class="them"><b>56%</b></i></div></div>
+          <!-- /chart:score -->
+        </div>
+        <p class="bench-note">At least 90% of an item's characters redacted. Up to 1,000 texts per set. <a href="https://github.com/chadtollison/privacy-tools/blob/main/benchmarks/compare.md" target="_blank" rel="noreferrer">Full results table ↗</a></p>
+      </figure>
+      <p class="wu-p">Precision matters too, or a tool could score well by redacting everything. On the English set, 99% of scrubpii's finds were real personal data, against 91% for Presidio's.</p>
+      <p class="wu-p">By type on the English set, the differences are mostly in things a pattern can't describe: names, street addresses, phone numbers written in unusual ways, and ID numbers. Emails are fully hidden by both.</p>
+      <figure class="bench wu-chart in" aria-labelledby="cap-type">
+        <figcaption id="cap-type"><small>FULLY HIDDEN BY TYPE, AI4PRIVACY ENGLISH</small><span><i class="k-me"></i>scrubpii <i class="k-them"></i>Presidio, default setup</span></figcaption>
+        <div class="bench-rows">
+          <!-- chart:types -->
+          <div class="brow" style="--a:99.8%;--b:74.8%"><span>Names <em>848 items</em></span><div><i class="me"><b>99.8%</b></i><i class="them"><b>75%</b></i></div></div>
+          <div class="brow" style="--a:99.1%;--b:44.8%"><span>Street addresses <em>319 items</em></span><div><i class="me"><b>99%</b></i><i class="them"><b>45%</b></i></div></div>
+          <div class="brow" style="--a:100.0%;--b:48.5%"><span>Phone numbers <em>171 items</em></span><div><i class="me"><b>100%</b></i><i class="them"><b>48%</b></i></div></div>
+          <div class="brow" style="--a:99.1%;--b:49.5%"><span>ID numbers <em>109 items</em></span><div><i class="me"><b>99%</b></i><i class="them"><b>50%</b></i></div></div>
+          <div class="brow" style="--a:100.0%;--b:100.0%"><span>Emails <em>123 items</em></span><div><i class="me"><b>100%</b></i><i class="them"><b>100%</b></i></div></div>
+          <!-- /chart:types -->
+        </div>
+      </figure>
+    </section>
+
+    <section class="wu" aria-labelledby="h-moved">
+      <div class="title"><b>04</b><h2 id="h-moved">What moved the numbers</h2></div>
+      <p class="wu-p">I tracked every change against the hardest set: financial documents from a source the model never trained on. Long, dense and full of numbers that look personal but aren't. During development I tracked F1, so this chart uses it; on the strict score, the final version fully hides 78% of items here.</p>
+      <figure class="wu-steps wu-chart" aria-labelledby="cap-steps">
+        <figcaption id="cap-steps"><small>F1 ON UNSEEN FINANCE DOCUMENTS, AFTER EACH CHANGE</small><span><i class="k-me"></i>scrubpii</span></figcaption>
+        <div class="steps-plot">
+          <div class="step" style="--v:70%"><b>.70</b><i></i><span>v2<em>generated sentences</em></span></div>
+          <div class="step dip" style="--v:65%"><b>.65</b><i></i><span>v3<em>real data, 500k examples</em></span></div>
+          <div class="step" style="--v:76%"><b>.76</b><i></i><span>+ windows<em>128-token reading</em></span></div>
+          <div class="step" style="--v:80%"><b>.80</b><i></i><span>+ rules<em>checksums confirm</em></span></div>
+          <div class="step best" style="--v:84.5%"><b>.845</b><i></i><span>v5<em>broader data</em></span></div>
+        </div>
+      </figure>
+
+      <ol class="lessons">
+        <li>
+          <h3>Real data beat clever data</h3>
+          <p>Version 2 learned from sentences I generated. Version 3 trained on 500,000 realistic examples from <a href="https://huggingface.co/datasets/ai4privacy/open-pii-masking-500k-ai4privacy" target="_blank" rel="noreferrer">ai4privacy</a> (CC BY 4.0) and improved sharply on English. But the finance score <em>dropped</em>, from 0.70 to 0.65. That dip told me the next problem wasn't the data.</p>
+        </li>
+        <li>
+          <h3>Long documents needed a shorter window</h3>
+          <p>The model trained on short texts, then read long reports in 512-token chunks and lost track of what mattered. Reading in overlapping 128-token windows, the length it learned on, took finance from 0.65 to 0.76 without retraining.</p>
+        </li>
+        <li>
+          <h3>The model proposes, math confirms</h3>
+          <p>A model can guess that 16 digits are a card number. A Luhn checksum knows. I added validators for cards, SSNs, IBANs, IPs and real US area codes. They confirm or reject the model's finds and stretch a half-found item to its full length. Each find carries a reason, like <code>model found it, rule confirmed: valid Luhn checksum</code>, so a privacy reviewer can audit every redaction.</p>
+        </li>
+        <li class="fail">
+          <h3>The bigger model lost</h3>
+          <p>I tried DeBERTa-v3, a newer and larger model that usually wins on paper. It fully hid <strong>52% of English personal data against 99%</strong> for the small DistilBERT model, and ran about 2.5 times slower. I kept the small one. Measuring before switching saved me from shipping a worse product that sounded better.</p>
+        </li>
+        <li>
+          <h3>Shipping small mattered as much as accuracy</h3>
+          <p>Nobody adds a 1.5 GB dependency to strip emails from logs. Exporting to ONNX with 8-bit weights removed PyTorch entirely, with no measurable change in accuracy.</p>
+          <figure class="bench wu-mini in" aria-labelledby="cap-size">
+            <figcaption id="cap-size"><small>SCRUBPII INSTALL SIZE · LOWER IS BETTER</small></figcaption>
+            <div class="bench-rows">
+              <div class="brow" style="--b:100%"><span>With PyTorch (0.3)</span><div><i class="them"><b>1,558 MB</b></i></div></div>
+              <div class="brow" style="--a:18.5%"><span>ONNX 8-bit (0.4 and later)</span><div><i class="me"><b>288 MB</b></i></div></div>
+            </div>
+            <p class="bench-note">Cold start dropped from 3.4 s to 0.6 s.</p>
+          </figure>
+        </li>
+        <li>
+          <h3>Broader data, then stop</h3>
+          <p>Version 5 added NVIDIA's Nemotron-PII set (medical notes, tickets, logs) plus French, German and Italian. Unseen finance rose to 0.845 F1 even though no finance data was added.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="wu" aria-labelledby="h-lose">
+      <div class="title"><b>05</b><h2 id="h-lose">Limits and open gaps</h2></div>
+      <div class="wu-honest">
+        <div><b>Finance isn't solved</b><p>On unfamiliar financial paperwork, about one item in five isn't fully hidden. That's the next thing to fix.</p></div>
+        <div><b>SSNs and passports</b><p>Presidio fully hid every SSN and passport number in the English set; scrubpii hid 94% and 96%. Small groups, 18 and 24 items, but a miss is a miss.</p></div>
+        <div><b>Default configurations</b><p>Presidio is configurable: language models, custom recognizers, tuned thresholds. This compares defaults, which is what most people start with, not what a tuned deployment can reach.</p></div>
+        <div><b>Synthetic text</b><p>Most test sets are synthetic or semi-synthetic. Real documents are messier, which is why the never-seen finance set is the one I watch.</p></div>
+      </div>
+    </section>
+
+    <section class="wu wu-try" aria-labelledby="h-try">
+      <div class="title"><b>06</b><h2 id="h-try">Try it yourself</h2></div>
+      <pre class="wu-code"><code><span class="c">$</span> pip install scrubpii
+
+<span class="k">from</span> scrubpii <span class="k">import</span> redact
+redact(<span class="s">"Call Maria Gonzalez at (415) 555-0132"</span>)
+<span class="c"># 'Call [PERSON] at [PHONE]'</span></code></pre>
+      <div class="links">
+        <a class="projectlink live" href="https://chadtollison.github.io/privacy-tools/pii/">Paste your own text <span>→</span></a>
+        <a class="projectlink" href="https://chadtollison.github.io/privacy-tools/">Five free privacy tools <span>→</span></a>
+        <a class="projectlink" href="https://github.com/chadtollison/privacy-tools/blob/main/benchmarks/compare.md" target="_blank" rel="noreferrer">Benchmark results <span>↗</span></a>
+        <a class="projectlink" href="https://pypi.org/project/scrubpii/" target="_blank" rel="noreferrer">PyPI <span>↗</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer><span>Michael Chad Tollison</span><a href="../">← Portfolio</a><span id="year"></span></footer>
+  <script>
+    (function () {
+      var y = document.getElementById('year'); if (y) y.textContent = new Date().getFullYear();
+      var bar = document.getElementById('scroll-progress');
+      function upd() { var m = document.documentElement.scrollHeight - innerHeight; bar.style.width = (m > 0 ? scrollY / m * 100 : 0) + '%'; }
+      addEventListener('scroll', upd, { passive: true }); upd();
+    })();
+  </script>
+  <!-- Private visitor stats: https://chadtollison.goatcounter.com -->
+  <script data-goatcounter="https://chadtollison.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>
