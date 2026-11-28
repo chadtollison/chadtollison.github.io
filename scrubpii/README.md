@@ -58,7 +58,7 @@ It runs on ONNX Runtime, so there is no PyTorch to install. The 8-bit model
 under a second and works offline. Nothing is sent anywhere. If you already
 use PyTorch, `pip install "scrubpii[torch]"` and set `SCRUBPII_BACKEND=torch`.
 
-Try it in your browser first: [chadtollison.github.io/redact.html](https://chadtollison.github.io/redact.html)
+Try it in your browser first: [chadtollison.github.io/pii/](https://chadtollison.github.io/pii/)
 
 ## Ways to redact
 
@@ -136,7 +136,7 @@ scrubpii.understand("redact any ###-#####-##-RC as an RC code")
 ```
 
 On the command line: `scrubpii --rule "redact any ###-#####-##-RC as an RC code" --file notes.txt`.
-The [online demo](https://chadtollison.github.io/redact.html) takes the same rules.
+The [online demo](https://chadtollison.github.io/pii/) takes the same rules.
 
 ### Rules with regular expressions
 

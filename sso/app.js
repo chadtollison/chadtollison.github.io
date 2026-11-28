@@ -3,6 +3,12 @@ import { analyzeSaml, relTime, NAMEID_FORMATS } from './saml.js';
 import { analyzeScim, describeAttr } from './scim.js';
 import { parseCertificate, shortAlg } from './xmldsig.js';
 import { SAML_SAMPLES, SCIM_SAMPLES, SAMPLE_SETTINGS, DEMO_CERT } from './samples.js';
+import { renderFlow } from './flow.js';
+import { runAttacks } from './attacks.js';
+import { fixFor, IDPS } from './fixes.js';
+import { buildReport } from './report.js';
+import * as idp from './fakeidp.js';
+import { decodeInput } from './saml.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const el = (tag, attrs = {}, ...children) => {
@@ -43,7 +49,30 @@ tabs.forEach((t, i) => {
     showTab(next.dataset.tab, true);
   });
 });
-showTab(location.hash === '#scim' ? 'scim' : 'saml');
+showTab(location.hash === '#scim' ? 'scim' : location.hash === '#idp' ? 'idp' : 'saml');
+for (const a of document.querySelectorAll('.features a')) {
+  a.addEventListener('click', (e) => {
+    e.preventDefault();
+    showTab(a.getAttribute('href').slice(1));
+    const target = a.dataset.jump ? $(`#${a.dataset.jump === 'report' ? 'saml-report' : a.dataset.jump}`) : $('.tabs');
+    (target || $('.tabs')).scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+}
+
+// ---------- fix guides ----------
+const prefSel = $('#idp-pref');
+prefSel.value = store.get('sso-debugger-idp-pref') || 'all';
+prefSel.addEventListener('change', () => { store.set('sso-debugger-idp-pref', prefSel.value); rerender(); });
+function fixNode(c) {
+  const pref = prefSel.value;
+  if (pref === 'none') return null;
+  const f = fixFor(c);
+  if (!f) return null;
+  if (pref !== 'all') return f[pref] ? el('p', { class: 'fix' }, el('strong', { text: `Fix in ${IDPS[pref]}: ` }), f[pref]) : null;
+  return el('details', { class: 'fix' }, el('summary', { text: `How to fix in ${Object.keys(f).map((k) => IDPS[k].replace('Microsoft ', '').replace(' Workspace', '')).join(', ')}` }),
+    el('dl', {}, Object.entries(f).map(([k, v]) => [el('dt', { text: IDPS[k] }), el('dd', { text: v })])));
+}
+const fixText = (c) => { const f = fixFor(c); if (!f) return null; const p = prefSel.value; return p !== 'all' && p !== 'none' ? (f[p] || null) : Object.entries(f).map(([k, v]) => `${IDPS[k]}: ${v}`).join(' / '); };
 
 // ---------- shared rendering ----------
 const ICON = { error: '✕', warn: '!', ok: '✓', info: 'i' };
@@ -56,7 +85,8 @@ function renderChecks(target, checks) {
       el('span', { class: 'ico', 'aria-hidden': 'true', text: ICON[c.level] }),
       el('div', {},
         el('div', { class: 'check-title' }, el('span', { class: 'sr-only', text: { error: 'Problem: ', warn: 'Warning: ', ok: 'Pass: ', info: 'Note: ' }[c.level] }), c.title, el('small', { text: c.area })),
-        c.detail ? el('p', { text: c.detail }) : null)));
+        c.detail ? el('p', { text: c.detail }) : null,
+        fixNode(c))));
   }
 }
 function renderVerdict(target, checks, subtitle) {
@@ -199,6 +229,8 @@ function certCard(c) {
 }
 
 let samlRun = 0;
+let lastSaml = null, lastScim = null;
+function rerender() { if (lastSaml) runSaml(); if (lastScim) runScim(); }
 async function runSaml() {
   const raw = samlIn.value;
   const run = ++samlRun;
@@ -206,11 +238,15 @@ async function runSaml() {
   let r;
   try { r = await analyzeSaml(raw, readSettings()); } catch (e) {
     if (run !== samlRun) return;
-    samlOut.hidden = true; showError(samlVerdict, e.message); return;
+    samlOut.hidden = true; lastSaml = null; showError(samlVerdict, e.message); return;
   }
   if (run !== samlRun) return;
   const kindLabel = { Response: 'SAML Response', Assertion: 'SAML Assertion', AuthnRequest: 'AuthnRequest', LogoutRequest: 'LogoutRequest', LogoutResponse: 'LogoutResponse' }[r.kind] || `<${r.root?.nodeName}>`;
   renderVerdict(samlVerdict, r.checks, kindLabel);
+  lastSaml = { r, raw };
+  $('#saml-flow').replaceChildren(renderFlow(r, el) || '');
+  $('#attacks').hidden = !(r.assertion && r.response && r.kind === 'Response');
+  $('#attacks-out').replaceChildren();
   renderChecks($('#saml-checks'), r.checks);
   $('#saml-steps').replaceChildren(...[...r.decoded.steps.map((s) => el('li', { text: s })),
     r.decoded.binding ? el('li', { text: `Binding: ${r.decoded.binding}` }) : null,
@@ -295,7 +331,8 @@ function runScim() {
   const raw = scimIn.value;
   if (!raw.trim()) { scimOut.hidden = true; scimVerdict.hidden = true; return; }
   let r;
-  try { r = analyzeScim(raw, { direction: dirSel.value }); } catch (e) { scimOut.hidden = true; showError(scimVerdict, e.message); return; }
+  try { r = analyzeScim(raw, { direction: dirSel.value }); } catch (e) { scimOut.hidden = true; lastScim = null; showError(scimVerdict, e.message); return; }
+  lastScim = { r, raw };
   const what = [r.http.method && `${r.http.method} ${r.http.path.replace(/\?.*$/, '')}`, r.http.status && `HTTP ${r.http.status}`, r.kind, r.direction && (r.direction === 'request' ? 'sent to your app' : 'sent by your app')].filter(Boolean).join(' · ');
   renderVerdict(scimVerdict, r.checks, what);
   renderChecks($('#scim-checks'), r.checks);
@@ -353,3 +390,176 @@ $('#settings-reset').addEventListener('click', () => { writeSettings({ spEntityI
 // Start with working examples so the page is never empty (unless the visitor saved their own settings).
 scimSamples.querySelector('[data-sample="deactivate"]').click();
 if (!store.get('sso-debugger-settings')) samlSamples.querySelector('[data-sample="valid"]').click();
+
+// ---------- attack playground ----------
+$('#attacks-run').addEventListener('click', async () => {
+  if (!lastSaml) return;
+  const btn = $('#attacks-run');
+  btn.disabled = true; btn.textContent = 'Attacking…';
+  const out = $('#attacks-out');
+  try {
+    const results = await runAttacks(lastSaml.r.decoded.xml, readSettings());
+    const ran = results.filter((x) => !x.skipped);
+    const caught = ran.filter((x) => x.caught).length;
+    out.replaceChildren(
+      el('p', { class: `score ${caught === ran.length ? 'good' : 'bad'}` }, el('strong', { text: `${caught} of ${ran.length} attacks caught` }),
+        caught === ran.length ? ' Every forged or replayed version was rejected.' : ' The ones not caught show what your app must check on its own.'),
+      el('ol', { class: 'attack-list' }, results.map((x) => el('li', { class: x.skipped ? 'skipped' : x.caught ? 'caught' : 'missed' },
+        el('div', { class: 'atk-top' },
+          el('span', { class: 'atk-badge', text: x.skipped ? 'Skipped' : x.caught ? 'Caught' : 'Not caught' }),
+          el('strong', { text: x.atk.name })),
+        el('p', { text: x.atk.what }),
+        x.skipped ? el('p', { class: 'atk-why', text: x.error || 'This response has nothing this attack can use.' })
+          : x.caught ? el('p', { class: 'atk-why' }, 'Caught by: ', el('em', { text: x.errors[0].title }), x.errors.length > 1 ? ` (and ${x.errors.length - 1} more)` : '')
+            : el('p', { class: 'atk-why' }, x.atk.id === 'resign' ? 'Not caught, because no trusted IdP certificate is set. Paste your IdP’s certificate or thumbprint in the settings and run it again.' : x.atk.id === 'otherapp' ? 'Not caught, because the assertion has no audience to compare.' : 'Not caught.'),
+        x.scenario ? el('p', { class: 'atk-why', text: x.scenario }) : null,
+        x.skipped || x.atk.id === 'replay' ? null : el('button', {
+          type: 'button', class: 'mini-btn', text: 'Open in the debugger',
+          onclick: () => {
+            samlIn.value = x.xml;
+            if (x.atk.id === 'otherapp') writeSettings({ spEntityId: x.settings.spEntityId, acsUrl: x.settings.acsUrl });
+            $('#saml-note').textContent = `Attacked version: ${x.atk.name}.`;
+            for (const b of samlSamples.children) b.removeAttribute('aria-pressed');
+            runSaml().then(() => samlVerdict.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+          },
+        })))));
+  } catch (e) {
+    out.replaceChildren(el('p', { class: 'atk-why', text: `The attacks could not run: ${e.message}` }));
+  } finally { btn.disabled = false; btn.textContent = 'Attack it again'; }
+});
+
+// ---------- shareable report ----------
+const dlg = $('#report-dialog');
+let reportFor = null;
+function download(name, text, type = 'text/plain') {
+  const url = URL.createObjectURL(new Blob([text], { type }));
+  const a = el('a', { href: url, download: name });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+async function makeReport() {
+  const src = reportFor === 'saml' ? lastSaml : lastScim;
+  if (!src) return;
+  const status = $('#report-status');
+  status.textContent = 'Redacting…';
+  try {
+    const { text, hidden, total } = await buildReport({ tool: reportFor, result: src.r, raw: src.raw, fixFor: fixText });
+    $('#report-text').value = text;
+    status.textContent = total ? `Hidden ${total} personal value${total === 1 ? '' : 's'}: ${Object.entries(hidden).map(([k, n]) => `${n} ${k.toLowerCase()}`).join(', ')}. Read it over before you share it.` : 'No personal data found. Read it over before you share it.';
+  } catch (e) {
+    status.textContent = `The report could not be made: ${e.message}`;
+  }
+}
+for (const which of ['saml', 'scim']) {
+  $(`#${which}-report`).addEventListener('click', () => { reportFor = which; $('#report-text').value = ''; dlg.showModal(); makeReport(); });
+}
+$('#report-close').addEventListener('click', () => dlg.close());
+dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+$('#report-copy').addEventListener('click', async () => {
+  const b = $('#report-copy');
+  try { await navigator.clipboard.writeText($('#report-text').value); b.textContent = 'Copied'; } catch { $('#report-text').select(); b.textContent = 'Press Ctrl+C'; }
+  setTimeout(() => { b.textContent = 'Copy report'; }, 1600);
+});
+$('#report-download').addEventListener('click', () => download(`${reportFor}-debug-report.md`, $('#report-text').value, 'text/markdown'));
+
+// ---------- test IdP ----------
+const idpField = (k) => $(`#idp-${k}`);
+let lastSigned = null;
+async function showIdpInfo() {
+  const box = $('#idp-info');
+  try {
+    const me = await idp.getIdp();
+    box.replaceChildren(kv([
+      ['Entity ID (issuer)', me.entityId], ['Sign-in URL', `${location.origin}${location.pathname}`],
+      ['Certificate', me.info.subject.replace(/^CN=/, '').replace(/, O=.*/, ''), `Valid until ${me.info.notAfter.toISOString().slice(0, 10)}`],
+      ['SHA-256 thumbprint', el('span', { class: 'mono fp' }, me.info.sha256, ' ', copyButton(() => me.info.sha256))],
+      ['SHA-1 thumbprint', el('span', { class: 'mono fp' }, me.info.sha1, ' ', copyButton(() => me.info.sha1.replace(/:/g, '')))],
+    ]));
+  } catch (e) { box.replaceChildren(el('p', { class: 'pane-note', text: `Could not make a key in this browser: ${e.message}` })); }
+}
+let idpShown = false;
+const ensureIdp = () => { if (!idpShown) { idpShown = true; showIdpInfo(); } };
+tabs.find((t) => t.dataset.tab === 'idp').addEventListener('click', ensureIdp);
+if (location.hash === '#idp') ensureIdp();
+for (const k of ['sp', 'acs']) {
+  const saved = store.get('sso-debugger-idp-form') || {};
+  if (saved[k]) idpField(k).value = saved[k];
+  idpField(k).addEventListener('input', () => { const f = store.get('sso-debugger-idp-form') || {}; f[k] = idpField(k).value.trim(); store.set('sso-debugger-idp-form', f); });
+}
+$('#idp-generate').addEventListener('click', async () => {
+  const sp = idpField('sp').value.trim(), acs = idpField('acs').value.trim();
+  if (!sp || !acs) { (sp ? idpField('acs') : idpField('sp')).focus(); $('#idp-out').value = 'Fill in your SP entity ID and ACS URL first.'; return; }
+  const res = await idp.buildResponse({
+    spEntityId: sp, acsUrl: acs, nameId: idpField('nameid').value.trim(), nameIdFormat: idp.NAMEID[idpField('format').value],
+    attrs: idp.parseAttrLines(idpField('attrs').value), minutes: Math.max(1, Math.min(1440, +idpField('minutes').value || 5)),
+    sign: idpField('signmode').value, inResponseTo: idpField('irt').value.trim(),
+  });
+  lastSigned = res;
+  $('#idp-out').value = res.b64;
+  $('#idp-check').disabled = false; $('#idp-post').disabled = false;
+  ensureIdp();
+});
+$('#idp-check').addEventListener('click', async () => {
+  if (!lastSigned) return;
+  const me = await idp.getIdp();
+  writeSettings({ spEntityId: idpField('sp').value.trim(), acsUrl: idpField('acs').value.trim(), idpEntityId: me.entityId, idpCert: me.info.sha256, requestId: idpField('irt').value.trim() });
+  samlIn.value = lastSigned.b64;
+  $('#saml-note').textContent = 'Signed by your test IdP. The settings were filled in from the Test IdP tab.';
+  for (const b of samlSamples.children) b.removeAttribute('aria-pressed');
+  showTab('saml'); runSaml(); $('.tabs').scrollIntoView({ behavior: 'smooth' });
+});
+$('#idp-post').addEventListener('click', () => { if (lastSigned) idp.postToAcs(idpField('acs').value.trim(), lastSigned.b64, idpField('relay').value.trim(), incomingRequest ? '_self' : '_blank'); });
+$('#idp-cert').addEventListener('click', async () => { const me = await idp.getIdp(); download('test-idp-certificate.pem', idp.pem(me.cert), 'application/x-pem-file'); });
+$('#idp-meta').addEventListener('click', async () => download('test-idp-metadata.xml', await idp.metadata(`${location.origin}${location.pathname}`), 'application/samlmetadata+xml'));
+$('#idp-rotate').addEventListener('click', async () => { await idp.getIdp({ fresh: true }); showIdpInfo(); $('#idp-out').value = ''; lastSigned = null; $('#idp-check').disabled = true; $('#idp-post').disabled = true; });
+
+// SCIM test users
+let lastGen = null;
+$('#scimgen-go').addEventListener('click', () => {
+  const n = Math.max(1, Math.min(50, +$('#scimgen-count').value || 1));
+  const mode = $('#scimgen-mode').value;
+  lastGen = idp.scimOutput(idp.fakeUsers(n, $('#scimgen-domain').value.trim().replace(/^@/, '') || 'example.com'), mode);
+  $('#scimgen-out').value = lastGen;
+  $('#scimgen-check').disabled = mode === 'curl';
+});
+$('#scimgen-check').addEventListener('click', () => {
+  if (!lastGen) return;
+  scimIn.value = $('#scimgen-mode').value === 'list' ? `HTTP/1.1 200 OK\nContent-Type: application/scim+json\n\n${lastGen}` : lastGen;
+  $('#scim-note').textContent = 'Generated by the Test IdP tab.';
+  for (const b of scimSamples.children) b.removeAttribute('aria-pressed');
+  dirSel.value = 'auto'; showTab('scim'); runScim(); $('.tabs').scrollIntoView({ behavior: 'smooth' });
+});
+
+// SP-initiated sign-in: an app whose IdP sign-in URL is this page redirects here with ?SAMLRequest=...
+let incomingRequest = null;
+(async () => {
+  const q = new URLSearchParams(location.search);
+  if (!q.has('SAMLRequest')) return;
+  const url = location.href;
+  history.replaceState(null, '', `${location.pathname}#idp`); // keep the request out of the address bar and history
+  try {
+    const dec = await decodeInput(url);
+    const doc = new DOMParser().parseFromString(dec.xml, 'application/xml');
+    const req = doc.documentElement;
+    if (req.localName !== 'AuthnRequest') throw new Error(`expected an AuthnRequest, got ${req.localName}`);
+    const issuer = [...req.childNodes].find((n) => n.nodeType === 1 && n.localName === 'Issuer')?.textContent.trim() || '';
+    incomingRequest = { id: req.getAttribute('ID'), acs: req.getAttribute('AssertionConsumerServiceURL'), issuer };
+    if (issuer) idpField('sp').value = issuer;
+    if (incomingRequest.acs) idpField('acs').value = incomingRequest.acs;
+    idpField('irt').value = incomingRequest.id || '';
+    idpField('relay').value = dec.relayState || '';
+    showTab('idp'); ensureIdp();
+    const banner = $('#idp-incoming');
+    banner.replaceChildren(el('span', { class: 'verdict-ico', 'aria-hidden': 'true', text: '→' }),
+      el('div', {}, el('strong', { text: `${issuer || 'An app'} asked this test IdP to sign someone in` }),
+        el('span', { text: `Request ${incomingRequest.id}. Check who to sign in as, press Sign response, then Send it to my ACS URL.${incomingRequest.acs ? '' : ' The request has no ACS URL, so type yours.'}` })));
+    banner.hidden = false;
+    $('#idp-post').textContent = 'Send it to my ACS URL';
+  } catch (e) {
+    showTab('idp');
+    const banner = $('#idp-incoming');
+    banner.className = 'verdict bad';
+    banner.replaceChildren(el('span', { class: 'verdict-ico', 'aria-hidden': 'true', text: '✕' }), el('div', {}, el('strong', { text: 'Got a sign-in request but could not read it' }), el('span', { text: e.message })));
+    banner.hidden = false;
+  }
+})();

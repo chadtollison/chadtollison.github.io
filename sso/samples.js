@@ -250,3 +250,6 @@ Content-Type: application/scim+json
 }`,
   },
 ];
+
+/** An unrelated "attacker" key pair, used by the attack playground. */
+export async function otherSigner() { return { key: await key(OTHER_KEY_PKCS8), cert: OTHER_CERT }; }

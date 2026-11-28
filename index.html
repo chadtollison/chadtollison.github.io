@@ -35,7 +35,7 @@
           <h1>I build <em>backend systems, data platforms &amp; AI.</em></h1>
           <p class="lead">I'm Chad, a software and data engineer with 10 years in C#/.NET, Python and AWS. I build production microservices for identity and privacy, data pipelines and reporting platforms, and lately AI, like the model behind my live demo. Go ahead and try it.</p>
           <div class="buttons">
-            <a class="primary magnetic" href="redact.html">Try my live PII demo <span>→</span></a>
+            <a class="primary magnetic" href="pii/">Try my live PII demo <span>→</span></a>
             <a class="secondary magnetic" href="#projects">Explore my work <span>↓</span></a>
             <a class="secondary magnetic" href="https://github.com/chadtollison" target="_blank" rel="noreferrer">GitHub ↗</a>
           </div>
@@ -49,7 +49,7 @@
           </figure>
         </div>
       </div>
-      <a class="redact-teaser reactive" href="redact.html" aria-label="Open the live PII redaction demo">
+      <a class="redact-teaser reactive" href="pii/" aria-label="Open the live PII redaction demo">
         <small><i class="live-dot" aria-hidden="true"></i>LIVE DEMO · RUNS IN YOUR BROWSER</small>
         <p aria-hidden="true">Hi, I'm <span class="t-pii" data-tag="NAME">Jane Doe</span>. Email me at <span class="t-pii" data-tag="EMAIL">jane@mail.com</span> or call <span class="t-pii" data-tag="PHONE">555-0142</span>.</p>
         <b>Paste your own text <span>→</span></b>
@@ -167,7 +167,7 @@
           <p>A service that finds and redacts personal data in free text. A fine-tuned DistilBERT model proposes candidates, and checksum and format validators confirm them, reaching 0.98 precision and recall on held-out data. Diagnosed shortcut learning in the first model through token-level error analysis and fixed it with leakage-checked training data, raising F1 from 0.55 to 0.97.</p>
           <div class="flow">Text → DistilBERT → Luhn &amp; format validators → Redacted output</div>
           <div class="tags"><span>Python</span><span>PyTorch</span><span>Hugging Face</span><span>FastAPI</span><span>Docker</span></div>
-          <a class="projectlink live" href="redact.html">Try the live demo <span>→</span></a>
+          <a class="projectlink live" href="pii/">Try the live demo <span>→</span></a>
           <a class="projectlink" href="https://github.com/chadtollison/PII-Detector" target="_blank" rel="noreferrer">View repository <span>↗</span></a>
           <a class="projectlink" href="https://huggingface.co/ChadTollison/pii-distilbert-v3" target="_blank" rel="noreferrer">View model <span>↗</span></a>
         </article>
@@ -175,10 +175,10 @@
         <article class="card reactive" data-glow data-tilt>
           <small>PUBLIC PROJECT · 03</small>
           <h3>SAML &amp; SCIM Debugger</h3>
-          <p>A free tool for the two problems I debugged most while building SSO for 300+ customer organizations. Paste a SAML response and it decodes it, verifies the XML signature, and flags expired assertions, audience and ACS mismatches, missing attributes, and signature wrapping attacks. Paste a SCIM payload and it checks it against RFC 7643/7644 and the quirks of Entra ID and Okta. The signature check is written from the W3C specs and runs entirely in the browser.</p>
+          <p>A free tool for the two problems I debugged most while building SSO for 300+ customer organizations. Paste a SAML response and it decodes it, verifies the XML signature, and flags expired assertions, audience and ACS mismatches, missing attributes, and signature wrapping attacks. Paste a SCIM payload and it checks it against RFC 7643/7644 and the quirks of Entra ID and Okta. It animates exactly where sign-in broke, runs eight real attacks against your own response, links each problem to the Entra ID, Okta or Google setting that fixes it, acts as a test identity provider and exports redacted reports for support tickets. The signature check is written from the W3C specs and everything runs in the browser.</p>
           <div class="flow">Paste → Decode → Verify signature → Check → Plain-English fixes</div>
           <div class="tags"><span>SAML 2.0</span><span>SCIM 2.0</span><span>XML Signature</span><span>WebCrypto</span><span>JavaScript</span></div>
-          <a class="projectlink live" href="sso-debugger.html">Try the debugger <span>→</span></a>
+          <a class="projectlink live" href="sso/">Try the debugger <span>→</span></a>
           <a class="projectlink" href="https://github.com/chadtollison/chadtollison.github.io/tree/main/sso" target="_blank" rel="noreferrer">View the code <span>↗</span></a>
         </article>
 
@@ -209,7 +209,7 @@
           <h3>Enterprise Identity & User Platform</h3>
           <p>Own C#/.NET microservices for organizations, users, groups, permissions, quotas, and password workflows, plus a SAML 2.0/JWT SSO framework used by 300+ customer organizations and Entra ID/SCIM provisioning that eliminates hours of manual developer work per onboarding request. Built a C# privacy microservice automating 50+ PII removal requests daily, replacing a workflow that required about 2 hours of manual processing per request. Automated daily Salesforce-to-AlloyDB privacy opt-out reconciliation in Python, eliminating 5–6 hours per day of manual work by a developer and a legal representative.</p>
           <div class="tags"><span>C#/.NET</span><span>Python</span><span>Microservices</span><span>NUnit</span><span>SAML</span><span>SCIM</span><span>Salesforce</span></div>
-          <a class="projectlink live" href="sso-debugger.html">Try my SAML &amp; SCIM debugger <span>→</span></a>
+          <a class="projectlink live" href="sso/">Try my SAML &amp; SCIM debugger <span>→</span></a>
         </article>
 
         <article class="card reactive" data-glow data-tilt>
