@@ -76,6 +76,24 @@ DOB_RE = re.compile(r"(?i)\b(?:born(?: on)?|d\.?o\.?b\.?|date of birth|birth ?da
 IPV6_RE = re.compile(r"(?<![\w:])(?=[0-9A-Fa-f:]*:[0-9A-Fa-f]*:)[0-9A-Fa-f:]{2,39}(?![\w:])")
 
 
+# US health identifiers, each checked the way the issuer checks it.
+NPI_RE = re.compile(r"(?i)\bNPI(?:\s*(?:number|no\.?|#))?\W{0,6}(\d{10})\b")
+MBI_RE = re.compile(r"(?i)(?<![A-Z0-9])[1-9][AC-HJKMNP-RT-Y][AC-HJKMNP-RT-Y0-9]\d-?[AC-HJKMNP-RT-Y][AC-HJKMNP-RT-Y0-9]\d-?"
+                    r"[AC-HJKMNP-RT-Y]{2}\d{2}(?![A-Z0-9])")
+DEA_RE = re.compile(r"(?<![A-Za-z0-9])[ABCDEFGHJKLMPRSTUX][A-Z9]\d{7}(?![A-Za-z0-9])")
+
+
+def npi_ok(s: str) -> bool:
+    """National Provider Identifier: Luhn over '80840' + the 10 digits."""
+    return len(s) == 10 and luhn_ok("80840" + s)
+
+
+def dea_ok(s: str) -> bool:
+    """DEA registration number: (d1+d3+d5) + 2*(d2+d4+d6) ends in d7."""
+    d = [int(c) for c in s[2:]]
+    return len(d) == 7 and (d[0] + d[2] + d[4] + 2 * (d[1] + d[3] + d[5])) % 10 == d[6]
+
+
 def ip_ok(s: str) -> bool:
     try:
         ipaddress.ip_address(s)
@@ -447,10 +465,13 @@ def _rules(ents: List[Entity], text: str) -> List[Entity]:
               ("EMAIL", SHAPES["EMAIL"], lambda s: True, "email address format"),
               ("IP_ADDRESS", SHAPES["IP_ADDRESS"], ip_ok, "valid IP address"),
               ("IP_ADDRESS", IPV6_RE, ip_ok, "valid IPv6 address"),
-              ("DATE_OF_BIRTH", DOB_RE, lambda s: True, "a date right after 'born' or 'DOB'")]
+              ("DATE_OF_BIRTH", DOB_RE, lambda s: True, "a date right after 'born' or 'DOB'"),
+              ("ID_NUMBER", NPI_RE, npi_ok, "NPI (provider number) with a valid check digit"),
+              ("ID_NUMBER", MBI_RE, lambda s: True, "Medicare Beneficiary Identifier format"),
+              ("ID_NUMBER", DEA_RE, dea_ok, "DEA registration number with a valid check digit")]
     for typ, rx, ok, why in checks:
         for m in rx.finditer(text):
-            g = 1 if rx in (SSN_BARE_RE, DOB_RE) else 0
+            g = 1 if rx in (SSN_BARE_RE, DOB_RE, NPI_RE) else 0
             ms, me = m.start(g), m.end(g)
             if ok == "context":
                 if not phone_context(text, ms):

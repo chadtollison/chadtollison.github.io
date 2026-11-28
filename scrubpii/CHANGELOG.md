@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+- US health identifiers found by rule: NPI numbers (after "NPI", with a valid check digit), Medicare
+  Beneficiary Identifiers (MBI format) and DEA registration numbers (with a valid check digit), as ID_NUMBER.
+
 ## 0.5.0
 - Rules in plain English: `teach("redact any ###-#####-##-RC as an RC code")`. Shapes (`#` digit, `@` letter,
   `?` letter or digit, `*` a run), examples ("codes like AB-1234"), "N digit numbers", "starting with",
