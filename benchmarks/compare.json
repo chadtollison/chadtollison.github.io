@@ -4,25 +4,29 @@
     "rows": 1000,
     "systems": [
       "scrubpii",
-      "Microsoft Presidio",
+      "Microsoft Presidio (English setup)",
+      "Microsoft Presidio (each language's own setup)",
       "Presidio + scrubpii plug-in",
       "spaCy (en_core_web_lg)"
-    ]
+    ],
+    "commit": "d2447b5"
   },
   "results": {
     "ai4privacy (English)": {
       "scrubpii": {
         "items": 1637,
-        "caught": 0.997,
-        "fully_hidden": 0.995,
-        "was_personal": 0.994,
-        "f1": 0.996,
-        "ms_per_text": 3.9,
+        "fully_hidden": 0.98,
+        "char_precision": 0.995,
+        "strict_f1": 0.987,
+        "caught": 0.982,
+        "was_personal": 0.995,
+        "touch_f1": 0.988,
+        "ms_per_text": 6.3,
         "by_type": {
           "ADDRESS": {
             "items": 319,
-            "caught": 0.997,
-            "fully_hidden": 0.991
+            "caught": 0.922,
+            "fully_hidden": 0.915
           },
           "CREDIT_CARD": {
             "items": 13,
@@ -66,13 +70,15 @@
           }
         }
       },
-      "Microsoft Presidio": {
+      "Microsoft Presidio (English setup)": {
         "items": 1637,
-        "caught": 0.74,
         "fully_hidden": 0.668,
+        "char_precision": 0.885,
+        "strict_f1": 0.761,
+        "caught": 0.74,
         "was_personal": 0.905,
-        "f1": 0.814,
-        "ms_per_text": 6.1,
+        "touch_f1": 0.814,
+        "ms_per_text": 7.1,
         "by_type": {
           "ADDRESS": {
             "items": 319,
@@ -121,18 +127,77 @@
           }
         }
       },
-      "Presidio + scrubpii plug-in": {
+      "Microsoft Presidio (each language's own setup)": {
         "items": 1637,
-        "caught": 0.999,
-        "fully_hidden": 0.997,
-        "was_personal": 0.948,
-        "f1": 0.973,
-        "ms_per_text": 14.1,
+        "fully_hidden": 0.633,
+        "char_precision": 0.88,
+        "strict_f1": 0.736,
+        "caught": 0.692,
+        "was_personal": 0.901,
+        "touch_f1": 0.783,
+        "ms_per_text": 6.9,
         "by_type": {
           "ADDRESS": {
             "items": 319,
-            "caught": 0.997,
-            "fully_hidden": 0.991
+            "caught": 0.42,
+            "fully_hidden": 0.279
+          },
+          "CREDIT_CARD": {
+            "items": 13,
+            "caught": 0.615,
+            "fully_hidden": 0.615
+          },
+          "DRIVER_LICENSE": {
+            "items": 12,
+            "caught": 0.667,
+            "fully_hidden": 0.5
+          },
+          "EMAIL": {
+            "items": 123,
+            "caught": 1.0,
+            "fully_hidden": 1.0
+          },
+          "ID_NUMBER": {
+            "items": 109,
+            "caught": 0.495,
+            "fully_hidden": 0.495
+          },
+          "PASSPORT": {
+            "items": 24,
+            "caught": 1.0,
+            "fully_hidden": 1.0
+          },
+          "PERSON": {
+            "items": 848,
+            "caught": 0.774,
+            "fully_hidden": 0.744
+          },
+          "PHONE": {
+            "items": 171,
+            "caught": 0.626,
+            "fully_hidden": 0.485
+          },
+          "SSN": {
+            "items": 18,
+            "caught": 1.0,
+            "fully_hidden": 1.0
+          }
+        }
+      },
+      "Presidio + scrubpii plug-in": {
+        "items": 1637,
+        "fully_hidden": 0.982,
+        "char_precision": 0.945,
+        "strict_f1": 0.963,
+        "caught": 0.985,
+        "was_personal": 0.947,
+        "touch_f1": 0.966,
+        "ms_per_text": 17.7,
+        "by_type": {
+          "ADDRESS": {
+            "items": 319,
+            "caught": 0.922,
+            "fully_hidden": 0.915
           },
           "CREDIT_CARD": {
             "items": 13,
@@ -178,11 +243,13 @@
       },
       "spaCy (en_core_web_lg)": {
         "items": 1637,
-        "caught": 0.517,
         "fully_hidden": 0.462,
+        "char_precision": 0.963,
+        "strict_f1": 0.624,
+        "caught": 0.517,
         "was_personal": 0.978,
-        "f1": 0.676,
-        "ms_per_text": 4.8,
+        "touch_f1": 0.676,
+        "ms_per_text": 6.0,
         "by_type": {
           "ADDRESS": {
             "items": 319,
@@ -235,16 +302,18 @@
     "ai4privacy (Spanish)": {
       "scrubpii": {
         "items": 790,
-        "caught": 0.992,
-        "fully_hidden": 0.99,
+        "fully_hidden": 0.973,
+        "char_precision": 0.995,
+        "strict_f1": 0.984,
+        "caught": 0.976,
         "was_personal": 0.996,
-        "f1": 0.994,
-        "ms_per_text": 5.0,
+        "touch_f1": 0.986,
+        "ms_per_text": 9.0,
         "by_type": {
           "ADDRESS": {
             "items": 169,
-            "caught": 0.988,
-            "fully_hidden": 0.988
+            "caught": 0.911,
+            "fully_hidden": 0.911
           },
           "CREDIT_CARD": {
             "items": 14,
@@ -288,13 +357,15 @@
           }
         }
       },
-      "Microsoft Presidio": {
+      "Microsoft Presidio (English setup)": {
         "items": 790,
-        "caught": 0.608,
         "fully_hidden": 0.515,
+        "char_precision": 0.444,
+        "strict_f1": 0.477,
+        "caught": 0.608,
         "was_personal": 0.653,
-        "f1": 0.629,
-        "ms_per_text": 5.6,
+        "touch_f1": 0.629,
+        "ms_per_text": 7.0,
         "by_type": {
           "ADDRESS": {
             "items": 169,
@@ -343,18 +414,77 @@
           }
         }
       },
-      "Presidio + scrubpii plug-in": {
+      "Microsoft Presidio (each language's own setup)": {
         "items": 790,
-        "caught": 0.997,
-        "fully_hidden": 0.995,
-        "was_personal": 0.918,
-        "f1": 0.956,
-        "ms_per_text": 11.6,
+        "fully_hidden": 0.676,
+        "char_precision": 0.962,
+        "strict_f1": 0.794,
+        "caught": 0.752,
+        "was_personal": 0.972,
+        "touch_f1": 0.848,
+        "ms_per_text": 6.0,
         "by_type": {
           "ADDRESS": {
             "items": 169,
-            "caught": 0.988,
-            "fully_hidden": 0.988
+            "caught": 0.775,
+            "fully_hidden": 0.604
+          },
+          "CREDIT_CARD": {
+            "items": 14,
+            "caught": 0.5,
+            "fully_hidden": 0.5
+          },
+          "DRIVER_LICENSE": {
+            "items": 11,
+            "caught": 0.455,
+            "fully_hidden": 0.455
+          },
+          "EMAIL": {
+            "items": 58,
+            "caught": 1.0,
+            "fully_hidden": 0.983
+          },
+          "ID_NUMBER": {
+            "items": 56,
+            "caught": 0.429,
+            "fully_hidden": 0.429
+          },
+          "PASSPORT": {
+            "items": 26,
+            "caught": 0.808,
+            "fully_hidden": 0.808
+          },
+          "PERSON": {
+            "items": 365,
+            "caught": 0.797,
+            "fully_hidden": 0.77
+          },
+          "PHONE": {
+            "items": 79,
+            "caught": 0.57,
+            "fully_hidden": 0.316
+          },
+          "SSN": {
+            "items": 12,
+            "caught": 1.0,
+            "fully_hidden": 1.0
+          }
+        }
+      },
+      "Presidio + scrubpii plug-in": {
+        "items": 790,
+        "fully_hidden": 0.978,
+        "char_precision": 0.913,
+        "strict_f1": 0.945,
+        "caught": 0.981,
+        "was_personal": 0.915,
+        "touch_f1": 0.947,
+        "ms_per_text": 20.5,
+        "by_type": {
+          "ADDRESS": {
+            "items": 169,
+            "caught": 0.911,
+            "fully_hidden": 0.911
           },
           "CREDIT_CARD": {
             "items": 14,
@@ -400,11 +530,13 @@
       },
       "spaCy (en_core_web_lg)": {
         "items": 790,
-        "caught": 0.413,
         "fully_hidden": 0.341,
+        "char_precision": 0.354,
+        "strict_f1": 0.347,
+        "caught": 0.413,
         "was_personal": 0.522,
-        "f1": 0.461,
-        "ms_per_text": 4.8,
+        "touch_f1": 0.461,
+        "ms_per_text": 6.0,
         "by_type": {
           "ADDRESS": {
             "items": 169,
@@ -457,16 +589,18 @@
     "ai4privacy (French)": {
       "scrubpii": {
         "items": 766,
-        "caught": 0.987,
-        "fully_hidden": 0.983,
-        "was_personal": 0.996,
-        "f1": 0.992,
-        "ms_per_text": 8.3,
+        "fully_hidden": 0.975,
+        "char_precision": 0.997,
+        "strict_f1": 0.986,
+        "caught": 0.979,
+        "was_personal": 0.997,
+        "touch_f1": 0.988,
+        "ms_per_text": 9.5,
         "by_type": {
           "ADDRESS": {
             "items": 111,
-            "caught": 0.991,
-            "fully_hidden": 0.973
+            "caught": 0.937,
+            "fully_hidden": 0.919
           },
           "CREDIT_CARD": {
             "items": 18,
@@ -510,13 +644,15 @@
           }
         }
       },
-      "Microsoft Presidio": {
+      "Microsoft Presidio (English setup)": {
         "items": 766,
-        "caught": 0.658,
         "fully_hidden": 0.577,
+        "char_precision": 0.524,
+        "strict_f1": 0.549,
+        "caught": 0.658,
         "was_personal": 0.725,
-        "f1": 0.69,
-        "ms_per_text": 6.1,
+        "touch_f1": 0.69,
+        "ms_per_text": 7.4,
         "by_type": {
           "ADDRESS": {
             "items": 111,
@@ -565,18 +701,77 @@
           }
         }
       },
-      "Presidio + scrubpii plug-in": {
+      "Microsoft Presidio (each language's own setup)": {
         "items": 766,
-        "caught": 0.996,
-        "fully_hidden": 0.992,
-        "was_personal": 0.935,
-        "f1": 0.964,
-        "ms_per_text": 17.0,
+        "fully_hidden": 0.606,
+        "char_precision": 0.949,
+        "strict_f1": 0.74,
+        "caught": 0.715,
+        "was_personal": 0.975,
+        "touch_f1": 0.825,
+        "ms_per_text": 7.9,
         "by_type": {
           "ADDRESS": {
             "items": 111,
-            "caught": 0.991,
-            "fully_hidden": 0.973
+            "caught": 0.793,
+            "fully_hidden": 0.55
+          },
+          "CREDIT_CARD": {
+            "items": 18,
+            "caught": 0.722,
+            "fully_hidden": 0.722
+          },
+          "DRIVER_LICENSE": {
+            "items": 11,
+            "caught": 0.727,
+            "fully_hidden": 0.364
+          },
+          "EMAIL": {
+            "items": 80,
+            "caught": 1.0,
+            "fully_hidden": 1.0
+          },
+          "ID_NUMBER": {
+            "items": 46,
+            "caught": 0.739,
+            "fully_hidden": 0.717
+          },
+          "PASSPORT": {
+            "items": 18,
+            "caught": 0.556,
+            "fully_hidden": 0.556
+          },
+          "PERSON": {
+            "items": 375,
+            "caught": 0.685,
+            "fully_hidden": 0.589
+          },
+          "PHONE": {
+            "items": 95,
+            "caught": 0.547,
+            "fully_hidden": 0.379
+          },
+          "SSN": {
+            "items": 12,
+            "caught": 0.5,
+            "fully_hidden": 0.5
+          }
+        }
+      },
+      "Presidio + scrubpii plug-in": {
+        "items": 766,
+        "fully_hidden": 0.984,
+        "char_precision": 0.929,
+        "strict_f1": 0.956,
+        "caught": 0.988,
+        "was_personal": 0.934,
+        "touch_f1": 0.96,
+        "ms_per_text": 21.3,
+        "by_type": {
+          "ADDRESS": {
+            "items": 111,
+            "caught": 0.937,
+            "fully_hidden": 0.919
           },
           "CREDIT_CARD": {
             "items": 18,
@@ -622,11 +817,13 @@
       },
       "spaCy (en_core_web_lg)": {
         "items": 766,
-        "caught": 0.379,
         "fully_hidden": 0.334,
+        "char_precision": 0.384,
+        "strict_f1": 0.357,
+        "caught": 0.379,
         "was_personal": 0.576,
-        "f1": 0.457,
-        "ms_per_text": 5.2,
+        "touch_f1": 0.457,
+        "ms_per_text": 6.3,
         "by_type": {
           "ADDRESS": {
             "items": 111,
@@ -679,16 +876,18 @@
     "ai4privacy (German)": {
       "scrubpii": {
         "items": 797,
-        "caught": 0.981,
-        "fully_hidden": 0.972,
-        "was_personal": 0.985,
-        "f1": 0.983,
-        "ms_per_text": 5.2,
+        "fully_hidden": 0.961,
+        "char_precision": 0.981,
+        "strict_f1": 0.971,
+        "caught": 0.97,
+        "was_personal": 0.984,
+        "touch_f1": 0.977,
+        "ms_per_text": 9.1,
         "by_type": {
           "ADDRESS": {
             "items": 129,
-            "caught": 0.961,
-            "fully_hidden": 0.946
+            "caught": 0.891,
+            "fully_hidden": 0.876
           },
           "CREDIT_CARD": {
             "items": 13,
@@ -732,13 +931,15 @@
           }
         }
       },
-      "Microsoft Presidio": {
+      "Microsoft Presidio (English setup)": {
         "items": 797,
-        "caught": 0.75,
         "fully_hidden": 0.652,
+        "char_precision": 0.363,
+        "strict_f1": 0.467,
+        "caught": 0.75,
         "was_personal": 0.503,
-        "f1": 0.602,
-        "ms_per_text": 5.7,
+        "touch_f1": 0.602,
+        "ms_per_text": 6.8,
         "by_type": {
           "ADDRESS": {
             "items": 129,
@@ -787,18 +988,77 @@
           }
         }
       },
-      "Presidio + scrubpii plug-in": {
+      "Microsoft Presidio (each language's own setup)": {
         "items": 797,
-        "caught": 0.982,
-        "fully_hidden": 0.974,
-        "was_personal": 0.927,
-        "f1": 0.954,
-        "ms_per_text": 12.0,
+        "fully_hidden": 0.66,
+        "char_precision": 0.864,
+        "strict_f1": 0.748,
+        "caught": 0.742,
+        "was_personal": 0.954,
+        "touch_f1": 0.834,
+        "ms_per_text": 6.0,
         "by_type": {
           "ADDRESS": {
             "items": 129,
-            "caught": 0.969,
-            "fully_hidden": 0.953
+            "caught": 0.667,
+            "fully_hidden": 0.473
+          },
+          "CREDIT_CARD": {
+            "items": 13,
+            "caught": 0.692,
+            "fully_hidden": 0.692
+          },
+          "DRIVER_LICENSE": {
+            "items": 15,
+            "caught": 0.933,
+            "fully_hidden": 0.667
+          },
+          "EMAIL": {
+            "items": 61,
+            "caught": 1.0,
+            "fully_hidden": 0.967
+          },
+          "ID_NUMBER": {
+            "items": 73,
+            "caught": 0.877,
+            "fully_hidden": 0.836
+          },
+          "PASSPORT": {
+            "items": 27,
+            "caught": 0.593,
+            "fully_hidden": 0.593
+          },
+          "PERSON": {
+            "items": 384,
+            "caught": 0.758,
+            "fully_hidden": 0.711
+          },
+          "PHONE": {
+            "items": 83,
+            "caught": 0.554,
+            "fully_hidden": 0.446
+          },
+          "SSN": {
+            "items": 12,
+            "caught": 0.333,
+            "fully_hidden": 0.0
+          }
+        }
+      },
+      "Presidio + scrubpii plug-in": {
+        "items": 797,
+        "fully_hidden": 0.962,
+        "char_precision": 0.91,
+        "strict_f1": 0.935,
+        "caught": 0.971,
+        "was_personal": 0.925,
+        "touch_f1": 0.947,
+        "ms_per_text": 20.4,
+        "by_type": {
+          "ADDRESS": {
+            "items": 129,
+            "caught": 0.899,
+            "fully_hidden": 0.884
           },
           "CREDIT_CARD": {
             "items": 13,
@@ -844,11 +1104,13 @@
       },
       "spaCy (en_core_web_lg)": {
         "items": 797,
-        "caught": 0.472,
         "fully_hidden": 0.417,
+        "char_precision": 0.247,
+        "strict_f1": 0.31,
+        "caught": 0.472,
         "was_personal": 0.319,
-        "f1": 0.381,
-        "ms_per_text": 4.6,
+        "touch_f1": 0.381,
+        "ms_per_text": 5.8,
         "by_type": {
           "ADDRESS": {
             "items": 129,
@@ -901,16 +1163,18 @@
     "ai4privacy (Italian)": {
       "scrubpii": {
         "items": 753,
-        "caught": 0.991,
-        "fully_hidden": 0.984,
-        "was_personal": 0.991,
-        "f1": 0.991,
-        "ms_per_text": 4.9,
+        "fully_hidden": 0.973,
+        "char_precision": 0.991,
+        "strict_f1": 0.982,
+        "caught": 0.979,
+        "was_personal": 0.992,
+        "touch_f1": 0.985,
+        "ms_per_text": 8.6,
         "by_type": {
           "ADDRESS": {
             "items": 160,
-            "caught": 0.988,
-            "fully_hidden": 0.975
+            "caught": 0.931,
+            "fully_hidden": 0.925
           },
           "CREDIT_CARD": {
             "items": 8,
@@ -954,13 +1218,15 @@
           }
         }
       },
-      "Microsoft Presidio": {
+      "Microsoft Presidio (English setup)": {
         "items": 753,
-        "caught": 0.683,
         "fully_hidden": 0.58,
+        "char_precision": 0.409,
+        "strict_f1": 0.48,
+        "caught": 0.683,
         "was_personal": 0.6,
-        "f1": 0.638,
-        "ms_per_text": 5.3,
+        "touch_f1": 0.638,
+        "ms_per_text": 6.7,
         "by_type": {
           "ADDRESS": {
             "items": 160,
@@ -1009,18 +1275,77 @@
           }
         }
       },
-      "Presidio + scrubpii plug-in": {
+      "Microsoft Presidio (each language's own setup)": {
         "items": 753,
-        "caught": 0.993,
-        "fully_hidden": 0.985,
-        "was_personal": 0.905,
-        "f1": 0.947,
-        "ms_per_text": 11.6,
+        "fully_hidden": 0.672,
+        "char_precision": 0.946,
+        "strict_f1": 0.786,
+        "caught": 0.758,
+        "was_personal": 0.956,
+        "touch_f1": 0.846,
+        "ms_per_text": 5.8,
         "by_type": {
           "ADDRESS": {
             "items": 160,
-            "caught": 0.988,
-            "fully_hidden": 0.975
+            "caught": 0.762,
+            "fully_hidden": 0.562
+          },
+          "CREDIT_CARD": {
+            "items": 8,
+            "caught": 0.875,
+            "fully_hidden": 0.875
+          },
+          "DRIVER_LICENSE": {
+            "items": 10,
+            "caught": 1.0,
+            "fully_hidden": 1.0
+          },
+          "EMAIL": {
+            "items": 55,
+            "caught": 1.0,
+            "fully_hidden": 1.0
+          },
+          "ID_NUMBER": {
+            "items": 59,
+            "caught": 0.644,
+            "fully_hidden": 0.61
+          },
+          "PASSPORT": {
+            "items": 13,
+            "caught": 1.0,
+            "fully_hidden": 1.0
+          },
+          "PERSON": {
+            "items": 361,
+            "caught": 0.751,
+            "fully_hidden": 0.72
+          },
+          "PHONE": {
+            "items": 83,
+            "caught": 0.651,
+            "fully_hidden": 0.41
+          },
+          "SSN": {
+            "items": 4,
+            "caught": 0.25,
+            "fully_hidden": 0.25
+          }
+        }
+      },
+      "Presidio + scrubpii plug-in": {
+        "items": 753,
+        "fully_hidden": 0.975,
+        "char_precision": 0.895,
+        "strict_f1": 0.933,
+        "caught": 0.981,
+        "was_personal": 0.903,
+        "touch_f1": 0.94,
+        "ms_per_text": 19.7,
+        "by_type": {
+          "ADDRESS": {
+            "items": 160,
+            "caught": 0.931,
+            "fully_hidden": 0.925
           },
           "CREDIT_CARD": {
             "items": 8,
@@ -1066,11 +1391,13 @@
       },
       "spaCy (en_core_web_lg)": {
         "items": 753,
-        "caught": 0.42,
         "fully_hidden": 0.352,
+        "char_precision": 0.309,
+        "strict_f1": 0.329,
+        "caught": 0.42,
         "was_personal": 0.45,
-        "f1": 0.434,
-        "ms_per_text": 4.7,
+        "touch_f1": 0.434,
+        "ms_per_text": 5.8,
         "by_type": {
           "ADDRESS": {
             "items": 160,
@@ -1123,11 +1450,13 @@
     "Gretel PII (English)": {
       "scrubpii": {
         "items": 2933,
-        "caught": 0.994,
         "fully_hidden": 0.992,
-        "was_personal": 0.986,
-        "f1": 0.99,
-        "ms_per_text": 8.6,
+        "char_precision": 0.987,
+        "strict_f1": 0.989,
+        "caught": 0.994,
+        "was_personal": 0.985,
+        "touch_f1": 0.989,
+        "ms_per_text": 15.1,
         "by_type": {
           "ADDRESS": {
             "items": 312,
@@ -1191,13 +1520,15 @@
           }
         }
       },
-      "Microsoft Presidio": {
+      "Microsoft Presidio (English setup)": {
         "items": 2933,
-        "caught": 0.872,
         "fully_hidden": 0.75,
+        "char_precision": 0.805,
+        "strict_f1": 0.777,
+        "caught": 0.872,
         "was_personal": 0.832,
-        "f1": 0.852,
-        "ms_per_text": 11.6,
+        "touch_f1": 0.852,
+        "ms_per_text": 13.3,
         "by_type": {
           "ADDRESS": {
             "items": 312,
@@ -1261,13 +1592,87 @@
           }
         }
       },
+      "Microsoft Presidio (each language's own setup)": {
+        "items": 2933,
+        "fully_hidden": 0.749,
+        "char_precision": 0.806,
+        "strict_f1": 0.777,
+        "caught": 0.869,
+        "was_personal": 0.833,
+        "touch_f1": 0.851,
+        "ms_per_text": 13.2,
+        "by_type": {
+          "ADDRESS": {
+            "items": 312,
+            "caught": 0.776,
+            "fully_hidden": 0.064
+          },
+          "API_KEY": {
+            "items": 7,
+            "caught": 0.286,
+            "fully_hidden": 0.143
+          },
+          "CREDIT_CARD": {
+            "items": 161,
+            "caught": 0.863,
+            "fully_hidden": 0.683
+          },
+          "DATE_OF_BIRTH": {
+            "items": 477,
+            "caught": 1.0,
+            "fully_hidden": 1.0
+          },
+          "EMAIL": {
+            "items": 222,
+            "caught": 1.0,
+            "fully_hidden": 1.0
+          },
+          "ID_NUMBER": {
+            "items": 547,
+            "caught": 0.748,
+            "fully_hidden": 0.707
+          },
+          "IP_ADDRESS": {
+            "items": 166,
+            "caught": 0.994,
+            "fully_hidden": 0.982
+          },
+          "PASSWORD": {
+            "items": 13,
+            "caught": 0.231,
+            "fully_hidden": 0.077
+          },
+          "PERSON": {
+            "items": 421,
+            "caught": 0.898,
+            "fully_hidden": 0.838
+          },
+          "PHONE": {
+            "items": 211,
+            "caught": 0.953,
+            "fully_hidden": 0.844
+          },
+          "SSN": {
+            "items": 349,
+            "caught": 0.857,
+            "fully_hidden": 0.791
+          },
+          "USERNAME": {
+            "items": 47,
+            "caught": 0.255,
+            "fully_hidden": 0.213
+          }
+        }
+      },
       "Presidio + scrubpii plug-in": {
         "items": 2933,
-        "caught": 0.997,
         "fully_hidden": 0.994,
-        "was_personal": 0.889,
-        "f1": 0.94,
-        "ms_per_text": 29.1,
+        "char_precision": 0.874,
+        "strict_f1": 0.93,
+        "caught": 0.997,
+        "was_personal": 0.888,
+        "touch_f1": 0.939,
+        "ms_per_text": 36.2,
         "by_type": {
           "ADDRESS": {
             "items": 312,
@@ -1333,11 +1738,13 @@
       },
       "spaCy (en_core_web_lg)": {
         "items": 2933,
-        "caught": 0.225,
         "fully_hidden": 0.142,
+        "char_precision": 0.867,
+        "strict_f1": 0.244,
+        "caught": 0.225,
         "was_personal": 0.846,
-        "f1": 0.356,
-        "ms_per_text": 9.3,
+        "touch_f1": 0.356,
+        "ms_per_text": 11.1,
         "by_type": {
           "ADDRESS": {
             "items": 312,
@@ -1405,16 +1812,18 @@
     "Gretel finance (English, never trained on)": {
       "scrubpii": {
         "items": 3136,
-        "caught": 0.855,
-        "fully_hidden": 0.776,
-        "was_personal": 0.836,
-        "f1": 0.845,
-        "ms_per_text": 51.5,
+        "fully_hidden": 0.799,
+        "char_precision": 0.841,
+        "strict_f1": 0.82,
+        "caught": 0.876,
+        "was_personal": 0.852,
+        "touch_f1": 0.864,
+        "ms_per_text": 95.6,
         "by_type": {
           "ADDRESS": {
             "items": 801,
-            "caught": 0.908,
-            "fully_hidden": 0.717
+            "caught": 0.896,
+            "fully_hidden": 0.73
           },
           "API_KEY": {
             "items": 19,
@@ -1448,8 +1857,8 @@
           },
           "IP_ADDRESS": {
             "items": 73,
-            "caught": 0.726,
-            "fully_hidden": 0.726
+            "caught": 1.0,
+            "fully_hidden": 0.986
           },
           "PASSPORT": {
             "items": 24,
@@ -1463,8 +1872,8 @@
           },
           "PERSON": {
             "items": 1503,
-            "caught": 0.798,
-            "fully_hidden": 0.739
+            "caught": 0.835,
+            "fully_hidden": 0.766
           },
           "PHONE": {
             "items": 183,
@@ -1483,13 +1892,15 @@
           }
         }
       },
-      "Microsoft Presidio": {
+      "Microsoft Presidio (English setup)": {
         "items": 3136,
-        "caught": 0.808,
         "fully_hidden": 0.564,
+        "char_precision": 0.421,
+        "strict_f1": 0.482,
+        "caught": 0.808,
         "was_personal": 0.384,
-        "f1": 0.521,
-        "ms_per_text": 52.6,
+        "touch_f1": 0.521,
+        "ms_per_text": 58.9,
         "by_type": {
           "ADDRESS": {
             "items": 801,
@@ -1563,18 +1974,102 @@
           }
         }
       },
-      "Presidio + scrubpii plug-in": {
+      "Microsoft Presidio (each language's own setup)": {
         "items": 3136,
-        "caught": 0.878,
-        "fully_hidden": 0.793,
-        "was_personal": 0.361,
-        "f1": 0.511,
-        "ms_per_text": 107.0,
+        "fully_hidden": 0.551,
+        "char_precision": 0.415,
+        "strict_f1": 0.473,
+        "caught": 0.79,
+        "was_personal": 0.38,
+        "touch_f1": 0.513,
+        "ms_per_text": 58.6,
         "by_type": {
           "ADDRESS": {
             "items": 801,
-            "caught": 0.914,
-            "fully_hidden": 0.72
+            "caught": 0.719,
+            "fully_hidden": 0.032
+          },
+          "API_KEY": {
+            "items": 19,
+            "caught": 0.158,
+            "fully_hidden": 0.0
+          },
+          "CREDIT_CARD": {
+            "items": 26,
+            "caught": 0.846,
+            "fully_hidden": 0.577
+          },
+          "DATE_OF_BIRTH": {
+            "items": 52,
+            "caught": 0.942,
+            "fully_hidden": 0.923
+          },
+          "DRIVER_LICENSE": {
+            "items": 30,
+            "caught": 0.933,
+            "fully_hidden": 0.533
+          },
+          "EMAIL": {
+            "items": 292,
+            "caught": 0.986,
+            "fully_hidden": 0.976
+          },
+          "IBAN": {
+            "items": 57,
+            "caught": 0.544,
+            "fully_hidden": 0.474
+          },
+          "IP_ADDRESS": {
+            "items": 73,
+            "caught": 0.986,
+            "fully_hidden": 0.986
+          },
+          "PASSPORT": {
+            "items": 24,
+            "caught": 1.0,
+            "fully_hidden": 1.0
+          },
+          "PASSWORD": {
+            "items": 33,
+            "caught": 0.394,
+            "fully_hidden": 0.333
+          },
+          "PERSON": {
+            "items": 1503,
+            "caught": 0.781,
+            "fully_hidden": 0.694
+          },
+          "PHONE": {
+            "items": 183,
+            "caught": 0.923,
+            "fully_hidden": 0.727
+          },
+          "SSN": {
+            "items": 32,
+            "caught": 0.75,
+            "fully_hidden": 0.75
+          },
+          "USERNAME": {
+            "items": 11,
+            "caught": 0.364,
+            "fully_hidden": 0.273
+          }
+        }
+      },
+      "Presidio + scrubpii plug-in": {
+        "items": 3136,
+        "fully_hidden": 0.81,
+        "char_precision": 0.434,
+        "strict_f1": 0.565,
+        "caught": 0.892,
+        "was_personal": 0.362,
+        "touch_f1": 0.515,
+        "ms_per_text": 166.2,
+        "by_type": {
+          "ADDRESS": {
+            "items": 801,
+            "caught": 0.905,
+            "fully_hidden": 0.733
           },
           "API_KEY": {
             "items": 19,
@@ -1623,8 +2118,8 @@
           },
           "PERSON": {
             "items": 1503,
-            "caught": 0.816,
-            "fully_hidden": 0.75
+            "caught": 0.85,
+            "fully_hidden": 0.778
           },
           "PHONE": {
             "items": 183,
@@ -1645,11 +2140,13 @@
       },
       "spaCy (en_core_web_lg)": {
         "items": 3136,
-        "caught": 0.552,
         "fully_hidden": 0.34,
+        "char_precision": 0.606,
+        "strict_f1": 0.436,
+        "caught": 0.552,
         "was_personal": 0.61,
-        "f1": 0.58,
-        "ms_per_text": 44.7,
+        "touch_f1": 0.58,
+        "ms_per_text": 49.8,
         "by_type": {
           "ADDRESS": {
             "items": 801,
@@ -1727,16 +2224,18 @@
     "Medical records (Nemotron-PII test split)": {
       "scrubpii": {
         "items": 3909,
-        "caught": 0.985,
-        "fully_hidden": 0.982,
-        "was_personal": 0.994,
-        "f1": 0.989,
-        "ms_per_text": 26.1,
+        "fully_hidden": 0.984,
+        "char_precision": 0.993,
+        "strict_f1": 0.988,
+        "caught": 0.987,
+        "was_personal": 0.993,
+        "touch_f1": 0.99,
+        "ms_per_text": 49.4,
         "by_type": {
           "ADDRESS": {
             "items": 248,
-            "caught": 0.988,
-            "fully_hidden": 0.98
+            "caught": 0.992,
+            "fully_hidden": 0.984
           },
           "API_KEY": {
             "items": 2,
@@ -1775,8 +2274,8 @@
           },
           "PERSON": {
             "items": 1274,
-            "caught": 0.97,
-            "fully_hidden": 0.963
+            "caught": 0.974,
+            "fully_hidden": 0.967
           },
           "PHONE": {
             "items": 365,
@@ -1795,13 +2294,15 @@
           }
         }
       },
-      "Microsoft Presidio": {
+      "Microsoft Presidio (English setup)": {
         "items": 3909,
-        "caught": 0.876,
         "fully_hidden": 0.781,
+        "char_precision": 0.703,
+        "strict_f1": 0.74,
+        "caught": 0.876,
         "was_personal": 0.764,
-        "f1": 0.816,
-        "ms_per_text": 29.5,
+        "touch_f1": 0.816,
+        "ms_per_text": 33.1,
         "by_type": {
           "ADDRESS": {
             "items": 248,
@@ -1865,18 +2366,92 @@
           }
         }
       },
-      "Presidio + scrubpii plug-in": {
+      "Microsoft Presidio (each language's own setup)": {
         "items": 3909,
-        "caught": 0.988,
-        "fully_hidden": 0.985,
-        "was_personal": 0.804,
-        "f1": 0.886,
-        "ms_per_text": 63.5,
+        "fully_hidden": 0.779,
+        "char_precision": 0.703,
+        "strict_f1": 0.739,
+        "caught": 0.872,
+        "was_personal": 0.765,
+        "touch_f1": 0.815,
+        "ms_per_text": 33.0,
         "by_type": {
           "ADDRESS": {
             "items": 248,
-            "caught": 0.988,
-            "fully_hidden": 0.98
+            "caught": 0.577,
+            "fully_hidden": 0.363
+          },
+          "API_KEY": {
+            "items": 2,
+            "caught": 0.0,
+            "fully_hidden": 0.0
+          },
+          "CREDIT_CARD": {
+            "items": 28,
+            "caught": 0.679,
+            "fully_hidden": 0.321
+          },
+          "DATE_OF_BIRTH": {
+            "items": 519,
+            "caught": 1.0,
+            "fully_hidden": 1.0
+          },
+          "EMAIL": {
+            "items": 402,
+            "caught": 0.993,
+            "fully_hidden": 0.988
+          },
+          "ID_NUMBER": {
+            "items": 918,
+            "caught": 0.865,
+            "fully_hidden": 0.566
+          },
+          "IP_ADDRESS": {
+            "items": 5,
+            "caught": 1.0,
+            "fully_hidden": 1.0
+          },
+          "PASSWORD": {
+            "items": 85,
+            "caught": 0.647,
+            "fully_hidden": 0.529
+          },
+          "PERSON": {
+            "items": 1274,
+            "caught": 0.849,
+            "fully_hidden": 0.847
+          },
+          "PHONE": {
+            "items": 365,
+            "caught": 0.945,
+            "fully_hidden": 0.926
+          },
+          "SSN": {
+            "items": 42,
+            "caught": 0.976,
+            "fully_hidden": 0.976
+          },
+          "USERNAME": {
+            "items": 21,
+            "caught": 0.333,
+            "fully_hidden": 0.143
+          }
+        }
+      },
+      "Presidio + scrubpii plug-in": {
+        "items": 3909,
+        "fully_hidden": 0.986,
+        "char_precision": 0.747,
+        "strict_f1": 0.85,
+        "caught": 0.989,
+        "was_personal": 0.803,
+        "touch_f1": 0.887,
+        "ms_per_text": 95.9,
+        "by_type": {
+          "ADDRESS": {
+            "items": 248,
+            "caught": 0.992,
+            "fully_hidden": 0.984
           },
           "API_KEY": {
             "items": 2,
@@ -1915,8 +2490,8 @@
           },
           "PERSON": {
             "items": 1274,
-            "caught": 0.97,
-            "fully_hidden": 0.963
+            "caught": 0.974,
+            "fully_hidden": 0.967
           },
           "PHONE": {
             "items": 365,
@@ -1937,11 +2512,13 @@
       },
       "spaCy (en_core_web_lg)": {
         "items": 3909,
-        "caught": 0.317,
         "fully_hidden": 0.301,
+        "char_precision": 0.884,
+        "strict_f1": 0.449,
+        "caught": 0.317,
         "was_personal": 0.937,
-        "f1": 0.474,
-        "ms_per_text": 26.3,
+        "touch_f1": 0.474,
+        "ms_per_text": 29.1,
         "by_type": {
           "ADDRESS": {
             "items": 248,
@@ -2009,16 +2586,18 @@
     "Support tickets, emails, transcripts (Nemotron-PII test split)": {
       "scrubpii": {
         "items": 3995,
-        "caught": 0.979,
-        "fully_hidden": 0.976,
-        "was_personal": 0.995,
-        "f1": 0.987,
-        "ms_per_text": 31.7,
+        "fully_hidden": 0.977,
+        "char_precision": 0.992,
+        "strict_f1": 0.985,
+        "caught": 0.981,
+        "was_personal": 0.994,
+        "touch_f1": 0.987,
+        "ms_per_text": 57.5,
         "by_type": {
           "ADDRESS": {
             "items": 188,
             "caught": 0.904,
-            "fully_hidden": 0.888
+            "fully_hidden": 0.894
           },
           "API_KEY": {
             "items": 5,
@@ -2057,8 +2636,8 @@
           },
           "PERSON": {
             "items": 1723,
-            "caught": 0.979,
-            "fully_hidden": 0.973
+            "caught": 0.983,
+            "fully_hidden": 0.976
           },
           "PHONE": {
             "items": 315,
@@ -2077,13 +2656,15 @@
           }
         }
       },
-      "Microsoft Presidio": {
+      "Microsoft Presidio (English setup)": {
         "items": 3995,
-        "caught": 0.823,
         "fully_hidden": 0.762,
+        "char_precision": 0.74,
+        "strict_f1": 0.751,
+        "caught": 0.823,
         "was_personal": 0.746,
-        "f1": 0.783,
-        "ms_per_text": 36.3,
+        "touch_f1": 0.783,
+        "ms_per_text": 39.4,
         "by_type": {
           "ADDRESS": {
             "items": 188,
@@ -2147,18 +2728,92 @@
           }
         }
       },
+      "Microsoft Presidio (each language's own setup)": {
+        "items": 3995,
+        "fully_hidden": 0.76,
+        "char_precision": 0.74,
+        "strict_f1": 0.75,
+        "caught": 0.819,
+        "was_personal": 0.746,
+        "touch_f1": 0.781,
+        "ms_per_text": 39.2,
+        "by_type": {
+          "ADDRESS": {
+            "items": 188,
+            "caught": 0.559,
+            "fully_hidden": 0.431
+          },
+          "API_KEY": {
+            "items": 5,
+            "caught": 0.0,
+            "fully_hidden": 0.0
+          },
+          "CREDIT_CARD": {
+            "items": 127,
+            "caught": 0.717,
+            "fully_hidden": 0.362
+          },
+          "DATE_OF_BIRTH": {
+            "items": 80,
+            "caught": 1.0,
+            "fully_hidden": 1.0
+          },
+          "EMAIL": {
+            "items": 818,
+            "caught": 0.993,
+            "fully_hidden": 0.991
+          },
+          "ID_NUMBER": {
+            "items": 65,
+            "caught": 0.785,
+            "fully_hidden": 0.4
+          },
+          "IP_ADDRESS": {
+            "items": 67,
+            "caught": 0.985,
+            "fully_hidden": 0.866
+          },
+          "PASSWORD": {
+            "items": 204,
+            "caught": 0.534,
+            "fully_hidden": 0.368
+          },
+          "PERSON": {
+            "items": 1723,
+            "caught": 0.828,
+            "fully_hidden": 0.819
+          },
+          "PHONE": {
+            "items": 315,
+            "caught": 0.946,
+            "fully_hidden": 0.937
+          },
+          "SSN": {
+            "items": 51,
+            "caught": 1.0,
+            "fully_hidden": 1.0
+          },
+          "USERNAME": {
+            "items": 352,
+            "caught": 0.52,
+            "fully_hidden": 0.293
+          }
+        }
+      },
       "Presidio + scrubpii plug-in": {
         "items": 3995,
-        "caught": 0.979,
-        "fully_hidden": 0.976,
+        "fully_hidden": 0.977,
+        "char_precision": 0.781,
+        "strict_f1": 0.868,
+        "caught": 0.981,
         "was_personal": 0.782,
-        "f1": 0.869,
-        "ms_per_text": 69.3,
+        "touch_f1": 0.87,
+        "ms_per_text": 111.1,
         "by_type": {
           "ADDRESS": {
             "items": 188,
             "caught": 0.904,
-            "fully_hidden": 0.888
+            "fully_hidden": 0.894
           },
           "API_KEY": {
             "items": 5,
@@ -2197,8 +2852,8 @@
           },
           "PERSON": {
             "items": 1723,
-            "caught": 0.979,
-            "fully_hidden": 0.973
+            "caught": 0.983,
+            "fully_hidden": 0.976
           },
           "PHONE": {
             "items": 315,
@@ -2219,11 +2874,13 @@
       },
       "spaCy (en_core_web_lg)": {
         "items": 3995,
-        "caught": 0.402,
         "fully_hidden": 0.39,
+        "char_precision": 0.931,
+        "strict_f1": 0.55,
+        "caught": 0.402,
         "was_personal": 0.97,
-        "f1": 0.568,
-        "ms_per_text": 31.8,
+        "touch_f1": 0.568,
+        "ms_per_text": 34.1,
         "by_type": {
           "ADDRESS": {
             "items": 188,
@@ -2291,11 +2948,13 @@
     "Logs and config files (Nemotron-PII test split)": {
       "scrubpii": {
         "items": 3723,
-        "caught": 0.965,
-        "fully_hidden": 0.955,
-        "was_personal": 0.971,
-        "f1": 0.968,
-        "ms_per_text": 38.0,
+        "fully_hidden": 0.96,
+        "char_precision": 0.975,
+        "strict_f1": 0.967,
+        "caught": 0.971,
+        "was_personal": 0.966,
+        "touch_f1": 0.968,
+        "ms_per_text": 68.2,
         "by_type": {
           "ADDRESS": {
             "items": 114,
@@ -2305,7 +2964,7 @@
           "API_KEY": {
             "items": 533,
             "caught": 0.991,
-            "fully_hidden": 0.979
+            "fully_hidden": 0.981
           },
           "CREDIT_CARD": {
             "items": 58,
@@ -2334,13 +2993,13 @@
           },
           "PASSWORD": {
             "items": 252,
-            "caught": 0.972,
-            "fully_hidden": 0.972
+            "caught": 0.98,
+            "fully_hidden": 0.98
           },
           "PERSON": {
             "items": 634,
-            "caught": 0.894,
-            "fully_hidden": 0.875
+            "caught": 0.916,
+            "fully_hidden": 0.896
           },
           "PHONE": {
             "items": 157,
@@ -2354,18 +3013,20 @@
           },
           "USERNAME": {
             "items": 605,
-            "caught": 0.931,
-            "fully_hidden": 0.904
+            "caught": 0.942,
+            "fully_hidden": 0.906
           }
         }
       },
-      "Microsoft Presidio": {
+      "Microsoft Presidio (English setup)": {
         "items": 3723,
-        "caught": 0.7,
         "fully_hidden": 0.596,
+        "char_precision": 0.729,
+        "strict_f1": 0.656,
+        "caught": 0.7,
         "was_personal": 0.735,
-        "f1": 0.717,
-        "ms_per_text": 32.4,
+        "touch_f1": 0.717,
+        "ms_per_text": 35.4,
         "by_type": {
           "ADDRESS": {
             "items": 114,
@@ -2429,13 +3090,87 @@
           }
         }
       },
+      "Microsoft Presidio (each language's own setup)": {
+        "items": 3723,
+        "fully_hidden": 0.594,
+        "char_precision": 0.73,
+        "strict_f1": 0.655,
+        "caught": 0.698,
+        "was_personal": 0.736,
+        "touch_f1": 0.717,
+        "ms_per_text": 35.2,
+        "by_type": {
+          "ADDRESS": {
+            "items": 114,
+            "caught": 0.623,
+            "fully_hidden": 0.404
+          },
+          "API_KEY": {
+            "items": 533,
+            "caught": 0.107,
+            "fully_hidden": 0.023
+          },
+          "CREDIT_CARD": {
+            "items": 58,
+            "caught": 0.655,
+            "fully_hidden": 0.224
+          },
+          "DATE_OF_BIRTH": {
+            "items": 25,
+            "caught": 1.0,
+            "fully_hidden": 1.0
+          },
+          "EMAIL": {
+            "items": 447,
+            "caught": 0.998,
+            "fully_hidden": 0.991
+          },
+          "ID_NUMBER": {
+            "items": 102,
+            "caught": 0.794,
+            "fully_hidden": 0.5
+          },
+          "IP_ADDRESS": {
+            "items": 786,
+            "caught": 0.994,
+            "fully_hidden": 0.831
+          },
+          "PASSWORD": {
+            "items": 252,
+            "caught": 0.488,
+            "fully_hidden": 0.262
+          },
+          "PERSON": {
+            "items": 634,
+            "caught": 0.877,
+            "fully_hidden": 0.874
+          },
+          "PHONE": {
+            "items": 157,
+            "caught": 0.943,
+            "fully_hidden": 0.936
+          },
+          "SSN": {
+            "items": 10,
+            "caught": 1.0,
+            "fully_hidden": 1.0
+          },
+          "USERNAME": {
+            "items": 605,
+            "caught": 0.435,
+            "fully_hidden": 0.314
+          }
+        }
+      },
       "Presidio + scrubpii plug-in": {
         "items": 3723,
-        "caught": 0.979,
-        "fully_hidden": 0.97,
+        "fully_hidden": 0.976,
+        "char_precision": 0.799,
+        "strict_f1": 0.879,
+        "caught": 0.984,
         "was_personal": 0.781,
-        "f1": 0.869,
-        "ms_per_text": 72.0,
+        "touch_f1": 0.871,
+        "ms_per_text": 116.7,
         "by_type": {
           "ADDRESS": {
             "items": 114,
@@ -2445,7 +3180,7 @@
           "API_KEY": {
             "items": 533,
             "caught": 0.991,
-            "fully_hidden": 0.979
+            "fully_hidden": 0.981
           },
           "CREDIT_CARD": {
             "items": 58,
@@ -2474,13 +3209,13 @@
           },
           "PASSWORD": {
             "items": 252,
-            "caught": 0.976,
-            "fully_hidden": 0.976
+            "caught": 0.984,
+            "fully_hidden": 0.984
           },
           "PERSON": {
             "items": 634,
-            "caught": 0.92,
-            "fully_hidden": 0.901
+            "caught": 0.942,
+            "fully_hidden": 0.921
           },
           "PHONE": {
             "items": 157,
@@ -2494,18 +3229,20 @@
           },
           "USERNAME": {
             "items": 605,
-            "caught": 0.983,
-            "fully_hidden": 0.964
+            "caught": 0.985,
+            "fully_hidden": 0.975
           }
         }
       },
       "spaCy (en_core_web_lg)": {
         "items": 3723,
-        "caught": 0.19,
         "fully_hidden": 0.182,
+        "char_precision": 0.826,
+        "strict_f1": 0.298,
+        "caught": 0.19,
         "was_personal": 0.878,
-        "f1": 0.313,
-        "ms_per_text": 28.1,
+        "touch_f1": 0.313,
+        "ms_per_text": 29.8,
         "by_type": {
           "ADDRESS": {
             "items": 114,
