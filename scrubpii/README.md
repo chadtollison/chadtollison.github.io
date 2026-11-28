@@ -31,27 +31,31 @@ F1 on held-out public data (full results in
 
 | Dataset | scrubpii | Microsoft Presidio | spaCy |
 |---|---:|---:|---:|
-| ai4privacy, English | **0.99** | 0.81 | 0.68 |
+| ai4privacy, English | **1.00** | 0.81 | 0.68 |
 | ai4privacy, Spanish | **0.99** | 0.63 | 0.46 |
+| ai4privacy, French | **0.99** | 0.69 | 0.46 |
+| ai4privacy, German | **0.98** | 0.60 | 0.38 |
+| ai4privacy, Italian | **0.99** | 0.64 | 0.43 |
 | Gretel PII, English | **0.99** | 0.85 | 0.36 |
-| Gretel finance (never trained on) | **0.80** | 0.52 | 0.58 |
-| Medical records (never trained on) | **0.91** | 0.82 | 0.47 |
-| Support tickets, emails, transcripts (never trained on) | **0.87** | 0.78 | 0.57 |
-| Logs and config files (never trained on) | **0.88** | 0.72 | 0.31 |
+| Gretel finance (never trained on) | **0.85** | 0.52 | 0.58 |
+| Medical records | **0.99** | 0.82 | 0.47 |
+| Support tickets, emails, transcripts | **0.99** | 0.78 | 0.57 |
+| Logs and config files | **0.97** | 0.72 | 0.31 |
 
-The last three come from NVIDIA's Nemotron-PII (CC BY 4.0). Presidio flags
-more text, so on long, unfamiliar documents it touches 3 to 7 points more of
-the real items, mostly first names on their own. But a quarter or more of what
-it flags there isn't personal data, while 97 to 99% of scrubpii's finds are.
+The last three are the test split of NVIDIA's Nemotron-PII (CC BY 4.0); the
+model trained on its separate train split. The finance set comes from a
+dataset it never saw. scrubpii now also catches more of the real items than
+Presidio on every set (finance: 86% vs 81%), while 84 to 99.6% of its finds
+are personal data, against 38 to 91% for Presidio.
 
 Install and speed ([benchmarks/speed.md](https://github.com/chadtollison/chadtollison.github.io/blob/main/benchmarks/speed.md)):
 
-| | scrubpii 0.4 | Microsoft Presidio |
+| | scrubpii | Microsoft Presidio |
 |---|---:|---:|
 | Install size, with model | **288 MB** | 815 MB |
 | Start-up (new process, first answer) | **0.6 s** | 1.5 s |
-| Short texts (ai4privacy) | **6 ms** | 8 ms |
-| Long documents (finance) | 95 ms | **59 ms** |
+| Short texts (ai4privacy, English) | **4 ms** | 6 ms |
+| Long documents (finance) | 52 ms | 53 ms |
 
 It runs on ONNX Runtime, so there is no PyTorch to install. The 8-bit model
 (about 66 MB) downloads on first use and is cached, so after that it starts in
@@ -222,7 +226,10 @@ results = analyzer.analyze(text, language="en")
 ```
 
 `replace_ner=True` removes Presidio's spaCy name finder, the source of most
-of its false alarms; leave it out to run both.
+of its false alarms; leave it out to run both. In our benchmark the plug-in
+lifts Presidio from 0.81 to 0.97 F1 on ai4privacy English and from 0.82 to
+0.89 on medical records. scrubpii on its own still scores higher, because
+Presidio's other recognizers add false alarms.
 
 ## Keep personal data out of LLM prompts
 
