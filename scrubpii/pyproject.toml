@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "scrubpii"
-version = "0.4.0"
+version = "0.5.0"
 description = "Find and redact 15 kinds of personal data in English and Spanish text, CSV, JSON and DataFrames, with a fine-tuned DistilBERT model plus checksum rules. Beats Microsoft Presidio on public benchmarks."
 readme = "README.md"
 requires-python = ">=3.9"

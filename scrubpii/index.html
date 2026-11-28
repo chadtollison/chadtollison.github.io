@@ -85,6 +85,22 @@ safe, key = tokenize(text)   # Call &lt;PERSON_1&gt; at &lt;PHONE_1&gt;.
 restore(safe, key) == text   # True</code></pre></div>
       <p>Fake values are harmless on purpose. Phones use the 555-01xx range reserved for fiction, cards are public test numbers, IPs come from the documentation range, and SSNs start with 9, which is never issued. Use <code>find(text)</code> to get each item's type, position, confidence, and the rule that confirmed it.</p>
 
+      <h2 id="rules">Your own rules, in plain English</h2>
+      <p>Tell it what else to hide in a sentence. No regex and no AI service: scrubpii reads the rule itself, offline. In a shape, <code>#</code> is a digit and <code>@</code> a letter; everything else is matched as written. <a href="../redact.html">Try rules in the demo</a>.</p>
+      <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>from scrubpii import teach, redact, understand
+
+teach("redact any ###-#####-##-RC as an RC code",
+      "hide codes like AB-1234 as order number",
+      'redact 8 digit numbers after "member" as member id',
+      "redact Globex and Initech as client",
+      "never redact support@acme.com")
+
+redact("Ref 123-45678-90-RC for Globex, member 12345678")
+# Ref [RC_CODE] for [CLIENT], member [MEMBER_ID]
+understand("redact any ###-#####-##-RC as an RC code")
+# Redact 3 digits, then "-", then 5 digits, then "-", then 2 digits, then "-RC", labeled [RC_CODE]</code></pre></div>
+      <p>Every redaction can also be explained: <code>audit(text)</code> lists each item, how sure it was, what found it and why, plus what it left visible, without storing the personal data itself.</p>
+
       <h2 id="data">JSON, CSV and pandas</h2>
       <p>These collect every string and run the model in batches, so they're much faster than a loop.</p>
       <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>from scrubpii import redact_many, redact_json, redact_csv, redact_dataframe

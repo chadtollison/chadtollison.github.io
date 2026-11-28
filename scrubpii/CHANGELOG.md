@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0
+- Rules in plain English: `teach("redact any ###-#####-##-RC as an RC code")`. Shapes (`#` digit, `@` letter,
+  `?` letter or digit, `*` a run), examples ("codes like AB-1234"), "N digit numbers", "starting with",
+  "ending with", word lists, "after ..." for nearby words, and "never redact ..." to keep values visible.
+  Read offline by simple grammar, no AI model. `understand()` shows how a rule is read.
+- `add_rule()` also takes a plain-English sentence; the CLI takes `--rule`, and rules files take `"say"`.
+
 ## 0.4.0
 - Runs on ONNX Runtime by default: no PyTorch or transformers needed. Installs far smaller and starts much
   faster, and the model download is the 66 MB 8-bit ONNX file instead of 260 MB.
