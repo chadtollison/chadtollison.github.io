@@ -559,6 +559,23 @@ def _rules(ents: List[Entity], text: str) -> List[Entity]:
                 else:
                     e.start, e.end = min(e.start, ms), max(e.end, me)
                 e.text = text[e.start:e.end]
+    # Names the model missed but the text gives away: "Sarah Johnson" next to
+    # sarah.johnson@..., and every other mention of a name already found.
+    def add_name(a: int, b: int, why: str) -> None:
+        if not any(e.start < b and e.end > a for e in ents):
+            ents.append(Entity("PERSON", text[a:b], a, b, 1.0, why, "rule"))
+    for e in [e for e in ents if e.type == "EMAIL"]:
+        parts = [p for p in re.split(r"[._-]+", e.text.split("@")[0]) if re.fullmatch(r"[^\W\d_]{2,}", p)]
+        if not 2 <= len(parts) <= 3:
+            continue
+        for m in re.finditer(r"(?<![^\W\d_])" + r"\s+".join(map(re.escape, parts)) + r"(?![^\W\d_])", text, re.I):
+            if all(w[:1].isupper() for w in m.group().split()):
+                add_name(m.start(), m.end(), "the same name as in an email address")
+    for e in [e for e in ents if e.type == "PERSON" and e.source == "model" and e.score >= 0.5]:
+        if len(e.text) < 3 or not e.text[:1].isupper():
+            continue
+        for m in re.finditer(r"(?<!\w)" + re.escape(e.text) + r"(?!\w)", text):
+            add_name(m.start(), m.end(), "the same name found elsewhere in the text")
     ents.sort(key=lambda e: (e.start, -e.end))
     kept: List[Entity] = []
     for e in ents:

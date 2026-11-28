@@ -44,6 +44,8 @@
   {"text": "-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA1234abcd\n-----END RSA PRIVATE KEY-----",
    "expect": [["PRIVATE_KEY", "-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA1234abcd\n-----END RSA PRIVATE KEY-----"]]},
   {"text": "Nothing personal here: the Q3 plan, room 4B, build 2026.11.28.",
-   "expect": []}
+   "expect": []},
+  {"text": "Ticket from Sarah Johnson (sarah.johnson@example.com): please call SARAH JOHNSON's manager.",
+   "expect": [["PERSON", "Sarah Johnson"], ["EMAIL", "sarah.johnson@example.com"], ["PERSON", "SARAH JOHNSON"]]}
  ]
 }
