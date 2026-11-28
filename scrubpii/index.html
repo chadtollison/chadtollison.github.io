@@ -38,7 +38,7 @@
 <body>
   <header>
     <a class="logo name-logo" href="../" aria-label="Back to portfolio">Michael Chad Tollison<span>.</span></a>
-    <a class="back" href="../redact.html">Live demo →</a>
+    <a class="back" href="../pii/">Live demo →</a>
   </header>
 
   <main>
@@ -52,7 +52,7 @@
 "Hi, I'm [PERSON]. Email [EMAIL] or call [PHONE]."</code></pre></div>
       <div class="buttons">
         <a class="primary" href="https://pypi.org/project/scrubpii/" target="_blank" rel="noreferrer">PyPI ↗</a>
-        <a class="secondary" href="../redact.html">Try it in the browser</a>
+        <a class="secondary" href="../pii/">Try it in the browser</a>
         <a class="secondary" href="https://github.com/chadtollison/chadtollison.github.io/tree/main/scrubpii" target="_blank" rel="noreferrer">Source ↗</a>
       </div>
       <nav class="toc" aria-label="On this page">
@@ -86,7 +86,7 @@ restore(safe, key) == text   # True</code></pre></div>
       <p>Fake values are harmless on purpose. Phones use the 555-01xx range reserved for fiction, cards are public test numbers, IPs come from the documentation range, and SSNs start with 9, which is never issued. Use <code>find(text)</code> to get each item's type, position, confidence, and the rule that confirmed it.</p>
 
       <h2 id="rules">Your own rules, in plain English</h2>
-      <p>Tell it what else to hide in a sentence. No regex and no AI service: scrubpii reads the rule itself, offline. In a shape, <code>#</code> is a digit and <code>@</code> a letter; everything else is matched as written. <a href="../redact.html">Try rules in the demo</a>.</p>
+      <p>Tell it what else to hide in a sentence. No regex and no AI service: scrubpii reads the rule itself, offline. In a shape, <code>#</code> is a digit and <code>@</code> a letter; everything else is matched as written. <a href="../pii/">Try rules in the demo</a>.</p>
       <div class="code"><button type="button" class="copy-code">Copy</button><pre><code>from scrubpii import teach, redact, understand
 
 teach("redact any ###-#####-##-RC as an RC code",

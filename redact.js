@@ -8,7 +8,7 @@ import { parseRule, ruleSpans, isAllowed } from './english-rules.js?v=2026-11-28
 
 env.allowRemoteModels = false;
 env.allowLocalModels = true;
-env.localModelPath = new URL('models/', location.href).href;
+env.localModelPath = new URL('models/', import.meta.url).href;
 const MODEL_ID = 'pii-distilbert-v5';
 // The model learned on short texts and finds much more in long ones when it
 // reads them in short windows (see benchmarks/compare.md), so pack about 126 pieces.
@@ -653,7 +653,7 @@ render();
 // ---- Head-to-head with Presidio and spaCy (filled in by the benchmark workflow) ----
 (async () => {
   try {
-    const res = await fetch('benchmarks/compare.json', { cache: 'no-cache' });
+    const res = await fetch(new URL('benchmarks/compare.json', import.meta.url), { cache: 'no-cache' });
     if (!res.ok) return;
     const data = await res.json();
     const sets = Object.keys(data.results);
