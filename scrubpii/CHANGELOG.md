@@ -12,6 +12,10 @@
 - Fewer false alarms: `password = input.value`, version numbers like `v1.2.3.4`, and 2147483647 are left alone;
   `user:password@host` is no longer read as an email.
 - Adjacent address parts are joined, and secrets lose a `key=` prefix the model included.
+- Names the text gives away are caught even when the model misses them: "Sarah Johnson" next to
+  `sarah.johnson@...`, and every other mention of a name already found.
+- Benchmarks now lead with strict coverage (items fully hidden, share of redacted characters that were
+  personal data); the old touch-based F1 could score a one-character redaction as perfect.
 
 ## 0.7.0
 - `scrubpii proxy`: a local privacy proxy for LLM APIs. Point `OPENAI_BASE_URL` or `ANTHROPIC_BASE_URL` at it;

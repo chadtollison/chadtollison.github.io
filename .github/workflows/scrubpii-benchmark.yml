@@ -1,7 +1,8 @@
 # The head-to-head benchmark: scrubpii (this branch, ONNX) vs Microsoft
 # Presidio (English default and a per-language setup) vs spaCy on ten test
 # sets. Headline score is strict (items fully hidden, redacted characters that
-# were personal). Commits benchmarks/compare.md and compare.json.
+# were personal), using the scrubpii rules in this commit. Commits
+# benchmarks/compare.md and compare.json.
 name: scrubpii benchmark
 on:
   workflow_dispatch:

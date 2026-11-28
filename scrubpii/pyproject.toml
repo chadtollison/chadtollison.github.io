@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "scrubpii"
 version = "0.7.1"
-description = "Find and redact 15 kinds of personal data in English and Spanish text, CSV, JSON and DataFrames, with a fine-tuned DistilBERT model plus checksum rules. Beats Microsoft Presidio on public benchmarks."
+description = "Find and redact personal data and secrets in English, Spanish, French, German and Italian text, CSV, JSON, logs and DataFrames, on your own machine, with a fine-tuned DistilBERT model plus checksum rules."
 readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"
