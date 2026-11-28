@@ -1,12 +1,13 @@
 # The head-to-head benchmark: scrubpii (this branch, ONNX) vs Microsoft
-# Presidio vs spaCy on seven test sets, three of them hard kinds of text the
-# model never trained on. Commits benchmarks/compare.md and compare.json.
+# Presidio (English default and a per-language setup) vs spaCy on ten test
+# sets. Headline score is strict (items fully hidden, redacted characters that
+# were personal). Commits benchmarks/compare.md and compare.json.
 name: scrubpii benchmark
 on:
   workflow_dispatch:
   push:
     branches: ["claude/**"]
-    paths: ["training/compare.py", "training/pii_data.py", ".github/workflows/scrubpii-benchmark.yml"]
+    paths: ["training/compare.py", "training/test_compare.py", "training/pii_data.py", ".github/workflows/scrubpii-benchmark.yml"]
 concurrency:
   group: bench-${{ github.ref }}
   cancel-in-progress: true
@@ -22,14 +23,16 @@ jobs:
         with: { python-version: "3.11" }
       - name: Install
         run: |
-          pip install "datasets==3.1.0" "huggingface_hub<1" "presidio-analyzer==2.2.355" ./scrubpii
-          python -m spacy download en_core_web_lg -q
+          pip install "datasets==3.1.0" "huggingface_hub<1" "presidio-analyzer==2.2.355" pytest ./scrubpii
+          for m in en_core_web_lg es_core_news_lg fr_core_news_lg de_core_news_lg it_core_news_lg; do python -m spacy download $m -q; done
+      - name: Scorer self-test (a one-character detector must not score well)
+        run: cd training && python -m pytest -q test_compare.py
       - name: scrubpii vs Presidio vs spaCy
         run: |
           cd training
           export SCRUBPII_MODEL=../models/pii-distilbert-v5
           python compare.py --rows 1000 --out compare \
-            --system "scrubpii@onnx:../models/pii-distilbert-v5=scrubpii" --system presidio --system presidio+scrubpii --system spacy
+            --system "scrubpii@onnx:../models/pii-distilbert-v5=scrubpii" --system presidio --system presidio-multi --system presidio+scrubpii --system spacy
           cat ../benchmarks/compare.md >> "$GITHUB_STEP_SUMMARY"
       - name: Commit results
         run: |
