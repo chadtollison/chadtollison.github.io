@@ -15,15 +15,16 @@
   <meta property="og:image" content="https://chadtollison.github.io/images/og-card.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Michael Chad Tollison: I build backend systems, data platforms and AI">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="styles.css?v=2026-11-28c">
+  <link rel="stylesheet" href="styles.css?v=2026-11-28d">
 </head>
 <body>
   <div id="scroll-progress" aria-hidden="true"></div>
   <div class="cursor-glow" aria-hidden="true"></div>
 
   <header>
-    <a class="logo name-logo" href="#top" aria-label="Back to top">Michael Chad Tollison<span>.</span></a>
+    <a class="logo name-logo" href="#top" aria-label="Michael Chad Tollison, back to top">Michael Chad Tollison<span>.</span></a>
     <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
@@ -58,11 +59,32 @@
           </figure>
         </div>
       </div>
-      <a class="redact-teaser reactive" href="https://chadtollison.github.io/privacy-tools/pii/" aria-label="Open the live PII redaction demo">
-        <small><i class="live-dot" aria-hidden="true"></i>LIVE DEMO · RUNS IN YOUR BROWSER</small>
-        <p aria-hidden="true">Hi, I'm <span class="t-pii" data-tag="NAME">Jane Doe</span>. Email me at <span class="t-pii" data-tag="EMAIL">jane@mail.com</span> or call <span class="t-pii" data-tag="PHONE">555-0142</span>.</p>
-        <b>Paste your own text <span>→</span></b>
-      </a>
+      <div class="xray reactive" id="xray" role="region" aria-label="Example: scrubpii finding and hiding personal data">
+        <div class="xray-bar">
+          <small><i class="live-dot" aria-hidden="true"></i>REAL OUTPUT<span class="xw"> · SCRUBPII</span></small>
+          <div class="xray-tabs" role="tablist" aria-label="Example texts">
+            <button type="button" role="tab" aria-selected="true" data-n="0">Support ticket<i aria-hidden="true"></i></button><button type="button" role="tab" aria-selected="false" data-n="1">Server log<i aria-hidden="true"></i></button><button type="button" role="tab" aria-selected="false" data-n="2">Clinic note<i aria-hidden="true"></i></button>
+          </div>
+          <a class="xray-cta" href="https://chadtollison.github.io/privacy-tools/pii/">Try your own text <span>→</span></a>
+        </div>
+        <div class="xray-panes">
+          <div class="xray-pane">
+            <span class="xray-lbl">Before</span>
+            <div class="xray-stack">
+              <p class="xs is-on is-done" data-n="0" data-found="4" data-rules="3">Hi, this is <mark class="f-p" style="--d:0">Maria Gonzalez</mark>. My card <mark class="f-f" style="--d:1">4111 1111 1111 1111</mark> was charged twice. Call me at <mark class="f-c" style="--d:2">(415) 555-0132</mark> or email <mark class="f-c" style="--d:3">maria.g@example.com</mark>.</p><p class="xs" data-n="1" data-found="3" data-rules="3">2026-11-28 09:14:02 WARN login failed user=<mark class="f-c" style="--d:0">dkim@example.org</mark> ip=<mark class="f-c" style="--d:1">203.0.113.42</mark> ssn=<mark class="f-f" style="--d:2">123-45-6789</mark></p><p class="xs" data-n="2" data-found="4" data-rules="1">Patient <mark class="f-p" style="--d:0">Robert Chen</mark>, DOB <mark class="f-l" style="--d:1">03/14/1968</mark>, seen at <mark class="f-l" style="--d:2">18 Willow Lane, Dayton</mark>. MRN <mark class="f-f" style="--d:3">88412093</mark>.</p>
+              <i class="xray-scan" aria-hidden="true"></i>
+            </div>
+          </div>
+          <div class="xray-arrow" aria-hidden="true">→</div>
+          <div class="xray-pane after">
+            <span class="xray-lbl">Safe to share</span>
+            <div class="xray-stack">
+              <p class="xs is-on is-done" data-n="0">Hi, this is <span class="tag f-p" style="--d:0">[PERSON]</span>. My card <span class="tag f-f" style="--d:1">[CREDIT_CARD]</span> was charged twice. Call me at <span class="tag f-c" style="--d:2">[PHONE]</span> or email <span class="tag f-c" style="--d:3">[EMAIL]</span>.</p><p class="xs" data-n="1">2026-11-28 09:14:02 WARN login failed user=<span class="tag f-c" style="--d:0">[EMAIL]</span> ip=<span class="tag f-c" style="--d:1">[IP_ADDRESS]</span> ssn=<span class="tag f-f" style="--d:2">[SSN]</span></p><p class="xs" data-n="2">Patient <span class="tag f-p" style="--d:0">[PERSON]</span>, DOB <span class="tag f-l" style="--d:1">[DATE_OF_BIRTH]</span>, seen at <span class="tag f-l" style="--d:2">[ADDRESS]</span>. MRN <span class="tag f-f" style="--d:3">[ID_NUMBER]</span>.</p>
+            </div>
+          </div>
+        </div>
+        <p class="xray-foot"><span class="xray-count" aria-live="off"><b>4</b> found · <b>3</b> double-checked by checksum and format rules</span><span>Same model as the live demo, which runs on your device</span></p>
+      </div>
       <div class="tags hero-tags" aria-label="Core technologies">
         <span>C# / .NET</span><span>Microservices</span><span>SQL Server</span><span>PostgreSQL</span><span>AWS</span><span>Google Cloud</span><span>Python</span><span>ETL</span><span>AI</span>
       </div>
@@ -91,7 +113,7 @@
         <div class="flag-copy">
           <small>FLAGSHIP · FREE PRIVACY TOOLS · OPEN SOURCE</small>
           <h3>Privacy tools</h3>
-          <p class="headline">Five free tools that hide personal data on your own device, built on scrubpii, my PII redactor that beats Microsoft Presidio on all 7 benchmark sets.</p>
+          <p class="headline">Five free tools that hide personal data on your own device, built on scrubpii, my PII redactor that beats Microsoft Presidio on all 10 benchmark sets.</p>
           <ul class="tool-list">
             <li><b>Prompt Shield</b> hides names and numbers from ChatGPT and Claude, then restores them in the answer.</li>
             <li><b>Log Scrubber</b> cleans logs, with a Python logging filter and a GitHub Action.</li>
@@ -101,28 +123,34 @@
           </ul>
           <div class="code-line"><span>$</span> pip install scrubpii</div>
           <div class="flag-stats">
-            <div><strong>0.99</strong><span>F1 vs Presidio's 0.81 on ai4privacy English</span></div>
+            <div><strong>99.5%</strong><span>of English personal data fully hidden, vs Presidio's 67%</span></div>
             <div><strong>288 MB</strong><span>to install, vs 815 MB for Presidio</span></div>
             <div><strong>0.6 s</strong><span>cold start, vs 1.5 s</span></div>
           </div>
           <div class="links">
             <a class="projectlink live" href="https://chadtollison.github.io/privacy-tools/">See all the tools <span>→</span></a>
+            <a class="projectlink" href="how-i-beat-presidio/">How I beat Presidio <span>→</span></a>
             <a class="projectlink" href="https://chadtollison.github.io/privacy-tools/pii/">Try the live demo <span>→</span></a>
             <a class="projectlink" href="https://pypi.org/project/scrubpii/" target="_blank" rel="noreferrer">PyPI <span>↗</span></a>
           </div>
         </div>
         <figure class="bench" data-chart aria-labelledby="bench-cap">
-          <figcaption id="bench-cap"><small>F1 SCORE · HIGHER IS BETTER</small><span><i class="k-me"></i>scrubpii <i class="k-them"></i>Microsoft Presidio</span></figcaption>
+          <figcaption id="bench-cap"><small>PERSONAL DATA FULLY HIDDEN · HIGHER IS BETTER</small><span><i class="k-me"></i>scrubpii <i class="k-them"></i>Microsoft Presidio</span></figcaption>
           <div class="bench-rows">
-            <div class="brow" style="--a:99%;--b:81%"><span>ai4privacy, English</span><div><i class="me"><b>.99</b></i><i class="them"><b>.81</b></i></div></div>
-            <div class="brow" style="--a:99%;--b:63%"><span>ai4privacy, Spanish</span><div><i class="me"><b>.99</b></i><i class="them"><b>.63</b></i></div></div>
-            <div class="brow" style="--a:99%;--b:85%"><span>Gretel PII</span><div><i class="me"><b>.99</b></i><i class="them"><b>.85</b></i></div></div>
-            <div class="brow" style="--a:91%;--b:82%"><span>Medical records <em>never trained on</em></span><div><i class="me"><b>.91</b></i><i class="them"><b>.82</b></i></div></div>
-            <div class="brow" style="--a:88%;--b:72%"><span>Logs &amp; config files <em>never trained on</em></span><div><i class="me"><b>.88</b></i><i class="them"><b>.72</b></i></div></div>
-            <div class="brow" style="--a:87%;--b:78%"><span>Tickets, emails, transcripts <em>never trained on</em></span><div><i class="me"><b>.87</b></i><i class="them"><b>.78</b></i></div></div>
-            <div class="brow" style="--a:80%;--b:52%"><span>Finance documents <em>never trained on</em></span><div><i class="me"><b>.80</b></i><i class="them"><b>.52</b></i></div></div>
+            <!-- chart:home -->
+            <div class="brow" style="--a:99.5%;--b:66.8%"><span>ai4privacy, English</span><div><i class="me"><b>99.5%</b></i><i class="them"><b>67%</b></i></div></div>
+            <div class="brow" style="--a:99.0%;--b:51.5%"><span>ai4privacy, Spanish <em>Presidio in English mode</em></span><div><i class="me"><b>99%</b></i><i class="them"><b>52%</b></i></div></div>
+            <div class="brow" style="--a:98.3%;--b:57.7%"><span>ai4privacy, French <em>Presidio in English mode</em></span><div><i class="me"><b>98%</b></i><i class="them"><b>58%</b></i></div></div>
+            <div class="brow" style="--a:97.2%;--b:65.2%"><span>ai4privacy, German <em>Presidio in English mode</em></span><div><i class="me"><b>97%</b></i><i class="them"><b>65%</b></i></div></div>
+            <div class="brow" style="--a:98.4%;--b:58.0%"><span>ai4privacy, Italian <em>Presidio in English mode</em></span><div><i class="me"><b>98%</b></i><i class="them"><b>58%</b></i></div></div>
+            <div class="brow" style="--a:99.2%;--b:75.0%"><span>Gretel PII</span><div><i class="me"><b>99%</b></i><i class="them"><b>75%</b></i></div></div>
+            <div class="brow" style="--a:98.2%;--b:78.1%"><span>Medical records</span><div><i class="me"><b>98%</b></i><i class="them"><b>78%</b></i></div></div>
+            <div class="brow" style="--a:97.6%;--b:76.2%"><span>Support tickets, emails, chats</span><div><i class="me"><b>98%</b></i><i class="them"><b>76%</b></i></div></div>
+            <div class="brow" style="--a:95.5%;--b:59.6%"><span>Logs &amp; config files</span><div><i class="me"><b>96%</b></i><i class="them"><b>60%</b></i></div></div>
+            <div class="brow" style="--a:77.6%;--b:56.4%"><span>Finance documents <em>source never seen in training</em></span><div><i class="me"><b>78%</b></i><i class="them"><b>56%</b></i></div></div>
+            <!-- /chart:home -->
           </div>
-          <p class="bench-note">Held-out public data, measured on GitHub Actions. Includes four sets the model never saw in training.</p>
+          <p class="bench-note">Share of personal-data items at least 90% redacted, on held-out public test data. The finance set comes from a source the model never saw. Presidio has no non-English models by default, so it ran in English mode on those sets. <a href="how-i-beat-presidio/">How I did it →</a></p>
         </figure>
       </article>
 
@@ -457,7 +485,7 @@
   </main>
 
   <footer><span>Michael Chad Tollison</span><span>Software & Data Engineer</span><span id="year"></span></footer>
-  <script src="script.js?v=2026-11-28a"></script>
+  <script src="script.js?v=2026-11-28d"></script>
   <!-- Private visitor stats: https://chadtollison.goatcounter.com -->
   <script data-goatcounter="https://chadtollison.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
