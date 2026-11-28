@@ -20,10 +20,11 @@ classifiers = [
 dependencies = ["onnxruntime>=1.17", "tokenizers>=0.15", "huggingface_hub>=0.20", "numpy"]
 
 [project.optional-dependencies]
-test = ["pytest>=7", "pandas", "fastapi", "httpx"]
+test = ["pytest>=7", "pandas", "fastapi", "httpx", "presidio-analyzer>=2.2"]
 server = ["fastapi>=0.100", "uvicorn>=0.20"]
 pandas = ["pandas>=1.5"]
 torch = ["transformers>=4.40", "torch>=2.6"]
+presidio = ["presidio-analyzer>=2.2"]
 
 [project.scripts]
 scrubpii = "scrubpii.cli:main"

@@ -208,6 +208,22 @@ redact_csv(open("customers.csv").read(), columns=["name", "email", "notes"])
 safe_df = redact_dataframe(df, mode="fake")        # pip install "scrubpii[pandas]"
 ```
 
+## Already using Presidio?
+
+Add scrubpii to your Presidio setup in two lines. Results keep Presidio's
+entity names, so its anonymizer and the rest of your pipeline keep working.
+
+```python
+from presidio_analyzer import AnalyzerEngine
+from scrubpii.presidio import add_to          # pip install "scrubpii[presidio]"
+
+analyzer = add_to(AnalyzerEngine(), replace_ner=True)   # scrubpii finds names instead of spaCy
+results = analyzer.analyze(text, language="en")
+```
+
+`replace_ner=True` removes Presidio's spaCy name finder, the source of most
+of its false alarms; leave it out to run both.
+
 ## Keep personal data out of LLM prompts
 
 ```python

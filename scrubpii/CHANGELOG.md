@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+- Presidio plug-in: `scrubpii.presidio.add_to(AnalyzerEngine())` adds scrubpii as a Presidio recognizer, with
+  Presidio's entity names (`pip install "scrubpii[presidio]"`). `replace_ner=True` drops Presidio's spaCy names.
 - US health identifiers found by rule: NPI numbers (after "NPI", with a valid check digit), Medicare
   Beneficiary Identifiers (MBI format) and DEA registration numbers (with a valid check digit), as ID_NUMBER.
 

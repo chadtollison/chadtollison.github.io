@@ -58,6 +58,16 @@ def make_system(spec):
         eng = AnalyzerEngine()
         return "Microsoft Presidio", lambda t: [(r.start, r.end, PRESIDIO_MAP.get(r.entity_type, r.entity_type))
                                                 for r in eng.analyze(t, language="en")]
+    if spec == "presidio+scrubpii":
+        from presidio_analyzer import AnalyzerEngine
+        from scrubpii.presidio import add_to
+        eng = add_to(AnalyzerEngine(), replace_ner=True)
+        to_ours = {v: k for k, v in __import__("scrubpii.presidio", fromlist=["x"]).TO_PRESIDIO.items()}
+        to_ours["DATE_TIME"] = "DATE_OF_BIRTH"
+        fn = lambda t: [(r.start, r.end, to_ours.get(r.entity_type, PRESIDIO_MAP.get(r.entity_type, r.entity_type)))
+                        for r in eng.analyze(t, language="en")]
+        fn("warm up")
+        return "Presidio + scrubpii plug-in", fn
     if spec == "spacy":
         import spacy
         nlp = spacy.load("en_core_web_lg")

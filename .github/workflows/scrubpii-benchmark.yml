@@ -28,7 +28,7 @@ jobs:
         run: |
           cd training
           python compare.py --rows 1000 --out compare \
-            --system "scrubpii@onnx:ChadTollison/pii-distilbert-v3=scrubpii 0.4" --system presidio --system spacy
+            --system "scrubpii@onnx:ChadTollison/pii-distilbert-v3=scrubpii 0.4" --system presidio --system presidio+scrubpii --system spacy
           cat ../benchmarks/compare.md >> "$GITHUB_STEP_SUMMARY"
       - name: Commit results
         run: |
