@@ -10,7 +10,7 @@ Sources (both allow training and redistribution with credit):
   * ai4privacy/open-pii-masking-500k-ai4privacy  (CC BY 4.0)
   * gretelai/gretel-pii-masking-en-v1            (Apache 2.0)
   * gretelai/synthetic_pii_finance_multilingual  (Apache 2.0)  test only, never trained on
-  * nvidia/Nemotron-PII                          (CC BY 4.0)   test only, never trained on
+  * nvidia/Nemotron-PII                          (CC BY 4.0)   v5 trains on its train split; tests use its test split
 """
 import ast
 import json
@@ -138,8 +138,9 @@ NEMOTRON_KINDS = {
 def nemotron(kind, split="test", n=None, seed=0):
     from datasets import load_dataset
     ds = load_dataset("nvidia/Nemotron-PII", split=split)
-    rx = re.compile(NEMOTRON_KINDS[kind], re.I)
-    ds = ds.filter(lambda r: bool(rx.search(r["document_type"])))
+    if kind:
+        rx = re.compile(NEMOTRON_KINDS[kind], re.I)
+        ds = ds.filter(lambda r: bool(rx.search(r["document_type"])))
     idx = list(range(len(ds)))
     random.Random(seed).shuffle(idx)
     out = []

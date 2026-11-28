@@ -103,12 +103,15 @@ def score(fn, rows):
 DATASETS = {
     "ai4privacy (English)": lambda n: pii_data.openpii("validation", langs=("en",), n=n, seed=7),
     "ai4privacy (Spanish)": lambda n: pii_data.openpii("validation", langs=("es",), n=n // 2, seed=7),
+    "ai4privacy (French)": lambda n: pii_data.openpii("validation", langs=("fr",), n=n // 2, seed=7),
+    "ai4privacy (German)": lambda n: pii_data.openpii("validation", langs=("de",), n=n // 2, seed=7),
+    "ai4privacy (Italian)": lambda n: pii_data.openpii("validation", langs=("it",), n=n // 2, seed=7),
     "Gretel PII (English)": lambda n: pii_data.gretel_en("test", n=n, seed=7),
     "Gretel finance (English, never trained on)": lambda n: pii_data.gretel_finance("test", n=n, seed=7),
-    "Medical records (Nemotron-PII, never trained on)": lambda n: pii_data.nemotron("medical", n=n, seed=7),
-    "Support tickets, emails, transcripts (Nemotron-PII, never trained on)":
+    "Medical records (Nemotron-PII test split)": lambda n: pii_data.nemotron("medical", n=n, seed=7),
+    "Support tickets, emails, transcripts (Nemotron-PII test split)":
         lambda n: pii_data.nemotron("conversation", n=n, seed=7),
-    "Logs and config files (Nemotron-PII, never trained on)": lambda n: pii_data.nemotron("logs_config", n=n, seed=7),
+    "Logs and config files (Nemotron-PII test split)": lambda n: pii_data.nemotron("logs_config", n=n, seed=7),
 }
 
 

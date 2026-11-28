@@ -1,0 +1,82 @@
+# scrubpii v5: continue training v3 on more data (Nemotron-PII names and health
+# IDs; French, German and Italian from ai4privacy), then compare the 8-bit v5
+# with the 8-bit v3 and Presidio on every test set. Nothing is published:
+# the model is kept as an artifact and the scores are committed to this branch.
+name: scrubpii v5
+on:
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: "Training time budget (minutes)"
+        default: "320"
+  push:
+    branches: ["claude/**"]
+    paths: [".github/workflows/pii-v5.yml"]
+concurrency:
+  group: pii-v5-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: write
+env:
+  PIP_DEPS: >-
+    "torch==2.4.1" "transformers==4.46.3" "accelerate==1.1.1" "datasets==3.1.0"
+    "optimum[onnxruntime]==1.23.3" "onnx==1.17.0" "onnxruntime==1.20.1" "ml_dtypes" "huggingface_hub<1"
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install
+        run: pip install --extra-index-url https://download.pytorch.org/whl/cpu ${{ env.PIP_DEPS }}
+      - name: Train
+        run: |
+          python training/train_v3.py --base ChadTollison/pii-distilbert-v3 --out build/v5 \
+            --langs en,es,fr,de,it --openpii 50000 --gretel 12000 --nemotron 25000 --synthetic 12000 \
+            --join 0.15 --lr 3e-5 --minutes "${{ inputs.minutes || '320' }}"
+      - uses: actions/upload-artifact@v4
+        with: { name: v5-model, path: build/v5, retention-days: 30 }
+
+  compare:
+    needs: [train]
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install
+        run: |
+          pip install --extra-index-url https://download.pytorch.org/whl/cpu ${{ env.PIP_DEPS }} "presidio-analyzer==2.2.355" tokenizers
+          python -m spacy download en_core_web_lg -q
+          pip install --no-deps ./scrubpii
+      - uses: actions/download-artifact@v4
+        with: { name: v5-model, path: build/v5 }
+      - name: Build the 8-bit copy
+        run: |
+          set -e
+          optimum-cli export onnx --model build/v5 --task token-classification build/onnx/
+          mkdir -p build/v5-8bit/onnx
+          python training/quantize.py build/onnx build/v5-8bit/onnx/model_quantized.onnx
+          cp build/onnx/config.json build/onnx/tokenizer.json build/onnx/tokenizer_config.json build/v5-8bit/
+          cp build/onnx/special_tokens_map.json build/v5-8bit/ 2>/dev/null || true
+          cp build/v5/training.json build/v5-8bit/
+      - uses: actions/upload-artifact@v4
+        with: { name: v5-8bit, path: build/v5-8bit, retention-days: 30 }
+      - name: v5 vs v3 vs Presidio
+        run: |
+          cd training
+          python compare.py --rows 1000 --out compare-v5 \
+            --system "scrubpii@onnx:../build/v5-8bit=scrubpii v5" \
+            --system "scrubpii@onnx:ChadTollison/pii-distilbert-v3=scrubpii v3 (0.5)" --system presidio
+          cat ../benchmarks/compare-v5.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
+          git add benchmarks/compare-v5.*
+          git commit -m "scrubpii v5: benchmark vs v3 and Presidio" || exit 0
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

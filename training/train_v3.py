@@ -93,6 +93,8 @@ def main():
     ap.add_argument("--out", default="build/v3")
     ap.add_argument("--openpii", type=int, default=60000)
     ap.add_argument("--gretel", type=int, default=20000)
+    ap.add_argument("--langs", default="en,es", help="ai4privacy languages, comma separated")
+    ap.add_argument("--nemotron", type=int, default=0, help="texts from nvidia/Nemotron-PII (train split, CC BY 4.0)")
     ap.add_argument("--synthetic", type=int, default=20000)
     ap.add_argument("--epochs", type=float, default=1)
     ap.add_argument("--lr", type=float, default=5e-5)
@@ -110,9 +112,11 @@ def main():
     print("Loading data ...")
     rows = []
     if a.openpii:
-        rows += pii_data.openpii("train", n=a.openpii, seed=1)
+        rows += pii_data.openpii("train", langs=tuple(a.langs.split(",")), n=a.openpii, seed=1)
     if a.gretel:
         rows += pii_data.gretel_en("train", n=a.gretel, seed=1)
+    if a.nemotron:
+        rows += pii_data.nemotron(None, "train", n=a.nemotron, seed=1)
     retrain_pii.R.seed(5)
     rows += [retrain_pii.make_example(retrain_pii.TRAIN_TEMPLATES) for _ in range(a.synthetic)]
     mine = retrain_pii.load_examples()
@@ -158,7 +162,9 @@ def main():
     Path(a.out, "training.json").write_text(json.dumps({
         "base": a.base, "texts": len(rows), "joined_share": a.join, "max_len": a.max_len, "steps": trainer.state.global_step,
         "minutes": round((time.time() - t0) / 60, 1), "types": pii_data.TYPES,
+        "langs": a.langs, "nemotron": a.nemotron,
         "data": ["ai4privacy/open-pii-masking-500k-ai4privacy (CC BY 4.0)", "gretelai/gretel-pii-masking-en-v1 (Apache 2.0)",
+                 "nvidia/Nemotron-PII (CC BY 4.0)" if a.nemotron else "",
                  "generated sentences (training/retrain_pii.py)"]}, indent=2))
     print("Saved to", a.out)
 
