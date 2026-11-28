@@ -161,10 +161,12 @@
           <h3>SAML &amp; SCIM Debugger</h3>
           <p class="headline">Paste a broken SSO sign-in and it shows exactly where it failed and which setting fixes it.</p>
           <p>It decodes SAML, verifies the XML signature with code I wrote from the W3C specs, and catches expired assertions, audience and ACS mismatches and signature wrapping. It checks SCIM against RFC 7643/7644 and Entra ID and Okta quirks, runs eight real attacks against your response, acts as a test identity provider and exports redacted reports for tickets. No libraries.</p>
+          <p>New: three guided incidents (a certificate rollover, a mistyped audience, a SCIM new hire who never appears). Change the settings, replay the sign-in and watch the failing step turn green.</p>
           <div class="flow">Paste → Decode → Verify signature → Check → Fix in Entra ID, Okta or Google</div>
           <div class="tags"><span>SAML 2.0</span><span>SCIM 2.0</span><span>XML Signature</span><span>WebCrypto</span></div>
           <div class="links">
-            <a class="projectlink live" href="sso/">Try the debugger <span>→</span></a>
+            <a class="projectlink live" href="sso/#incidents">Fix a broken sign-in <span>→</span></a>
+            <a class="projectlink" href="sso/#saml">Try the debugger <span>→</span></a>
             <a class="projectlink" href="https://github.com/chadtollison/chadtollison.github.io/tree/main/sso" target="_blank" rel="noreferrer">Code <span>↗</span></a>
           </div>
         </article>
