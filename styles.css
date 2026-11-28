@@ -334,3 +334,7 @@ footer{display:flex;justify-content:space-between;border-top:1px solid var(--lin
   .hero-copy .lead{margin:0;font-size:1.05rem}
   .hero-copy .buttons{margin-top:24px}
 }
+.tool-list{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:7px}
+.tool-list li{position:relative;padding-left:18px;color:var(--muted);font-size:.93rem;line-height:1.5}
+.tool-list li:before{content:"";position:absolute;left:0;top:.6em;width:7px;height:7px;border-radius:2px;background:var(--accent);box-shadow:0 0 10px rgba(92,219,182,.5)}
+.tool-list b{color:var(--text)}
