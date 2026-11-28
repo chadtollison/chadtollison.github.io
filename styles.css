@@ -413,3 +413,4 @@ footer{display:flex;justify-content:space-between;border-top:1px solid var(--lin
 .xray-how a{color:var(--accent);font-weight:700}
 @media(min-width:901px){.xray-how ol{display:grid;grid-template-columns:1fr 1fr;gap:10px 28px}}
 @media(max-width:560px){.xray-cta .xw{display:none}.xray-how{padding:0 16px}.xray-foot a{display:none}}
+html,body{overflow-x:clip}

@@ -17,8 +17,8 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="How I built and measured a PII redactor">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="../styles.css?v=2026-11-28d">
-  <link rel="stylesheet" href="writeup.css?v=2026-11-28d">
+  <link rel="stylesheet" href="../styles.css?v=2026-11-28e">
+  <link rel="stylesheet" href="writeup.css?v=2026-11-28e">
 </head>
 <body>
   <a class="skip" href="#article">Skip to the article</a>
@@ -87,7 +87,7 @@
         <b>Overlap-based F1 doesn't guarantee redaction</b>
         <p>My first charts led with F1. A review showed why that isn't enough: a deliberately broken detector that marks one character of each email gets a perfect F1 from this scorer, while fully hidden correctly shows zero. So every chart on this page uses fully hidden, and F1 only appears where I describe how a number changed during development.</p>
       </aside>
-      <p class="wu-p">Anyone can rerun it: <a href="https://github.com/chadtollison/chadtollison.github.io/tree/main/training" target="_blank" rel="noreferrer">the scoring code</a> and <a href="https://github.com/chadtollison/privacy-tools/blob/main/benchmarks/compare.md" target="_blank" rel="noreferrer">the full results, with every metric</a> are public.</p>
+      <p class="wu-p">Anyone can rerun it: <a href="https://github.com/chadtollison/privacy-tools/blob/main/training/compare.py" target="_blank" rel="noreferrer">the scoring code</a> and <a href="https://github.com/chadtollison/privacy-tools/blob/main/benchmarks/compare.md" target="_blank" rel="noreferrer">the full results, with every metric</a> are public.</p>
     </section>
 
     <section class="wu" aria-labelledby="h-score">
