@@ -399,3 +399,18 @@ footer{display:flex;justify-content:space-between;border-top:1px solid var(--lin
 .pipe code{font:500 .78rem ui-monospace,monospace;color:var(--text);background:#111821;border:1px solid var(--line);border-radius:4px;padding:0 4px}
 .pipe-link{display:inline-block;margin-top:4px;font-size:.85rem;font-weight:700;color:var(--accent)}
 .pipe-link span{display:inline-block;transition:transform .2s ease}.pipe-link:hover span{transform:translateX(3px)}
+.xray-cta i{font-style:normal;font-size:.7rem;margin-right:2px}
+.xray-foot a{color:var(--accent);font-weight:700}
+.xray-how{border-top:1px solid var(--line);padding:0 20px}
+.xray-how summary{cursor:pointer;list-style:none;padding:11px 0;font:600 .72rem/1.4 monospace;letter-spacing:.06em;color:var(--muted)}
+.xray-how summary::-webkit-details-marker{display:none}
+.xray-how summary:before{content:"+";display:inline-block;width:14px;color:var(--accent)}
+.xray-how[open] summary:before{content:"−"}
+.xray-how summary:hover{color:var(--text)}
+.xray-how ol{margin:0 0 16px;padding-left:20px;display:grid;gap:8px}
+.xray-how li{font-size:.84rem;line-height:1.6;color:#b5c3d0}.xray-how li b{color:var(--text)}
+.xray-how code{font:500 .8em ui-monospace,monospace;background:#0b1118;border:1px solid var(--line);border-radius:4px;padding:0 4px;color:var(--text)}
+.xray-how a{color:var(--accent);font-weight:700}
+@media(min-width:901px){.xray-how ol{display:grid;grid-template-columns:1fr 1fr;gap:10px 28px}}
+@media(max-width:560px){.xray-cta .xw{display:none}.xray-how{padding:0 16px}.xray-foot a{display:none}}
+html,body{overflow-x:clip}
