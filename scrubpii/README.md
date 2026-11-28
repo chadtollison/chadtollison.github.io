@@ -15,9 +15,9 @@ redact("Hi, I'm Sarah Johnson. Email sarah.j@example.com or call 6626341142.")
 
 It finds **names, addresses, emails, phone numbers, Social Security numbers,
 card numbers, IBANs, passports, driver's licenses, ID numbers, dates of birth,
-usernames, passwords, IP addresses and API keys**, in English and Spanish. A
+usernames, passwords, IP addresses and API keys**, in English, Spanish, French, German and Italian. A
 fine-tuned DistilBERT model
-([ChadTollison/pii-distilbert-v3](https://huggingface.co/ChadTollison/pii-distilbert-v3))
+([ChadTollison/pii-distilbert-v5](https://huggingface.co/ChadTollison/pii-distilbert-v5))
 does the finding, and rules double-check it: card numbers must pass Luhn,
 IBANs their bank checksum, SSNs the SSA format. The rules also catch what the
 model misses: Luhn-valid card numbers, SSNs, emails, IP addresses, US phone

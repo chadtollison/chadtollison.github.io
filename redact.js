@@ -1,6 +1,6 @@
 // Live "Redact me" demo. Runs the fine-tuned DistilBERT PII model in the
 // visitor's browser with transformers.js, so no server (and no cost) is needed.
-// The model files live in models/pii-distilbert-v3 (built by the GitHub Action
+// The model files live in models/pii-distilbert-v5 (built by the GitHub Action
 // in .github/workflows/build-pii-model.yml).
 import { AutoTokenizer, AutoModelForTokenClassification, Tensor, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1';
 
@@ -9,7 +9,7 @@ import { parseRule, ruleSpans, isAllowed } from './english-rules.js?v=2026-11-28
 env.allowRemoteModels = false;
 env.allowLocalModels = true;
 env.localModelPath = new URL('models/', location.href).href;
-const MODEL_ID = 'pii-distilbert-v3';
+const MODEL_ID = 'pii-distilbert-v5';
 // The model learned on short texts and finds much more in long ones when it
 // reads them in short windows (see benchmarks/compare.md), so pack about 126 pieces.
 const MAX_TOKENS = 126;

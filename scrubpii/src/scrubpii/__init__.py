@@ -4,7 +4,7 @@
     >>> redact("Hi, I'm Sarah Johnson. Call 662-634-1142.")
     "Hi, I'm [PERSON]. Call [PHONE]."
 
-A fine-tuned DistilBERT model (ChadTollison/pii-distilbert-v3) finds the
+A fine-tuned DistilBERT model (ChadTollison/pii-distilbert-v5) finds the
 items, and checksum and format rules double-check them: card numbers must
 pass Luhn, IBANs their bank checksum, SSNs the SSA format. The rules also
 catch 10-digit US phone numbers with a real area code, valid IBANs and
@@ -27,9 +27,10 @@ from typing import Callable, Dict, Iterable, List, Optional, Tuple
 __all__ = ["Entity", "find", "find_many", "redact", "redact_many", "tokenize", "restore", "fake_for", "MODEL_ID",
            "redact_json", "redact_csv", "redact_dataframe", "Guard",
            "add_rule", "add_words", "allow", "teach", "understand", "clear_rules", "load_rules", "rules", "audit", "audit_markdown"]
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
-MODEL_ID = "ChadTollison/pii-distilbert-v3"
+# The model to use: a Hugging Face repo or a local folder. SCRUBPII_MODEL overrides it.
+MODEL_ID = os.environ.get("SCRUBPII_MODEL") or "ChadTollison/pii-distilbert-v5"
 MODES = ("label", "mask", "fake", "token")
 SURE = 0.95     # model confidence that overrides a failed format/checksum check
 # Long text is read in windows of this many tokens. The model learned on short

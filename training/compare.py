@@ -11,7 +11,7 @@ redaction?", so the main scores ignore what *name* each system gives an item:
   ms/text        average time per text on the same CPU
 
 Per-type "Caught" is reported too. Datasets:
-  * ai4privacy open-pii-masking-500k, validation split, English and Spanish
+  * ai4privacy open-pii-masking-500k, validation split, English, Spanish, French, German and Italian
   * gretel-pii-masking-en-v1, test split
   * gretel synthetic_pii_finance_multilingual, English test split: scrubpii
     never trains on this one, so it is the fairest outside test.

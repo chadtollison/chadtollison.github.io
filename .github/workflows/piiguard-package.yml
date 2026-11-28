@@ -20,6 +20,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      SCRUBPII_MODEL: models/pii-distilbert-v5      # test the exact model files in this commit
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -55,7 +57,7 @@ jobs:
         run: |
           pip install --index-url https://download.pytorch.org/whl/cpu "torch>=2.6"
           pip install "./scrubpii[torch]"
-          SCRUBPII_BACKEND=torch python -c "from scrubpii import redact; out = redact('Hi, I am Sarah Johnson, sarah.j@example.com'); print(out); assert 'Sarah Johnson' not in out"
+          SCRUBPII_MODEL=ChadTollison/pii-distilbert-v3 SCRUBPII_BACKEND=torch python -c "from scrubpii import redact; out = redact('Hi, I am Sarah Johnson, sarah.j@example.com'); print(out); assert 'Sarah Johnson' not in out"
       - name: Build
         run: python -m build scrubpii --outdir dist
       - uses: actions/upload-artifact@v4
