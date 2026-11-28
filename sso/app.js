@@ -9,6 +9,7 @@ import { fixFor, IDPS } from './fixes.js';
 import { buildReport } from './report.js';
 import * as idp from './fakeidp.js';
 import { decodeInput } from './saml.js';
+import { initSimulator } from './sim.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const el = (tag, attrs = {}, ...children) => {
@@ -39,7 +40,8 @@ function showTab(name, focus = false) {
     $(`#panel-${t.dataset.tab}`).hidden = !on;
     if (on && focus) t.focus();
   }
-  if (location.hash !== `#${name}`) history.replaceState(null, '', `#${name}`);
+  if (location.hash !== `#${name}` && !(name === 'incidents' && /^#incident-/.test(location.hash))) history.replaceState(null, '', `#${name}`);
+  if (name === 'incidents' && ensureSim.ready) ensureSim();
 }
 tabs.forEach((t, i) => {
   t.addEventListener('click', () => showTab(t.dataset.tab));
@@ -49,7 +51,9 @@ tabs.forEach((t, i) => {
     showTab(next.dataset.tab, true);
   });
 });
-showTab(location.hash === '#scim' ? 'scim' : location.hash === '#idp' ? 'idp' : 'saml');
+const tabFromHash = () => ({ '#scim': 'scim', '#idp': 'idp', '#saml': 'saml', '#incidents': 'incidents' })[location.hash] || (/^#incident-/.test(location.hash) ? 'incidents' : null);
+showTab(tabFromHash() || 'incidents');
+window.addEventListener('hashchange', () => { const t = tabFromHash(); if (t) { showTab(t); if (sim && /^#incident-/.test(location.hash)) sim.open(location.hash.slice(10)); } });
 for (const a of document.querySelectorAll('.features a')) {
   a.addEventListener('click', (e) => {
     e.preventDefault();
@@ -563,3 +567,20 @@ let incomingRequest = null;
     banner.hidden = false;
   }
 })();
+
+// ---------- incident simulator ----------
+function openSamlFromSim(b64, settings, note) {
+  writeSettings(settings);
+  samlIn.value = b64;
+  $('#saml-note').textContent = note;
+  for (const b of samlSamples.querySelectorAll('button')) b.removeAttribute('aria-pressed');
+  showTab('saml'); runSaml(); $('.tabs').scrollIntoView({ behavior: 'smooth' });
+}
+var sim = null;
+function ensureSim() {
+  if (sim || !document.getElementById('sim')) return;
+  sim = initSimulator({ el, $, renderChecks, copyButton, openSaml: openSamlFromSim, store });
+  sim?.start();
+}
+ensureSim.ready = true;
+if (!$('#panel-incidents').hidden) ensureSim();

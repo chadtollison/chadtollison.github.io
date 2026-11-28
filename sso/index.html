@@ -19,7 +19,7 @@
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="../styles.css?v=2026-11-28e">
-  <link rel="stylesheet" href="../sso.css?v=2026-11-28d">
+  <link rel="stylesheet" href="../sso.css?v=2026-11-28f">
 </head>
 <body>
   <header>
@@ -31,9 +31,10 @@
     <section class="tool-hero">
       <p class="kicker">LIVE TOOL · SAML &amp; SCIM DEBUGGER</p>
       <h1>Why won't SSO work<em>?</em></h1>
-      <p class="lead">Paste a SAML response or a SCIM payload. It decodes it, checks the signature, explains every field in plain English and points at what is breaking sign-in or provisioning.</p>
+      <p class="lead">Solve a guided SSO incident in a minute, or paste your own SAML response or SCIM payload. It decodes it, checks the signature, explains every field in plain English and points at what is breaking sign-in or provisioning.</p>
       <p class="local"><span class="lock" aria-hidden="true"></span>Runs entirely in your browser. Nothing you paste is uploaded, and the page is locked down so it can't be.</p>
       <ul class="features" aria-label="What it can do">
+        <li><a href="#incidents">Fix three guided SSO incidents</a></li>
         <li><a href="#saml">Shows where sign-in breaks</a></li>
         <li><a href="#saml" data-jump="attacks">Attacks your own response</a></li>
         <li><a href="#idp">Acts as a test identity provider</a></li>
@@ -45,7 +46,8 @@
     <section class="tool">
       <div class="tabs">
         <div class="tab-group" role="tablist" aria-label="What to debug">
-        <button type="button" role="tab" id="tab-saml" data-tab="saml" aria-controls="panel-saml" aria-selected="true">SAML sign-in</button>
+        <button type="button" role="tab" id="tab-incidents" data-tab="incidents" aria-controls="panel-incidents" aria-selected="true">Fix an incident</button>
+        <button type="button" role="tab" id="tab-saml" data-tab="saml" aria-controls="panel-saml" aria-selected="false" tabindex="-1">SAML sign-in</button>
         <button type="button" role="tab" id="tab-scim" data-tab="scim" aria-controls="panel-scim" aria-selected="false" tabindex="-1">SCIM provisioning</button>
         <button type="button" role="tab" id="tab-idp" data-tab="idp" aria-controls="panel-idp" aria-selected="false" tabindex="-1">Test IdP</button>
         </div>
@@ -60,8 +62,17 @@
         </label>
       </div>
 
+      <!-- ===================== INCIDENTS ===================== -->
+      <div id="panel-incidents" role="tabpanel" aria-labelledby="tab-incidents">
+        <div class="sim-intro">
+          <h2>Incident simulator</h2>
+          <p>Three real-world SSO outages, made up but true to life. Read the ticket, change the settings on either side, replay the sign-in, and watch the failing step turn green. Each replay signs and checks real SAML and SCIM messages in your browser.</p>
+        </div>
+        <div id="sim"><p class="pane-note">Loading the incidents…</p></div>
+      </div>
+
       <!-- ===================== SAML ===================== -->
-      <div id="panel-saml" role="tabpanel" aria-labelledby="tab-saml">
+      <div id="panel-saml" role="tabpanel" aria-labelledby="tab-saml" hidden>
         <div class="pane">
           <div class="pane-head">
             <label for="saml-input">SAML response, assertion or request</label>
@@ -256,7 +267,7 @@ groups = SSO-Admins</textarea></label>
   </main>
 
   <footer><span>Michael Chad Tollison</span><span>Software & Data Engineer</span><span><a href="../">Portfolio</a></span></footer>
-  <script type="module" src="app.js?v=2026-11-28d"></script>
+  <script type="module" src="app.js?v=2026-11-28f"></script>
   <script data-goatcounter="https://chadtollison.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
