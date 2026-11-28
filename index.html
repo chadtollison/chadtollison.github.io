@@ -65,7 +65,7 @@
           <div class="xray-tabs" role="tablist" aria-label="Example texts">
             <button type="button" role="tab" aria-selected="true" data-n="0">Support ticket<i aria-hidden="true"></i></button><button type="button" role="tab" aria-selected="false" data-n="1">Server log<i aria-hidden="true"></i></button><button type="button" role="tab" aria-selected="false" data-n="2">Clinic note<i aria-hidden="true"></i></button>
           </div>
-          <a class="xray-cta" href="https://chadtollison.github.io/privacy-tools/pii/">Try your own text <span>→</span></a>
+          <a class="xray-cta" href="https://chadtollison.github.io/privacy-tools/prompt-shield/#demo"><i aria-hidden="true">▶</i> <span class="xw">Try a </span>60-second demo</a>
         </div>
         <div class="xray-panes">
           <div class="xray-pane">
@@ -83,7 +83,16 @@
             </div>
           </div>
         </div>
-        <p class="xray-foot"><span class="xray-count" aria-live="off"><b>4</b> found · <b>3</b> double-checked by checksum and format rules</span><span>Same model as the live demo, which runs on your device</span></p>
+        <p class="xray-foot"><span class="xray-count" aria-live="off"><b>4</b> found · <b>3</b> double-checked by checksum and format rules</span><a href="https://chadtollison.github.io/privacy-tools/pii/">Or paste your own text →</a></p>
+        <details class="xray-how">
+          <summary>How it works, for engineers</summary>
+          <ol>
+            <li><b>In the browser.</b> The page loads an 8-bit ONNX build of my fine-tuned DistilBERT model (about 65 MB, cached) and runs it with transformers.js. Nothing you type is sent anywhere.</li>
+            <li><b>Model, then rules.</b> The model tags spans in overlapping 128-token windows; checksum and format rules (Luhn, SSN, IBAN, IP) confirm number-shaped finds and stretch partial ones to full length.</li>
+            <li><b>Reversible.</b> In the 60-second demo, Prompt Shield swaps each value for a placeholder like <code>&lt;PERSON_1&gt;</code>, keeps the key only in page memory, and puts the real values back into the AI's answer locally.</li>
+            <li><b>Same engine everywhere.</b> The Python package (<code>pip install scrubpii</code>), a logging filter, a GitHub Action and a browser extension share the model and rules. <a href="pii-benchmark/">How it's measured →</a></li>
+          </ol>
+        </details>
       </div>
       <div class="tags hero-tags" aria-label="Core technologies">
         <span>C# / .NET</span><span>Microservices</span><span>SQL Server</span><span>PostgreSQL</span><span>AWS</span><span>Google Cloud</span><span>Python</span><span>ETL</span><span>AI</span>
