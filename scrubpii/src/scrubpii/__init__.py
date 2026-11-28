@@ -17,6 +17,7 @@ runs start fast and work offline.
 from __future__ import annotations
 
 import hashlib
+import unicodedata
 import ipaddress
 import os
 import re
@@ -668,10 +669,18 @@ def find_many(texts: List[str], min_score: float = 0.5, model: str = MODEL_ID, b
 
 
 # ---------------------------------------------------------------- redaction
-_FIRST = ["Alex", "Jordan", "Taylor", "Morgan", "Casey", "Riley", "Jamie", "Avery", "Quinn", "Rowan", "Drew", "Skyler"]
-_LAST = ["Rivera", "Brooks", "Hayes", "Bennett", "Foster", "Reed", "Parker", "Ellis", "Price", "Shaw", "Lane", "Cole"]
-_CARDS = ["4111 1111 1111 1111", "5500 0000 0000 0004", "3782 822463 10005", "6011 1111 1111 1117"]
-_STREETS = ["Example Street", "Sample Avenue", "Placeholder Road", "Fictional Lane", "Demo Drive"]
+_FIRST = ["Alex", "Jordan", "Taylor", "Morgan", "Casey", "Riley", "Jamie", "Avery", "Quinn", "Rowan", "Drew", "Skyler",
+          "Harper", "Elliot", "Reese", "Parker", "Sage", "Logan", "Emerson", "Hayden", "Kendall", "Blake", "Cameron", "Dakota",
+          "Finley", "Jesse", "Kai", "Marlowe", "Noel", "Oakley", "Peyton", "Remy", "Sasha", "Tatum", "Wren", "Ari",
+          "Ellis", "Frankie", "Greer", "Indy", "Jules", "Lane", "Micah", "Nico", "Phoenix", "Robin", "Shay", "Toby"]
+_LAST = ["Rivera", "Brooks", "Hayes", "Bennett", "Foster", "Reed", "Parker", "Ellis", "Morgan", "Price", "Shaw", "Lane",
+         "Carter", "Delgado", "Fischer", "Garrison", "Holloway", "Ibarra", "Jensen", "Kowalski", "Lindqvist", "Mercer", "Navarro", "Okafor",
+         "Pennington", "Quintero", "Rasmussen", "Sandoval", "Thornton", "Underwood", "Vasquez", "Whitaker", "Yamada", "Zimmerman", "Abbott", "Calloway",
+         "Donovan", "Esposito", "Fairbanks", "Gallagher", "Hendricks", "Iverson", "Keller", "Lowell", "Montague", "Nakamura", "Ostrowski", "Prescott"]
+_CARDS = ["4111 1111 1111 1111", "5500 0000 0000 0004", "3782 822463 10005", "6011 1111 1111 1117",
+          "4012 8888 8888 1881", "5105 1051 0510 5100", "3714 496353 98431", "6011 0009 9013 9424"]   # public test numbers
+_STREETS = ["Maple", "Cedar", "Willow", "Harbor", "Juniper", "Lakeview", "Sycamore", "Birch", "Orchard", "Highland", "Meadow", "Ridge"]
+_SUFFIX = ["Street", "Avenue", "Road", "Lane", "Drive", "Court", "Way", "Place"]
 _IBANS = ["GB82 WEST 1234 5698 7654 32", "DE89 3704 0044 0532 0130 00", "FR14 2004 1010 0505 0001 3M02 606"]
 
 
@@ -679,44 +688,157 @@ def _h(s: str) -> int:
     return int(hashlib.sha256(s.encode()).hexdigest()[:12], 16)
 
 
+def _into_shape(shape: str, digits: str) -> str:
+    """Put new digits into the old value's layout: (415) 555-0198 stays (xxx) xxx-xxxx."""
+    it = iter(digits)
+    return re.sub(r"\d", lambda m: next(it, "0"), shape)
+
+
+def _shuffle_digits(text: str, h: int) -> str:
+    out = []
+    for c in text:
+        if c.isdigit():
+            h = (h * 6364136223846793005 + 1442695040888963407) % 2**64
+            out.append(str((h >> 33) % 10))
+        else:
+            out.append(c)
+    return "".join(out)
+
+
 def fake_for(e: Entity) -> str:
-    """A realistic but harmless stand-in. The same input always gets the same fake."""
+    """A realistic but harmless stand-in that keeps the original's format.
+    The same input always gets the same fake (see _apply for uniqueness within a text)."""
     h = _h(e.type + "|" + e.text)
-    first, last = _FIRST[h % 12], _LAST[(h >> 8) % 12]
-    same = lambda x: re.sub(r"\s", "", x) == re.sub(r"\s", "", e.text)
+    first, last = _FIRST[h % len(_FIRST)], _LAST[(h >> 8) % len(_LAST)]
+    digits = re.sub(r"\D", "", e.text)
     if e.type == "PERSON":
         return f"{first} {last}" if " " in e.text.strip() else first
     if e.type == "EMAIL":
         return f"{first}.{last}@example.com".lower()
+    if e.type == "USERNAME":
+        return f"{first}{last}{h % 100}".lower()
     if e.type == "PHONE":
-        return f"(202) 555-01{h % 100:02d}"                        # 555-0100..0199 are reserved for fiction
+        tail = f"55501{h % 100:02d}"                                   # 555-0100..0199 are reserved for fiction
+        area = f"{200 + (h >> 5) % 700}"
+        area = area[0] + ("2" if area[1] == "1" else area[1]) + area[2]
+        if len(digits) == 10:
+            return _into_shape(e.text, area + tail)
+        if len(digits) == 11 and digits[0] == "1":
+            return _into_shape(e.text, "1" + area + tail)
+        return "(202) 555-01%02d" % (h % 100) if len(digits) < 7 else _shuffle_digits(e.text, h)
     if e.type == "SSN":
-        return f"9{h % 100:02d}-{(h >> 7) % 90 + 10}-{(h >> 3) % 9000 + 1000}"   # SSNs never start with 9
+        fake = f"9{h % 100:02d}{(h >> 7) % 90 + 10}{(h >> 3) % 9000 + 1000}"  # SSNs never start with 9
+        return _into_shape(e.text if len(digits) == 9 else "000-00-0000", fake)
     if e.type == "CREDIT_CARD":
-        c = [x for x in _CARDS if not same(x)]
-        return c[h % len(c)]
+        c = [x for x in _CARDS if re.sub(r"\D", "", x) != digits]
+        same = [x for x in c if len(re.sub(r"\D", "", x)) == len(digits)] or c
+        pick = same[h % len(same)]
+        fd = re.sub(r"\D", "", pick)
+        return _into_shape(e.text, fd) if len(fd) == len(digits) else pick
     if e.type == "IP_ADDRESS":
-        return f"203.0.113.{h % 254 + 1}"                          # documentation-only range
+        return f"2001:db8::{h % 65535:x}" if ":" in e.text else f"203.0.113.{h % 254 + 1}"   # documentation-only ranges
+    if e.type == "MAC_ADDRESS":
+        return f"00:00:5e:00:53:{h % 256:02x}".replace(":", "-" if "-" in e.text else ":")
     if e.type == "IBAN":
-        c = [x for x in _IBANS if not same(x)]
+        c = [x for x in _IBANS if re.sub(r"\s", "", x) != re.sub(r"\s", "", e.text)]
         return c[h % len(c)]
     if e.type == "PASSPORT":
         return f"X{h % 10**8:08d}"
     if e.type == "DRIVER_LICENSE":
         return f"D{h % 10**7:07d}"
-    if e.type == "API_KEY":
+    if e.type in ("API_KEY", "SECRET"):
         return f"sk_example_{h:016x}"[:27]
     if e.type == "ADDRESS":
-        return f"{h % 900 + 100} {_STREETS[h % len(_STREETS)]}"
+        return f"{h % 9000 + 100} {_STREETS[(h >> 3) % len(_STREETS)]} {_SUFFIX[(h >> 7) % len(_SUFFIX)]}"
     if e.type == "ID_NUMBER":
-        return f"ID-{h % 10**8:08d}"
+        return _shuffle_digits(e.text, h) if digits else f"ID-{h % 10**8:08d}"
     if e.type == "DATE_OF_BIRTH":
-        return f"01/01/{1950 + h % 50}"
-    if e.type == "USERNAME":
-        return f"user{h % 10**5:05d}"
+        y, mo, dd = 1950 + h % 50, 1 + (h >> 4) % 12, 1 + (h >> 9) % 28
+        m = re.fullmatch(r"(\d{4})([/.-])(\d{1,2})\2(\d{1,2})", e.text)
+        if m:
+            return f"{y}{m[2]}{mo:02d}{m[2]}{dd:02d}"
+        m = re.fullmatch(r"(\d{1,2})([/.-])(\d{1,2})\2(\d{2}|\d{4})", e.text)
+        if m:
+            yy = str(y)[2:] if len(m[4]) == 2 else str(y)
+            return f"{dd:02d}{m[2]}{mo:02d}{m[2]}{yy}" if int(m[1]) > 12 else f"{mo:02d}{m[2]}{dd:02d}{m[2]}{yy}"
+        return f"{mo:02d}/{dd:02d}/{y}"
     if e.type == "PASSWORD":
         return "********"
+    if e.type == "PRIVATE_KEY":
+        return "-----BEGIN PRIVATE KEY-----\n(removed)\n-----END PRIVATE KEY-----"
+    if e.type == "PROFILE_URL":
+        return f"https://example.com/@{first}{last}".lower()
     return f"[{e.type}]"
+
+
+def _email_like(email: str, real_name: str, fake_name: str) -> Optional[str]:
+    """A stand-in email in the real one's pattern (maria.lopez, lopez_maria, mlopez, marial),
+    made from the person's stand-in name. None if the address isn't made from the name."""
+    def plain(x: str) -> str:
+        return "".join(c for c in unicodedata.normalize("NFD", x.lower()) if not unicodedata.combining(c))
+    local = plain(email.split("@")[0])
+    letters = re.sub(r"[^a-z]", "", local)
+    sep = (re.search(r"[._-]", local) or [""])[0]
+    rp = re.sub(r"[^a-z ]", "", plain(real_name)).split()
+    fp = re.sub(r"[^a-z ]", "", plain(fake_name)).split()
+    if len(rp) < 2 or not fp:
+        return None
+    a, b, fa, fb = rp[0], rp[-1], fp[0], fp[-1]
+    if a == b:
+        return None
+    if len(a) > 2 and len(b) > 2 and a in letters and b in letters:
+        fl = fa + sep + fb if letters.index(a) <= letters.index(b) else fb + sep + fa
+    elif len(b) > 2 and letters == a[0] + b:
+        fl = fa[0] + (sep if len(re.sub(r"\d+$", "", local)) > len(letters) else "") + fb
+    elif len(a) > 2 and letters == a + b[0]:
+        fl = fa + fb[0]
+    elif len(a) > 2 and letters == a:
+        fl = fa
+    else:
+        return None
+    return f"{fl}@example.com"
+
+
+class _Fakes:
+    """Stand-ins for one text (or one key): the same real value always gets the same
+    fake, two different values never share one, a lone first name gets the first name
+    of that person's stand-in, and a person's email is made from their stand-in."""
+
+    def __init__(self) -> None:
+        self.real_to_fake: Dict[str, str] = {}
+        self.used: Dict[str, str] = {}
+        self.people: Dict[str, str] = {}
+
+    def get(self, e: Entity) -> str:
+        real = e.text
+        if real in self.real_to_fake:
+            return self.real_to_fake[real]
+        fake = None
+        if e.type == "PERSON" and " " not in real.strip():
+            for r, f in self.people.items():
+                if r.split()[0] == real.strip():
+                    fake = f.split()[0]
+                elif r.split()[-1] == real.strip():
+                    fake = f.split()[-1]
+                if fake:
+                    break
+        if fake is None and e.type == "EMAIL":
+            for r, f in self.people.items():
+                cand = _email_like(real, r, f)
+                if cand and cand not in self.used:
+                    fake = cand
+                    break
+        salt = 0
+        while fake is None or (fake in self.used and self.used[fake] != real) or fake == real:
+            fake = fake_for(Entity(e.type, f"{real}#{salt}" if salt else real, e.start, e.end, e.score))
+            salt += 1
+            if salt > 60:
+                break
+        self.used[fake] = real
+        self.real_to_fake[real] = fake
+        if e.type == "PERSON" and " " in real.strip():
+            self.people[real.strip()] = fake
+        return fake
 
 
 def _apply(text: str, ents: List[Entity], mode: str, key: Optional[Dict[str, str]] = None) -> Tuple[str, Dict[str, str]]:
@@ -731,13 +853,19 @@ def _apply(text: str, ents: List[Entity], mode: str, key: Optional[Dict[str, str
             tokens[(m[1], val)] = tok
             counts[m[1]] = max(counts.get(m[1], 0), int(m[2]))
     out, pos = [], 0
+    fakes = _Fakes()
+    # People first, so their emails and first-name mentions can follow their stand-in.
+    if mode == "fake":
+        for e in ents:
+            if e.type == "PERSON" and " " in e.text.strip():
+                fakes.get(e)
     for e in ents:
         if mode == "label":
             rep = f"[{e.type}]"
         elif mode == "mask":
             rep = "█" * len(e.text)
         elif mode == "fake":
-            rep = fake_for(e)
+            rep = fakes.get(e)
         else:
             if (e.type, e.text) not in tokens:
                 counts[e.type] = counts.get(e.type, 0) + 1

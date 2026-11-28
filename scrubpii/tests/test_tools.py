@@ -265,3 +265,19 @@ def test_proxy_streaming(proxy):
                    if l.startswith("data: ") and '"content_block_delta"' in l)
     assert text == "Sure, 4111 1111 1111 1111 is noted."
     assert "message_stop" in raw
+
+
+def test_fakes_keep_format_stay_unique_and_follow_the_person():
+    import scrubpii as cp
+    f = cp._Fakes()
+    E = lambda t, x: cp.Entity(t, x, 0, len(x), 1.0)
+    person = f.get(E("PERSON", "Maria Lopez"))
+    assert f.get(E("PERSON", "Maria")) == person.split()[0]
+    first, last = person.lower().split()
+    assert f.get(E("EMAIL", "mlopez@acme.com")) == f"{first[0]}{last}@example.com"
+    card = f.get(E("CREDIT_CARD", "4111-1111-1111-1111"))
+    assert len(card) == 19 and card.count("-") == 3 and card != "4111-1111-1111-1111"
+    assert f.get(E("PHONE", "(415) 555-0198")).startswith("(")
+    assert f.get(E("SSN", "123.45.6789")).count(".") == 2
+    names = {f.get(E("PERSON", f"Person{i} Name{i}")) for i in range(300)}
+    assert len(names) == 300

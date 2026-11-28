@@ -11,6 +11,9 @@
   addresses, social profile links, and `user=` / `name=` hints in logs.
 - Fewer false alarms: `password = input.value`, version numbers like `v1.2.3.4`, and 2147483647 are left alone;
   `user:password@host` is no longer read as an email.
+- `mode="fake"` stand-ins keep the original's format (card length and dashes, phone and SSN layout, date
+  format), two people never share a stand-in, "Maria" after "Maria Lopez" gets the same stand-in first name,
+  and a person's email follows their stand-in in the same pattern (`mlopez@` becomes `rcarter@`).
 - Adjacent address parts are joined, and secrets lose a `key=` prefix the model included.
 - Names the text gives away are caught even when the model misses them: "Sarah Johnson" next to
   `sarah.johnson@...`, and every other mention of a name already found.
