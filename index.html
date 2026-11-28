@@ -6,7 +6,17 @@
   <meta name="description" content="Michael Chad Tollison — Software & Data Engineer with 10 years building backend services, identity systems, and data platforms in C#/.NET and Python on AWS.">
   <meta name="theme-color" content="#090d12">
   <title>Michael Chad Tollison | Software & Data Engineer</title>
-  <link rel="stylesheet" href="styles.css?v=2026-11-27b">
+  <link rel="canonical" href="https://chadtollison.github.io/">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://chadtollison.github.io/">
+  <meta property="og:title" content="Michael Chad Tollison | Software & Data Engineer">
+  <meta property="og:description" content="Identity, privacy and data systems at work. Open-source tools you can try, including a PII redactor that beats Microsoft Presidio.">
+  <meta property="og:image" content="https://chadtollison.github.io/images/og-card.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="styles.css?v=2026-11-28a">
 </head>
 <body>
   <div id="scroll-progress" aria-hidden="true"></div>
@@ -18,9 +28,8 @@
       <span></span><span></span><span></span>
     </button>
     <nav aria-label="Primary navigation">
-      <a href="#impact">Impact</a>
-      <a href="#career">Career</a>
       <a href="#projects">Projects</a>
+      <a href="#work">Work</a>
       <a href="#experience">Experience</a>
       <a href="#skills">Skills</a>
       <a href="#contact">Contact</a>
@@ -33,11 +42,11 @@
         <div class="hero-copy">
           <p class="kicker">SOFTWARE & DATA ENGINEER · C#/.NET · PYTHON · AWS</p>
           <h1>I build <em>backend systems, data platforms &amp; AI.</em></h1>
-          <p class="lead">I'm Chad, a software and data engineer with 10 years in C#/.NET, Python and AWS. I build production microservices for identity and privacy, data pipelines and reporting platforms, and lately AI, like the model behind my live demo. Go ahead and try it.</p>
+          <p class="lead">I'm Chad, a software and data engineer with 10 years in C#/.NET, Python and AWS. At work I own identity, privacy and data systems, including SSO used by 300+ customer organizations. On my own time I build open-source tools you can try right here, like a PII redactor that beats Microsoft Presidio.</p>
           <div class="buttons">
-            <a class="primary magnetic" href="pii/">Try my live PII demo <span>→</span></a>
-            <a class="secondary magnetic" href="#projects">Explore my work <span>↓</span></a>
-            <a class="secondary magnetic" href="https://github.com/chadtollison" target="_blank" rel="noreferrer">GitHub ↗</a>
+            <a class="primary magnetic" href="#projects">See what I've built <span>↓</span></a>
+            <a class="secondary magnetic" href="#work">My work at Babel Street <span>↓</span></a>
+            <a class="secondary magnetic" href="Michael_Chad_Tollison_Resume.pdf" target="_blank" rel="noopener">Resume ↓</a>
           </div>
         </div>
         <div class="hero-side">
@@ -59,191 +68,193 @@
       </div>
     </section>
 
-    <section id="impact" data-reveal>
-      <div class="title"><b>01</b><h2>Engineering impact</h2></div>
-      <div class="metrics">
-        <article class="reactive" data-glow>
-          <strong data-counter data-value="440" data-suffix="+ GB">440+ GB</strong>
-          <p>Centralized enterprise reporting platform</p>
-        </article>
-        <article class="reactive" data-glow>
-          <strong data-counter data-value="5" data-suffix="+ TB">5+ TB</strong>
-          <p>Elasticsearch data environment worked across in production</p>
-        </article>
-        <article class="reactive" data-glow>
-          <strong data-counter data-value="300" data-suffix="+">300+</strong>
-          <p>Customer organizations supported by enterprise identity integrations</p>
-        </article>
-        <article class="reactive" data-glow>
-          <strong data-counter data-value="30" data-suffix="+">30+</strong>
-          <p>SSRS reports and 7 Power BI dashboards delivered</p>
-        </article>
-      </div>
-
-      <div class="charts">
-        <article class="card chart reactive" data-glow data-chart>
-          <small>DATA SCALE · TO PROPORTION</small>
-          <h3>Data I've worked across</h3>
-          <div class="hbars">
-            <div class="hbar" style="--p:8.8%;--d:.1s"><span class="hbar-label">Centralized reporting database<em>Architected at Babel Street</em></span><b>440+ GB</b><div class="hbar-track"><i></i></div></div>
-            <div class="hbar" style="--p:40%;--d:.25s"><span class="hbar-label">Statewide administrative data<em>Designed &amp; optimized at nSPARC</em></span><b>2+ TB</b><div class="hbar-track"><i></i></div></div>
-            <div class="hbar" style="--p:100%;--d:.4s"><span class="hbar-label">Elasticsearch environment<em>Worked across in production</em></span><b>5+ TB</b><div class="hbar-track"><i></i></div></div>
-          </div>
-        </article>
-
-        <article class="card chart reactive" data-glow data-chart>
-          <small>AUTOMATION · PRIVACY REQUESTS</small>
-          <h3>50+ requests handled automatically, every day</h3>
-          <div class="dots" data-dots="50" aria-hidden="true"></div>
-          <p>Each PII removal request once took about 2 hours of manual processing. A C# microservice now owns intake, processing, and confirmation.</p>
-        </article>
-      </div>
-    </section>
-
-    <section id="career" data-reveal>
-      <div class="title"><b>02</b><h2>Career at a glance</h2></div>
-      <p class="intro">Ten years across healthcare, state government, and software, growing from data analyst to  software engineer.</p>
-      <div class="career-grid">
-        <article class="card donut-card reactive" data-glow data-chart>
-          <small>TIME BY ORGANIZATION</small>
-          <div class="donut" role="img" aria-label="Donut chart of ten years of experience: about 6.5 years at Babel Street, 2 years at Blue Cross Blue Shield of Mississippi, and 1.8 years at nSPARC">
-            <svg viewBox="0 0 200 200" aria-hidden="true">
-              <circle class="track" cx="100" cy="100" r="80" pathLength="100"/>
-              <circle class="seg s1" data-key="bcbs" data-start="2016-06" data-end="2018-06" cx="100" cy="100" r="80" pathLength="100" style="--len:18.1;--rest:81.9;stroke-dashoffset:0"/>
-              <circle class="seg s2" data-key="nsparc" data-start="2018-07" data-end="2020-04" cx="100" cy="100" r="80" pathLength="100" style="--len:16.5;--rest:83.5;stroke-dashoffset:-19.3"/>
-              <circle class="seg s3" data-key="babel" data-start="2020-04" data-end="now" cx="100" cy="100" r="80" pathLength="100" style="--len:61.8;--rest:38.2;stroke-dashoffset:-37"/>
-            </svg>
-            <div class="donut-center"><strong data-counter data-years-total data-value="10" data-suffix="">10</strong><span>YEARS</span></div>
-          </div>
-          <ul class="legend">
-            <li><i style="background:var(--violet)"></i><div><strong>Blue Cross Blue Shield of Mississippi</strong>Data / Information Analyst</div><b data-dur="bcbs">2 yrs</b></li>
-            <li><i style="background:var(--blue)"></i><div><strong>nSPARC, Mississippi State University</strong>Data Analyst</div><b data-dur="nsparc">1.8 yrs</b></li>
-            <li><i style="background:var(--accent)"></i><div><strong>Babel Street</strong>Software Engineer</div><b data-dur="babel">6.5 yrs</b></li>
-          </ul>
-        </article>
-
-        <article class="card gantt-card reactive" data-glow data-chart>
-          <small>TIMELINE · 2016 TO PRESENT</small>
-          <div class="gantt" data-axis-start="2016-01" data-axis-end="2027-01">
-            <div class="gantt-axis">
-              <div></div>
-              <div class="ticks"><span style="--x:0%">2016</span><span style="--x:18.18%">2018</span><span style="--x:36.36%">2020</span><span style="--x:54.55%">2022</span><span style="--x:72.73%">2024</span><span style="--x:90.91%">2026</span></div>
-            </div>
-            <div class="gantt-row">
-              <div class="gantt-meta"><strong>BCBS Mississippi</strong><span>Enterprise ETL in a HIPAA-regulated environment</span></div>
-              <div class="gantt-track"><i class="gantt-bar" title="June 2016 – June 2018" data-start="2016-06" data-end="2018-06" style="--c:var(--violet);--l:3.79%;--w:18.94%;--d:.1s"></i></div>
-            </div>
-            <div class="gantt-row">
-              <div class="gantt-meta"><strong>nSPARC · Mississippi State</strong><span>2+ TB statewide longitudinal data system</span></div>
-              <div class="gantt-track"><i class="gantt-bar" title="July 2018 – April 2020" data-start="2018-07" data-end="2020-04" style="--c:var(--blue);--l:22.73%;--w:16.67%;--d:.32s"></i></div>
-            </div>
-            <div class="gantt-row">
-              <div class="gantt-meta"><strong>Babel Street</strong><span>Software Engineer</span></div>
-              <div class="gantt-track"><i class="gantt-bar live" title="April 2020 – present" data-start="2020-04" data-end="now" style="--c:var(--accent);--l:38.64%;--w:59.26%;--d:.54s"></i></div>
-            </div>
-          </div>
-          <div class="path" aria-label="Career path">
-            <span>Data / Information Analyst</span><i>→</i><span>Data Analyst</span><i>→</i><span>Software Engineer II</span><i>→</i><span>Software Engineer III</span><i>→</i><span>Software Engineer</span>
-          </div>
-        </article>
-      </div>
-    </section>
+    <div class="paths" role="navigation" aria-label="Two ways to see my work" data-reveal>
+      <a class="path-card reactive" data-glow href="#projects">
+        <small>BUILT BY ME · OPEN SOURCE</small>
+        <strong>Things you can use right now</strong>
+        <p>A Python package that beats Microsoft Presidio, a live PII redaction demo and a SAML &amp; SCIM debugger. Click, paste, try.</p>
+        <b>See my projects <span>↓</span></b>
+      </a>
+      <a class="path-card reactive" data-glow href="#work">
+        <small>BUILT AT WORK · BABEL STREET, 2020 TO NOW</small>
+        <strong>Systems I own in production</strong>
+        <p>SSO for 300+ customer organizations, privacy automation, a 440+ GB data platform and AI agents, written up as case studies.</p>
+        <b>Read the case studies <span>↓</span></b>
+      </a>
+    </div>
 
     <section id="projects" data-reveal>
-      <div class="title"><b>03</b><h2>Featured engineering</h2></div>
-      <p class="intro">Selected work presented as sanitized case studies. Proprietary code, customer information, internal schemas, and confidential implementation details are intentionally excluded.</p>
-      <div class="grid">
-        <article class="card feature reactive" data-glow data-tilt>
-          <small>PUBLIC PROJECT · 01</small>
-          <h3>LocalLift</h3>
-          <p>A revenue engine designed to help local service businesses discover opportunities, strengthen their online presence, and turn demand into customers.</p>
-          <div class="tags"><span>AI</span><span>Automation</span><span>Python</span><span>Business Intelligence</span></div>
-          <a class="projectlink" href="https://github.com/chadtollison/LocalLift" target="_blank" rel="noreferrer">View repository <span>↗</span></a>
-        </article>
-        
+      <div class="title"><b>01</b><h2>Things I've built</h2></div>
+      <p class="intro">My own work, open source and free. Each one runs in your browser or installs with one line, so you can check it yourself instead of taking my word for it.</p>
+
+      <article class="card flagship reactive" data-glow>
+        <div class="flag-copy">
+          <small>FLAGSHIP · PYTHON PACKAGE ON PYPI · MIT</small>
+          <h3>scrubpii</h3>
+          <p class="headline">Finds and redacts personal data with one line of Python, and beats Microsoft Presidio on all 7 benchmark sets.</p>
+          <p>Names, addresses, emails, phones, SSNs, cards, IBANs, passports, licenses, dates of birth, passwords, IPs and API keys, in English and Spanish. A DistilBERT model I fine-tuned does the finding and checksum rules double-check it, so a card number must pass Luhn and an IBAN its bank checksum. Teams can add their own rules in plain English, and an audit report shows what was found and why. It runs offline, with no PyTorch to install.</p>
+          <div class="code-line"><span>$</span> pip install scrubpii</div>
+          <div class="flag-stats">
+            <div><strong>0.99</strong><span>F1 vs Presidio's 0.81 on ai4privacy English</span></div>
+            <div><strong>288 MB</strong><span>to install, vs 815 MB for Presidio</span></div>
+            <div><strong>0.6 s</strong><span>cold start, vs 1.5 s</span></div>
+          </div>
+          <div class="links">
+            <a class="projectlink live" href="scrubpii/">Read the docs <span>→</span></a>
+            <a class="projectlink" href="https://pypi.org/project/scrubpii/" target="_blank" rel="noreferrer">PyPI <span>↗</span></a>
+            <a class="projectlink" href="https://github.com/chadtollison/chadtollison.github.io/blob/main/benchmarks/compare.md" target="_blank" rel="noreferrer">Full benchmark <span>↗</span></a>
+            <a class="projectlink" href="https://huggingface.co/ChadTollison/pii-distilbert-v3" target="_blank" rel="noreferrer">Model <span>↗</span></a>
+          </div>
+        </div>
+        <figure class="bench" data-chart aria-labelledby="bench-cap">
+          <figcaption id="bench-cap"><small>F1 SCORE · HIGHER IS BETTER</small><span><i class="k-me"></i>scrubpii <i class="k-them"></i>Microsoft Presidio</span></figcaption>
+          <div class="bench-rows">
+            <div class="brow" style="--a:99%;--b:81%"><span>ai4privacy, English</span><div><i class="me"><b>.99</b></i><i class="them"><b>.81</b></i></div></div>
+            <div class="brow" style="--a:99%;--b:63%"><span>ai4privacy, Spanish</span><div><i class="me"><b>.99</b></i><i class="them"><b>.63</b></i></div></div>
+            <div class="brow" style="--a:99%;--b:85%"><span>Gretel PII</span><div><i class="me"><b>.99</b></i><i class="them"><b>.85</b></i></div></div>
+            <div class="brow" style="--a:91%;--b:82%"><span>Medical records <em>never trained on</em></span><div><i class="me"><b>.91</b></i><i class="them"><b>.82</b></i></div></div>
+            <div class="brow" style="--a:88%;--b:72%"><span>Logs &amp; config files <em>never trained on</em></span><div><i class="me"><b>.88</b></i><i class="them"><b>.72</b></i></div></div>
+            <div class="brow" style="--a:87%;--b:78%"><span>Tickets, emails, transcripts <em>never trained on</em></span><div><i class="me"><b>.87</b></i><i class="them"><b>.78</b></i></div></div>
+            <div class="brow" style="--a:80%;--b:52%"><span>Finance documents <em>never trained on</em></span><div><i class="me"><b>.80</b></i><i class="them"><b>.52</b></i></div></div>
+          </div>
+          <p class="bench-note">Held-out public data, measured on GitHub Actions. Includes four sets the model never saw in training.</p>
+        </figure>
+        <a class="job-link" href="#case-privacy">From my day job: I automate privacy requests at Babel Street <span>→</span></a>
+      </article>
+
+      <div class="grid built-grid">
         <article class="card reactive" data-glow data-tilt>
-          <small>PUBLIC PROJECT · 02</small>
-          <h3>PII Detector</h3>
-          <p>A service that finds and redacts personal data in free text. A fine-tuned DistilBERT model proposes candidates, and checksum and format validators confirm them, reaching 0.98 precision and recall on held-out data. Diagnosed shortcut learning in the first model through token-level error analysis and fixed it with leakage-checked training data, raising F1 from 0.55 to 0.97.</p>
-          <div class="flow">Text → DistilBERT → Luhn &amp; format validators → Redacted output</div>
-          <div class="tags"><span>Python</span><span>PyTorch</span><span>Hugging Face</span><span>FastAPI</span><span>Docker</span></div>
-          <a class="projectlink live" href="pii/">Try the live demo <span>→</span></a>
-          <a class="projectlink" href="https://github.com/chadtollison/PII-Detector" target="_blank" rel="noreferrer">View repository <span>↗</span></a>
-          <a class="projectlink" href="https://huggingface.co/ChadTollison/pii-distilbert-v3" target="_blank" rel="noreferrer">View model <span>↗</span></a>
+          <small>LIVE DEMO · RUNS IN YOUR BROWSER</small>
+          <h3>Redact me</h3>
+          <p class="headline">Paste any text, PDF or CSV and watch personal data disappear, without anything leaving your device.</p>
+          <p>The same model behind scrubpii, shrunk to an 8-bit, 63 MB file that runs in the page. Switch between tags, masks and realistic fake values, and teach it new rules in plain English. Hosted free on GitHub Pages with no server.</p>
+          <div class="flow">Your text → DistilBERT in the browser → Checksum rules → Redacted output</div>
+          <div class="tags"><span>Transformers.js</span><span>ONNX</span><span>JavaScript</span><span>Fine-tuning</span></div>
+          <div class="links">
+            <a class="projectlink live" href="pii/">Try the live demo <span>→</span></a>
+            <a class="projectlink" href="https://github.com/chadtollison/PII-Detector" target="_blank" rel="noreferrer">Training code <span>↗</span></a>
+          </div>
+          <a class="job-link" href="#case-privacy">Related work: privacy automation <span>→</span></a>
         </article>
-        
+
         <article class="card reactive" data-glow data-tilt>
-          <small>PUBLIC PROJECT · 03</small>
+          <small>FREE TOOL · RUNS IN YOUR BROWSER</small>
           <h3>SAML &amp; SCIM Debugger</h3>
-          <p>A free tool for the two problems I debugged most while building SSO for 300+ customer organizations. Paste a SAML response and it decodes it, verifies the XML signature, and flags expired assertions, audience and ACS mismatches, missing attributes, and signature wrapping attacks. Paste a SCIM payload and it checks it against RFC 7643/7644 and the quirks of Entra ID and Okta. It animates exactly where sign-in broke, runs eight real attacks against your own response, links each problem to the Entra ID, Okta or Google setting that fixes it, acts as a test identity provider and exports redacted reports for support tickets. The signature check is written from the W3C specs and everything runs in the browser.</p>
-          <div class="flow">Paste → Decode → Verify signature → Check → Plain-English fixes</div>
-          <div class="tags"><span>SAML 2.0</span><span>SCIM 2.0</span><span>XML Signature</span><span>WebCrypto</span><span>JavaScript</span></div>
-          <a class="projectlink live" href="sso/">Try the debugger <span>→</span></a>
-          <a class="projectlink" href="https://github.com/chadtollison/chadtollison.github.io/tree/main/sso" target="_blank" rel="noreferrer">View the code <span>↗</span></a>
+          <p class="headline">Paste a broken SSO sign-in and it shows exactly where it failed and which setting fixes it.</p>
+          <p>It decodes SAML, verifies the XML signature with code I wrote from the W3C specs, and catches expired assertions, audience and ACS mismatches and signature wrapping. It checks SCIM against RFC 7643/7644 and Entra ID and Okta quirks, runs eight real attacks against your response, acts as a test identity provider and exports redacted reports for tickets. No libraries.</p>
+          <div class="flow">Paste → Decode → Verify signature → Check → Fix in Entra ID, Okta or Google</div>
+          <div class="tags"><span>SAML 2.0</span><span>SCIM 2.0</span><span>XML Signature</span><span>WebCrypto</span></div>
+          <div class="links">
+            <a class="projectlink live" href="sso/">Try the debugger <span>→</span></a>
+            <a class="projectlink" href="https://github.com/chadtollison/chadtollison.github.io/tree/main/sso" target="_blank" rel="noreferrer">Code <span>↗</span></a>
+          </div>
+          <a class="job-link" href="#case-identity">From my day job: SSO for 300+ customer organizations <span>→</span></a>
+        </article>
+      </div>
+
+      <article class="card side-project reactive" data-glow>
+        <div>
+          <small>ALSO BUILT · SAAS</small>
+          <h3>LocalLift</h3>
+          <p>A full-stack, multi-tenant SaaS app that helps local service businesses find opportunities and turn demand into customers. Next.js and TypeScript front end, Django REST back end, PostgreSQL, Celery, Redis and Stripe billing.</p>
+        </div>
+        <a class="projectlink" href="https://github.com/chadtollison/LocalLift" target="_blank" rel="noreferrer">View repository <span>↗</span></a>
+      </article>
+    </section>
+
+    <section id="work" data-reveal>
+      <div class="title"><b>02</b><h2>Work at my job</h2></div>
+      <p class="intro">Software Engineer at Babel Street since April 2020, where I own production identity, privacy and data systems. Each case study gives the problem, what I did and what changed. Proprietary code, customer data and internal details are left out on purpose.</p>
+
+      <div class="metrics">
+        <article class="reactive" data-glow>
+          <strong data-counter data-value="300" data-suffix="+">300+</strong>
+          <p>Customer organizations signing in through SSO I built</p>
+        </article>
+        <article class="reactive" data-glow>
+          <strong data-counter data-value="50" data-suffix="+ / day">50+ / day</strong>
+          <p>Privacy removal requests handled automatically</p>
+        </article>
+        <article class="reactive" data-glow>
+          <strong data-counter data-value="440" data-suffix="+ GB">440+ GB</strong>
+          <p>Reporting platform I architected</p>
+        </article>
+        <article class="reactive" data-glow>
+          <strong data-counter data-value="50" data-suffix="%">50%</strong>
+          <p>Lower service latency after a data-access rewrite</p>
+        </article>
+      </div>
+
+      <div class="cases">
+        <article class="case reactive" data-glow id="case-identity">
+          <div class="case-head">
+            <small>CASE STUDY · IDENTITY</small>
+            <h3>Enterprise SSO and user provisioning</h3>
+            <div class="tags"><span>C#/.NET</span><span>SAML 2.0</span><span>JWT</span><span>SCIM</span><span>Entra ID</span><span>NUnit</span></div>
+          </div>
+          <div class="pai">
+            <div><b>Problem</b><p>Enterprise customers needed their people to sign in with their own identity provider, and every onboarding meant hours of manual developer work to set up users.</p></div>
+            <div><b>What I did</b><p>Built a SAML 2.0 and JWT SSO framework with certificate validation, identity mapping and identity-provider integrations. Automated provisioning and deprovisioning with Microsoft Entra ID over SCIM. I own the C#/.NET microservices behind it for users, organizations, groups, permissions, quotas and passwords, and fixed CVEs and CodeQL findings such as SSRF and ReDoS across .NET, Node.js and Python.</p></div>
+            <div class="impact"><b>Impact</b><ul><li><strong>300+</strong> customer organizations sign in through it</li><li>Hours of manual developer work removed from every onboarding</li><li>Helped win new enterprise contracts</li></ul></div>
+          </div>
+          <a class="job-link mine" href="sso/">I turned what I learned into a free SAML &amp; SCIM debugger <span>→</span></a>
         </article>
 
-        <article class="card reactive" data-glow data-tilt>
-          <small>CASE STUDY · 04</small>
-          <h3>Enterprise Data Platform</h3>
-          <p>Architected a centralized 440+ GB reporting platform and end-to-end pipelines across SQL Server, PostgreSQL, MySQL, Elasticsearch, product analytics, and internal APIs.</p>
-          <div class="flow">Multi-source data → C# + Python ETL → SQL Server → BI & Analytics</div>
-          <div class="tags"><span>C#</span><span>Python</span><span>SQL Server</span><span>PostgreSQL</span><span>AWS</span></div>
+        <article class="case reactive" data-glow id="case-privacy">
+          <div class="case-head">
+            <small>CASE STUDY · PRIVACY</small>
+            <h3>Privacy request automation</h3>
+            <div class="tags"><span>C#</span><span>Python</span><span>AWS ECS</span><span>EventBridge</span><span>CloudFormation</span><span>Salesforce</span><span>AlloyDB</span></div>
+          </div>
+          <div class="pai">
+            <div><b>Problem</b><p>Each request to remove someone's personal data took about 2 hours by hand. Separately, privacy opt-outs in Salesforce had to be reconciled with the privacy database by an engineer and someone from legal.</p></div>
+            <div><b>What I did</b><p>Built a C# privacy microservice that owns intake, processing and the confirmation that no requester data remains. Built a containerized Python service on ECS that syncs Salesforce with the AlloyDB (PostgreSQL) privacy database every day, with idempotent batch writes, plus the CloudFormation for scheduling, metrics, alarms and dashboards, deployed by GitHub Actions.</p></div>
+            <div class="impact"><b>Impact</b><ul><li><strong>50+</strong> removal requests a day handled with no manual work</li><li>About <strong>12 hours a week</strong> of engineering and legal reconciliation gone</li><li>Zero redundant API writes</li></ul></div>
+          </div>
+          <a class="job-link mine" href="#projects">On my own time I built scrubpii, an open-source PII redactor <span>↑</span></a>
         </article>
 
-        <article class="card reactive" data-glow data-tilt>
-          <small>CASE STUDY · 05</small>
-          <h3>Customer Health Intelligence</h3>
-          <p>Designed a pipeline that analyzes six months of product usage, calculates growth and decline trends, and combines product signals with Salesforce data to surface retention risk and upsell opportunities.</p>
-          <div class="tags"><span>Data Pipelines</span><span>Salesforce</span><span>Analytics</span></div>
+        <article class="case reactive" data-glow id="case-data">
+          <div class="case-head">
+            <small>CASE STUDY · DATA PLATFORM</small>
+            <h3>Centralized reporting platform</h3>
+            <div class="tags"><span>SQL Server</span><span>C#</span><span>Python</span><span>ECS / Fargate</span><span>SSIS</span><span>Power BI</span></div>
+          </div>
+          <div class="pai">
+            <div><b>Problem</b><p>Product and API usage lived in separate systems: SQL Server, PostgreSQL, MySQL, Elasticsearch, product analytics and internal APIs. There was no single place to answer questions about customers.</p></div>
+            <div><b>What I did</b><p>Architected a centralized SQL Server reporting database fed by idempotent C# and Python ETL on ECS, scheduled by EventBridge. Delivered 30+ SSRS reports and 7 Power BI dashboards, a customer-health pipeline that combines six months of usage with Salesforce to flag retention risk and upsell chances, and a .NET 8 service that tracks customer API usage for billing and contract limits.</p></div>
+            <div class="impact"><b>Impact</b><ul><li><strong>440+ GB</strong> in one shared analytical layer</li><li>Feeds Power BI, QuickSight, SSRS and internal services</li><li>CX and product decisions made from one source</li></ul></div>
+          </div>
         </article>
 
-        <article class="card reactive" data-glow data-tilt>
-          <small>CASE STUDY · 06</small>
-          <h3>Cloud Observability & SLA Monitoring</h3>
-          <p>Built AWS monitoring with custom CloudWatch metrics, run-status tracking, dashboards, and 15+ automated alarms, alongside Sentry and Splunk. Added a daily runner that collects per-endpoint API metrics and GitHub Actions deployment-drift reporting that flags stale or missed releases across dev, test, and prod.</p>
-          <div class="tags"><span>CloudWatch</span><span>Sentry</span><span>Splunk</span><span>AWS</span></div>
+        <article class="case reactive" data-glow id="case-reliability">
+          <div class="case-head">
+            <small>CASE STUDY · PERFORMANCE &amp; RELIABILITY</small>
+            <h3>Faster, steadier production services</h3>
+            <div class="tags"><span>Dapper</span><span>SQL Server</span><span>CloudWatch</span><span>Sentry</span><span>GitHub Actions</span><span>Node.js</span></div>
+          </div>
+          <div class="pai">
+            <div><b>Problem</b><p>Blocking database calls and SQL Server parameter sniffing slowed services down, timeouts set off cascading retry storms, and releases could quietly go stale in one environment.</p></div>
+            <div><b>What I did</b><p>Replaced blocking ADO.NET calls with async Dapper and fixed the parameter sniffing. Built bounded-parallel document retrieval with cancellation so downstream connections can't be exhausted, and configurable retry controls for gateway timeouts. Added CloudWatch metrics and 15+ alarms with Sentry and Splunk, and a daily deployment-drift check across five environments. I lead production triage and customer escalations.</p></div>
+            <div class="impact"><b>Impact</b><ul><li>About <strong>50%</strong> lower service latency</li><li>Retry storms on 408 and 504 timeouts stopped</li><li>Stale or missed releases caught every day</li><li>Mentored four interns, two hired full-time</li></ul></div>
+          </div>
         </article>
 
-        <article class="card reactive" data-glow data-tilt>
-          <small>CASE STUDY · 07</small>
-          <h3>Enterprise Identity & User Platform</h3>
-          <p>Own C#/.NET microservices for organizations, users, groups, permissions, quotas, and password workflows, plus a SAML 2.0/JWT SSO framework used by 300+ customer organizations and Entra ID/SCIM provisioning that eliminates hours of manual developer work per onboarding request. Built a C# privacy microservice automating 50+ PII removal requests daily, replacing a workflow that required about 2 hours of manual processing per request. Automated daily Salesforce-to-AlloyDB privacy opt-out reconciliation in Python, eliminating 5–6 hours per day of manual work by a developer and a legal representative.</p>
-          <div class="tags"><span>C#/.NET</span><span>Python</span><span>Microservices</span><span>NUnit</span><span>SAML</span><span>SCIM</span><span>Salesforce</span></div>
-          <a class="projectlink live" href="sso/">Try my SAML &amp; SCIM debugger <span>→</span></a>
-        </article>
-
-        <article class="card reactive" data-glow data-tilt>
-          <small>CASE STUDY · 08</small>
-          <h3>AWS ETL & Infrastructure as Code</h3>
-          <p>Engineered idempotent Python/.NET workloads on ECS and infrastructure-as-code for scheduling, logging, IAM, and delivery. Also built a containerized .NET 8 service to track customer API usage through AWS API Gateway, giving CX visibility beyond billing. Exposure to Apache Spark and Airflow.</p>
-          <div class="flow">EventBridge → ECS → .NET / Python → SQL Server / S3</div>
-          <div class="tags"><span>ECS</span><span>Fargate</span><span>CloudFormation</span><span>Docker</span></div>
-        </article>
-
-        <article class="card reactive" data-glow data-tilt>
-          <small>CASE STUDY · 09</small>
-          <h3>AI Engineering & Automation</h3>
-          <p>Developed AI-assisted reporting and engineering workflows using Python, FastAPI, Vertex AI, and LLMs to summarize data, identify anomalies, assist troubleshooting, and accelerate investigation.</p>
-          <div class="tags"><span>Vertex AI</span><span>LLMs</span><span>FastAPI</span><span>Python</span></div>
+        <article class="case reactive" data-glow id="case-ai">
+          <div class="case-head">
+            <small>CASE STUDY · AI</small>
+            <h3>AI agents on Vertex AI</h3>
+            <div class="tags"><span>Vertex AI</span><span>Gemini</span><span>Claude</span><span>Python</span><span>FastAPI</span></div>
+          </div>
+          <div class="pai">
+            <div><b>Problem</b><p>Getting answers out of reports meant waiting on someone to dig through data, and routine engineering tickets took developer time.</p></div>
+            <div><b>What I did</b><p>Built a multi-model Gemini and Claude agent that writes executive report summaries and answers questions about them. Built an autonomous developer agent that takes a Jira ticket, explores several repositories, writes and tests the code and opens a GitHub pull request.</p></div>
+            <div class="impact"><b>Impact</b><ul><li>Report summaries and Q&amp;A on demand</li><li>Tickets go from Jira to a tested pull request</li></ul></div>
+          </div>
         </article>
       </div>
 
       <div class="diagrams">
-        <article class="card diagram-card reactive" data-glow data-chart>
-          <small>ARCHITECTURE · DATA PLATFORM (SIMPLIFIED)</small>
-          <h3>From scattered sources to one analytical layer</h3>
-          <div class="pipe">
-            <div class="pnode"><small>SOURCES</small><div class="pchips"><span>SQL Server</span><span>PostgreSQL</span><span>MySQL</span><span>Elasticsearch</span><span>Product analytics</span><span>Internal APIs</span></div></div>
-            <i class="plink" data-label="EXTRACT" style="--k:0"></i>
-            <div class="pnode"><small>SCHEDULED ETL</small><strong>EventBridge → ECS / Fargate</strong><p>Idempotent Python and .NET workloads</p></div>
-            <i class="plink" data-label="LOAD" style="--k:1"></i>
-            <div class="pnode core"><small>REPORTING DATABASE</small><strong>SQL Server</strong><p>440+ GB, one shared analytical layer</p></div>
-            <i class="plink" data-label="SERVE" style="--k:2"></i>
-            <div class="pnode"><small>CONSUMERS</small><div class="pchips"><span>Power BI</span><span>SSRS</span><span>QuickSight</span><span>Internal services</span></div></div>
-          </div>
-          <div class="pipe-foot"><small>OBSERVABILITY</small><span>CloudWatch custom metrics</span><span>15+ alarms</span><span>Sentry</span><span>Splunk</span></div>
-        </article>
-
         <article class="card diagram-card reactive" data-glow data-chart>
           <small>ARCHITECTURE · IDENTITY AND PRIVACY (SIMPLIFIED)</small>
           <h3>How people get in, and how their data gets out</h3>
@@ -278,7 +289,7 @@
             </div>
           </div>
           <div class="lane">
-            <p class="lane-title">Privacy opt-out sync <span>· daily, replaced 5–6 hours/day of manual work</span></p>
+            <p class="lane-title">Privacy opt-out sync <span>· daily, about 12 hours a week of manual work removed</span></p>
             <div class="pipe">
               <div class="pnode"><small>CRM</small><strong>Salesforce</strong><p>Contact opt-out preferences</p></div>
               <i class="plink" data-label="REST API" style="--k:0"></i>
@@ -288,31 +299,85 @@
             </div>
           </div>
         </article>
+
+        <article class="card diagram-card reactive" data-glow data-chart>
+          <small>ARCHITECTURE · DATA PLATFORM (SIMPLIFIED)</small>
+          <h3>From scattered sources to one analytical layer</h3>
+          <div class="pipe">
+            <div class="pnode"><small>SOURCES</small><div class="pchips"><span>SQL Server</span><span>PostgreSQL</span><span>MySQL</span><span>Elasticsearch</span><span>Product analytics</span><span>Internal APIs</span></div></div>
+            <i class="plink" data-label="EXTRACT" style="--k:0"></i>
+            <div class="pnode"><small>SCHEDULED ETL</small><strong>EventBridge → ECS / Fargate</strong><p>Idempotent Python and .NET workloads</p></div>
+            <i class="plink" data-label="LOAD" style="--k:1"></i>
+            <div class="pnode core"><small>REPORTING DATABASE</small><strong>SQL Server</strong><p>440+ GB, one shared analytical layer</p></div>
+            <i class="plink" data-label="SERVE" style="--k:2"></i>
+            <div class="pnode"><small>CONSUMERS</small><div class="pchips"><span>Power BI</span><span>SSRS</span><span>QuickSight</span><span>Internal services</span></div></div>
+          </div>
+          <div class="pipe-foot"><small>OBSERVABILITY</small><span>CloudWatch custom metrics</span><span>15+ alarms</span><span>Sentry</span><span>Splunk</span></div>
+        </article>
       </div>
     </section>
 
     <section id="experience" data-reveal>
-      <div class="title"><b>04</b><h2>Experience</h2></div>
+      <div class="title"><b>03</b><h2>Experience</h2></div>
+      <p class="intro">Ten years across healthcare, state government and software, growing from data analyst to software engineer.</p>
+      <div class="career-grid">
+        <article class="card donut-card reactive" data-glow data-chart>
+          <small>TIME BY ORGANIZATION</small>
+          <div class="donut" role="img" aria-label="Donut chart of ten years of experience at Babel Street, Blue Cross Blue Shield of Mississippi and nSPARC">
+            <svg viewBox="0 0 200 200" aria-hidden="true">
+              <circle class="track" cx="100" cy="100" r="80" pathLength="100"/>
+              <circle class="seg s1" data-key="bcbs" data-start="2016-06" data-end="2018-06" cx="100" cy="100" r="80" pathLength="100" style="--len:18.1;--rest:81.9;stroke-dashoffset:0"/>
+              <circle class="seg s2" data-key="nsparc" data-start="2018-07" data-end="2020-04" cx="100" cy="100" r="80" pathLength="100" style="--len:16.5;--rest:83.5;stroke-dashoffset:-19.3"/>
+              <circle class="seg s3" data-key="babel" data-start="2020-04" data-end="now" cx="100" cy="100" r="80" pathLength="100" style="--len:61.8;--rest:38.2;stroke-dashoffset:-37"/>
+            </svg>
+            <div class="donut-center"><strong data-counter data-years-total data-value="10" data-suffix="">10</strong><span>YEARS</span></div>
+          </div>
+          <ul class="legend">
+            <li><i style="background:var(--violet)"></i><div><strong>Blue Cross Blue Shield of Mississippi</strong>Data / Information Analyst</div><b data-dur="bcbs">2 yrs</b></li>
+            <li><i style="background:var(--blue)"></i><div><strong>nSPARC, Mississippi State University</strong>Data Analyst</div><b data-dur="nsparc">1.8 yrs</b></li>
+            <li><i style="background:var(--accent)"></i><div><strong>Babel Street</strong>Software Engineer</div><b data-dur="babel">6.6 yrs</b></li>
+          </ul>
+        </article>
+
+        <article class="card gantt-card reactive" data-glow data-chart>
+          <small>TIMELINE · 2016 TO PRESENT</small>
+          <div class="gantt" data-axis-start="2016-01" data-axis-end="2027-01">
+            <div class="gantt-axis">
+              <div></div>
+              <div class="ticks"><span style="--x:0%">2016</span><span style="--x:18.18%">2018</span><span style="--x:36.36%">2020</span><span style="--x:54.55%">2022</span><span style="--x:72.73%">2024</span><span style="--x:90.91%">2026</span></div>
+            </div>
+            <div class="gantt-row">
+              <div class="gantt-meta"><strong>BCBS Mississippi</strong><span>Enterprise ETL in a HIPAA-regulated environment</span></div>
+              <div class="gantt-track"><i class="gantt-bar" title="June 2016 – June 2018" data-start="2016-06" data-end="2018-06" style="--c:var(--violet);--l:3.79%;--w:18.94%;--d:.1s"></i></div>
+            </div>
+            <div class="gantt-row">
+              <div class="gantt-meta"><strong>nSPARC · Mississippi State</strong><span>2+ TB statewide longitudinal data system</span></div>
+              <div class="gantt-track"><i class="gantt-bar" title="July 2018 – April 2020" data-start="2018-07" data-end="2020-04" style="--c:var(--blue);--l:22.73%;--w:16.67%;--d:.32s"></i></div>
+            </div>
+            <div class="gantt-row">
+              <div class="gantt-meta"><strong>Babel Street</strong><span>Identity, privacy, data and AI</span></div>
+              <div class="gantt-track"><i class="gantt-bar live" title="April 2020 – present" data-start="2020-04" data-end="now" style="--c:var(--accent);--l:38.64%;--w:59.26%;--d:.54s"></i></div>
+            </div>
+          </div>
+          <div class="path" aria-label="Career path">
+            <span>Data / Information Analyst</span><i>→</i><span>Data Analyst</span><i>→</i><span>Software Engineer II</span><i>→</i><span>Software Engineer III</span><i>→</i><span>Software Engineer</span>
+          </div>
+        </article>
+      </div>
+
       <div class="experience-list">
         <article class="experience-card reactive" data-glow>
           <div class="experience-heading">
             <div><p class="role-path">Software Engineer</p><h3>Babel Street</h3></div>
             <span>April 2020 — Present</span>
           </div>
-          <p class="experience-summary">Software and data engineer owning production microservices and APIs for identity, privacy requests, and usage tracking, plus the data platforms and AWS workloads behind them.</p>
-
-          <p class="kicker exp-group">Software &amp; Identity Engineering</p>
-          <div class="impact-grid">
-            <div><strong>Identity &amp; Security</strong><p>Built a SAML 2.0/JWT SSO framework used by 300+ customer organizations, including certificate validation, identity mapping, and identity-provider integrations; helped win new contracts. Automated user provisioning and deprovisioning with Microsoft Entra ID and SCIM, eliminating hours of manual developer work per onboarding request. Remediated dependency CVEs and CodeQL findings across .NET, Node.js/TypeScript, and Python, addressing SSRF, ReDoS, URL sanitization, insecure randomness, and TLS issues.</p></div>
-            <div><strong>C#/.NET &amp; Platform Engineering</strong><p>Own C#/.NET microservices for users, organizations, groups, permissions, quotas, and password workflows; maintain NUnit tests and optimize SQL Server stored procedures, indexes, table-valued parameters, and Dapper operations. Built a C# privacy microservice automating 50+ PII removal requests daily, replacing about 2 hours of manual processing per request. Automated daily privacy opt-out reconciliation between Salesforce CRM and an AlloyDB (PostgreSQL) privacy database with a Python service on ECS and EventBridge, eliminating 5–6 hours per day of manual work by a developer and a legal representative. Built a containerized .NET 8 service to track customer API usage through AWS API Gateway, giving CX visibility beyond billing to identify usage issues and support needs.</p></div>
-            <div><strong>Production Support &amp; Mentoring</strong><p>Lead production triage and customer escalations for API errors, timeouts, search hangs, and export failures using Sentry and CloudWatch. Built deployment-drift reports and GitHub Actions workflows to catch stale or missed releases. Mentored four interns; two were hired full-time.</p></div>
-          </div>
-
-          <p class="kicker exp-group">Data Engineering &amp; Analytics</p>
-          <div class="impact-grid">
-            <div><strong>Data Platforms &amp; Analytics</strong><p>Architected a 440+ GB centralized reporting database consolidating product and API usage into a shared analytical layer for Power BI, QuickSight, SSRS, and internal services, with SSIS, 30+ SSRS reports, and 7 Power BI dashboards for CX and product decisions. Also work with Elasticsearch datasets exceeding 5 TB.</p></div>
-            <div><strong>ETL &amp; AWS Workloads</strong><p>Engineered Python and C# ETL on AWS to load API and product-usage metrics into SQL Server and CloudWatch for usage reporting, monthly login analysis, and session tracking; configured 15+ alarms with Sentry and Splunk monitoring. Workloads run on ECS/Fargate and EC2 with S3, ECR, EventBridge, IAM, CloudFormation, Docker, and GitHub Actions.</p></div>
-            <div><strong>AI &amp; Automation</strong><p>Developed Python/FastAPI and Vertex AI workflows for reporting summaries, anomaly detection, engineering investigation, bug triage, proposed fixes, and deployment-environment drift monitoring.</p></div>
+          <p class="experience-summary">I own production C#/.NET and Python services for identity, privacy and usage tracking, plus the data platform and AWS workloads behind them. I also build Next.js and React features for the search application, lead production triage and mentor interns.</p>
+          <div class="case-jump">
+            <a href="#case-identity">Enterprise SSO <span>↑</span></a>
+            <a href="#case-privacy">Privacy automation <span>↑</span></a>
+            <a href="#case-data">Reporting platform <span>↑</span></a>
+            <a href="#case-reliability">Performance &amp; reliability <span>↑</span></a>
+            <a href="#case-ai">AI agents <span>↑</span></a>
           </div>
         </article>
 
@@ -323,9 +388,9 @@
           </div>
           <p class="experience-summary">Engineered longitudinal data and analytics systems supporting education, workforce, and government research programs.</p>
           <div class="impact-grid">
-            <div><strong>Large-Scale ETL</strong><p>Built and operated ETL workflows for 2+ TB of education, workforce, unemployment, government-program, and student-record data using SQL Server, SSIS, Python, C#, and stored procedures.</p></div>
+            <div><strong>Large-Scale ETL</strong><p>Built and operated ETL workflows for 2+ TB of education, workforce, unemployment, government-program, and student-record data for Mississippi's Statewide Longitudinal Data System (LifeTracks), using SQL Server, SSIS, Python, C#, and stored procedures.</p></div>
             <div><strong>Data Engineering</strong><p>Normalized source data, designed repeatable transformations and loads, validated data quality, and prepared integrated datasets for downstream analysis and reporting.</p></div>
-            <div><strong>Privacy & Government Data</strong><p>De-identified personally identifiable information and worked with longitudinal datasets supplied by Mississippi education, community college/university, workforce, and other state partners.</p></div>
+            <div><strong>Privacy &amp; Government Data</strong><p>De-identified personally identifiable information and worked with longitudinal datasets supplied by Mississippi education, community college/university, workforce, and other state partners.</p></div>
           </div>
         </article>
 
@@ -345,7 +410,7 @@
     </section>
 
     <section id="skills" data-reveal>
-      <div class="title"><b>05</b><h2>Technical toolkit</h2></div>
+      <div class="title"><b>04</b><h2>Technical toolkit</h2></div>
       <div class="venn" data-chart role="img" aria-label="Venn diagram: software and identity skills on the left, data engineering skills on the right, and shared platform skills in the overlap">
         <div class="venn-circle l" aria-hidden="true"></div>
         <div class="venn-circle r" aria-hidden="true"></div>
@@ -364,7 +429,7 @@
     </section>
 
     <section class="education" data-reveal>
-      <div class="title"><b>06</b><h2>Education &amp; certifications</h2></div>
+      <div class="title"><b>05</b><h2>Education &amp; certifications</h2></div>
       <div class="edu reactive" data-glow>
         <div><strong>Bachelor of Business Administration</strong><h3>Major in Business Information Systems</h3></div>
         <p>Mississippi State University<br><span>May 2016</span></p>
@@ -382,6 +447,10 @@
         <p>Databricks<br><span class="verify">Verify credential ↗</span></p>
       </a>
       <div class="edu reactive" data-glow>
+        <div><strong>Certification</strong><h3>Hands-On Essentials: Data Warehouse</h3></div>
+        <p>Snowflake<br><span>2026</span></p>
+      </div>
+      <div class="edu reactive" data-glow>
         <div><strong>Certification</strong><h3>SAFe for Teams</h3></div>
         <p>Scaled Agile</p>
       </div>
@@ -389,8 +458,8 @@
 
     <section id="contact" class="contact reactive" data-glow data-reveal>
       <p class="kicker">LET'S BUILD SOMETHING THAT MATTERS</p>
-      <h2>Interested in working together?</h2>
-      <p>I'm interested in senior software, backend, data platform, cloud, and AI-enabled engineering opportunities where I can own meaningful systems from architecture through production. Open to remote.</p>
+      <h2>Hiring for identity, data or AI engineering?</h2>
+      <p>I'm looking for senior software, identity, data platform and AI engineering roles where I can own systems from architecture through production. Open to remote.</p>
       <div class="buttons">
         <a class="primary magnetic" href="mailto:mchadtollison@gmail.com">Email me <span>↗</span></a>
         <a class="secondary magnetic" href="https://www.linkedin.com/in/michael-chad-tollison" target="_blank" rel="noreferrer">LinkedIn ↗</a>
@@ -401,7 +470,7 @@
   </main>
 
   <footer><span>Michael Chad Tollison</span><span>Software & Data Engineer</span><span id="year"></span></footer>
-  <script src="script.js?v=2026-11-26"></script>
+  <script src="script.js?v=2026-11-28a"></script>
   <!-- Private visitor stats: https://chadtollison.goatcounter.com -->
   <script data-goatcounter="https://chadtollison.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
